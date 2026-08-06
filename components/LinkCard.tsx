@@ -2,11 +2,12 @@
 import { useState } from "react";
 import { gradeBridge, type BridgeGrade } from "@/lib/linkGrade";
 import { useLinkProgress } from "@/lib/state/useLinkProgress";
+import { speakCoach } from "@/lib/voice/playSpeech";
 import type { LinkScenario, LinkCandidate, CoachResponse } from "@/lib/schemas";
 
 export function LinkCard({ scenario, onExit }: { scenario: LinkScenario; onExit: () => void }) {
   const [progress, update] = useLinkProgress(scenario.id);
-  const [placed, setPlaced] = useState<string[]>(progress.placedIds);
+  const placed = progress.placedIds;
   const [grade, setGrade] = useState<BridgeGrade | null>(null);
   const [reactions, setReactions] = useState<Record<string, string>>({});
   const [coachError, setCoachError] = useState<Record<string, boolean>>({});
@@ -15,13 +16,14 @@ export function LinkCard({ scenario, onExit }: { scenario: LinkScenario; onExit:
 
   function toggle(id: string) {
     setGrade(null); // re-sorting invalidates the last test
-    setPlaced((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    const next = placed.includes(id) ? placed.filter((x) => x !== id) : [...placed, id];
+    update({ placedIds: next });
   }
 
   function test() {
     const g = gradeBridge(scenario, placed);
     setGrade(g);
-    update({ placedIds: placed, held: g.held });
+    update({ held: g.held });
   }
 
   async function talkThrough(c: LinkCandidate) {
@@ -38,7 +40,10 @@ export function LinkCard({ scenario, onExit }: { scenario: LinkScenario; onExit:
       });
       if (!res.ok) throw new Error("coach failed");
       const data: CoachResponse = await res.json();
-      if (data.kind === "link") setReactions((r) => ({ ...r, [c.id]: data.reaction }));
+      if (data.kind === "link") {
+        setReactions((r) => ({ ...r, [c.id]: data.reaction }));
+        void speakCoach(data.reaction);
+      }
     } catch {
       setCoachError((e) => ({ ...e, [c.id]: true }));
     }

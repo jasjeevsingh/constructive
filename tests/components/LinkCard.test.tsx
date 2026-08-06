@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LinkCard } from "@/components/LinkCard";
 import type { LinkScenario } from "@/lib/schemas";
+import { LINK_STORAGE_KEY } from "@/lib/state/linkProgress";
 
 const scenario: LinkScenario = {
   id: "s",
@@ -56,5 +57,12 @@ describe("LinkCard", () => {
     await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
     await userEvent.click(screen.getAllByRole("button", { name: /talk this through/i })[0]);
     expect(await screen.findByText(/tempting, but it argues the other way/i)).toBeInTheDocument();
+  });
+
+  it("restores a previously placed plank from localStorage on mount", async () => {
+    localStorage.setItem(LINK_STORAGE_KEY, JSON.stringify({ [scenario.id]: { placedIds: ["e1"], held: false } }));
+    render(<LinkCard scenario={scenario} onExit={() => {}} />);
+    // e1 was placed → its toggle should now read "Set aside", found via aria-label.
+    expect(await screen.findByRole("button", { name: /set aside .*stress/i })).toBeInTheDocument();
   });
 });
