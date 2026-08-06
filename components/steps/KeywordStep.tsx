@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { segmentMotion } from "@/lib/keywordMatch";
 import type { Motion, CoachResponse } from "@/lib/schemas";
 
 export function KeywordStep({
@@ -12,8 +13,6 @@ export function KeywordStep({
 }) {
   const [active, setActive] = useState<Motion["keywords"][number] | null>(null);
   const [reaction, setReaction] = useState<string | null>(null);
-
-  const keywordSet = new Set(motion.keywords.map((k) => k.word.toLowerCase()));
 
   async function submit(answer: string) {
     if (!active) return;
@@ -33,21 +32,20 @@ export function KeywordStep({
   return (
     <div>
       <p className="serif" style={{ fontSize: 22 }}>
-        {motion.motion.split(/(\s+)/).map((tok, i) => {
-          const clean = tok.trim().replace(/[.,]/g, "").toLowerCase();
-          const kw = motion.keywords.find((k) => k.word.toLowerCase() === clean);
-          if (kw && keywordSet.has(clean)) {
+        {segmentMotion(motion.motion, motion.keywords).map((segment, i) => {
+          if (segment.keyword) {
+            const kw = segment.keyword;
             return (
               <span
                 key={i}
                 onClick={() => { setActive(kw); setReaction(null); }}
                 style={{ cursor: "pointer", color: "var(--gold)", borderBottom: "2px dashed var(--gold)" }}
               >
-                {tok}
+                {segment.text}
               </span>
             );
           }
-          return <span key={i}>{tok}</span>;
+          return <span key={i}>{segment.text}</span>;
         })}
       </p>
       {active && (
