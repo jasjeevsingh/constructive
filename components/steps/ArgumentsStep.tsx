@@ -15,6 +15,8 @@ export function ArgumentsStep({
   const [argsAgainst, setAgainst] = useState<string[]>([...EMPTY]);
   const [verdicts, setVerdicts] = useState<RefineVerdict[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [attempted, setAttempted] = useState(false);
 
   const allFilled = [...argsFor, ...argsAgainst].every((a) => a.trim().length > 0);
 
@@ -24,16 +26,24 @@ export function ArgumentsStep({
 
   async function refine() {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/coach", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ step: "refine", motion, payload: { argsFor, argsAgainst } }),
       });
+      if (!res.ok) {
+        setError("The coach is unavailable right now — you can keep going.");
+        return;
+      }
       const data: CoachResponse = await res.json();
       if (data.kind === "refine") setVerdicts(data.verdicts);
+    } catch {
+      setError("The coach is unavailable right now — you can keep going.");
     } finally {
       setLoading(false);
+      setAttempted(true);
     }
   }
 
@@ -79,12 +89,13 @@ export function ArgumentsStep({
         <button type="button" onClick={refine} disabled={!allFilled || loading}>
           {loading ? "Refining…" : "Refine all six"}
         </button>
-        {verdicts.length > 0 && (
+        {(verdicts.length > 0 || attempted) && (
           <button type="button" onClick={() => onDone({ argsFor, argsAgainst })}>
             Done
           </button>
         )}
       </div>
+      {error && <p style={{ color: "var(--orange-light)", fontSize: 13, marginTop: 8 }}>{error}</p>}
     </div>
   );
 }

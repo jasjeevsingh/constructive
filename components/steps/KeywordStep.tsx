@@ -13,20 +13,30 @@ export function KeywordStep({
 }) {
   const [active, setActive] = useState<Motion["keywords"][number] | null>(null);
   const [reaction, setReaction] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function submit(answer: string) {
     if (!active) return;
-    const res = await fetch("/api/coach", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        step: "keyword",
-        motion: motion.motion,
-        payload: { word: active.word, hint: active.hint, answer },
-      }),
-    });
-    const data: CoachResponse = await res.json();
-    if (data.kind === "keyword") setReaction(data.reaction);
+    setError(null);
+    try {
+      const res = await fetch("/api/coach", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          step: "keyword",
+          motion: motion.motion,
+          payload: { word: active.word, hint: active.hint, answer },
+        }),
+      });
+      if (!res.ok) {
+        setError("The coach is unavailable right now — you can keep going.");
+        return;
+      }
+      const data: CoachResponse = await res.json();
+      if (data.kind === "keyword") setReaction(data.reaction);
+    } catch {
+      setError("The coach is unavailable right now — you can keep going.");
+    }
   }
 
   return (
@@ -52,6 +62,7 @@ export function KeywordStep({
         <div style={{ marginTop: 12 }}>
           <VoiceOrTextInput label={`What's the scope of "${active.word}" here — and why?`} onSubmit={submit} />
           {reaction && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>💬 {reaction}</p>}
+          {error && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>{error}</p>}
         </div>
       )}
       <button type="button" style={{ marginTop: 14 }} onClick={onNext}>

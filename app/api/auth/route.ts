@@ -1,4 +1,4 @@
-import { AUTH_COOKIE, checkPassword } from "@/lib/auth";
+import { AUTH_COOKIE, checkPassword, sessionToken } from "@/lib/auth";
 
 export async function POST(req: Request): Promise<Response> {
   let body: { password?: string };
@@ -12,11 +12,13 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ ok: false }, { status: 401 });
   }
 
+  const token = await sessionToken(process.env.APP_PASSWORD!);
+
   const headers = new Headers();
   headers.append("content-type", "application/json");
   headers.append(
     "set-cookie",
-    `${AUTH_COOKIE}=ok; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`
+    `${AUTH_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000`
   );
   return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
 }
