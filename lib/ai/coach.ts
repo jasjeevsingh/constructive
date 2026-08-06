@@ -1,6 +1,7 @@
 import { restatePrompt } from "@/lib/prompts/restate";
 import { keywordPrompt } from "@/lib/prompts/keyword";
 import { refinePrompt } from "@/lib/prompts/refine";
+import { linkPrompt } from "@/lib/prompts/link";
 import { CoachResponseSchema, type CoachRequest, type CoachResponse } from "@/lib/schemas";
 import type { ChatClient } from "@/lib/ai/claude";
 
@@ -21,6 +22,13 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
         motion: req.motion,
         argsFor: (p.argsFor as string[]) ?? [],
         argsAgainst: (p.argsAgainst as string[]) ?? [],
+      });
+    case "link":
+      return linkPrompt({
+        claim: req.motion,
+        impact: String(p.impact ?? ""),
+        candidateText: String(p.candidateText ?? ""),
+        verdict: String(p.verdict ?? ""),
       });
   }
 }

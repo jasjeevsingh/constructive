@@ -16,7 +16,7 @@ export type Motion = z.infer<typeof MotionSchema>;
 
 export const MotionsFileSchema = z.array(MotionSchema);
 
-export const CoachStepSchema = z.enum(["restate", "keyword", "refine"]);
+export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link"]);
 export type CoachStep = z.infer<typeof CoachStepSchema>;
 
 export const CoachRequestSchema = z.object({
@@ -45,10 +45,15 @@ export const RefineResponseSchema = z.object({
   verdicts: z.array(RefineVerdictSchema),
   duplicateGroups: z.array(z.array(z.string())),
 });
+export const LinkResponseSchema = z.object({
+  kind: z.literal("link"),
+  reaction: z.string(),
+});
 export const CoachResponseSchema = z.discriminatedUnion("kind", [
   RestateResponseSchema,
   KeywordResponseSchema,
   RefineResponseSchema,
+  LinkResponseSchema,
 ]);
 export type CoachResponse = z.infer<typeof CoachResponseSchema>;
 export type RefineVerdict = z.infer<typeof RefineVerdictSchema>;
