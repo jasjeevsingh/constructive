@@ -6,14 +6,19 @@ export function Gate() {
   const [error, setError] = useState(false);
 
   async function submit() {
-    const res = await fetch("/api/auth", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (res.ok) {
-      window.location.href = "/";
-    } else {
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        setError(true);
+      }
+    } catch (err) {
+      console.error(err);
       setError(true);
     }
   }

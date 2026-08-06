@@ -17,23 +17,34 @@ export function VoiceOrTextInput({
 
   async function record() {
     // Minimal batch capture: record one clip, POST to /api/transcribe, fill the textarea.
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      console.error(err);
+      return;
+    }
     const chunks: BlobPart[] = [];
     const rec = new MediaRecorder(stream);
     rec.ondataavailable = (e) => chunks.push(e.data);
     rec.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      const res = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: { "content-type": "audio/webm" },
-        body: blob,
-      });
-      if (res.ok) {
-        const { text: t } = await res.json();
-        setText((prev) => (prev ? `${prev} ${t}` : t));
+      try {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const res = await fetch("/api/transcribe", {
+          method: "POST",
+          headers: { "content-type": "audio/webm" },
+          body: blob,
+        });
+        if (res.ok) {
+          const { text: t } = await res.json();
+          setText((prev) => (prev ? `${prev} ${t}` : t));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setRecording(false);
       }
-      setRecording(false);
     };
     rec.start();
     setRecording(true);
