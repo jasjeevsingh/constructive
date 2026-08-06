@@ -11,7 +11,7 @@ function post(bytes: Uint8Array): Request {
   return new Request("http://test/api/transcribe", {
     method: "POST",
     headers: { "content-type": "audio/webm" },
-    body: bytes,
+    body: Buffer.from(bytes),
   });
 }
 
