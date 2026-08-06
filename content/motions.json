@@ -1,0 +1,31 @@
+[
+  {
+    "id": "m-homework",
+    "motion": "This House would ban homework.",
+    "keywords": [
+      { "word": "ban", "hint": "Total ban or limits? The strength of the wording matters." },
+      { "word": "homework", "hint": "What counts — reading? projects? What's the scope?" }
+    ],
+    "theme": "general"
+  },
+  {
+    "id": "m-kids-vote",
+    "motion": "This House would let kids vote.",
+    "keywords": [
+      { "word": "House", "hint": null },
+      { "word": "kids", "hint": "Age 5 or 17? Scope is the real fight here." },
+      { "word": "vote", "hint": "In every election, or only some?" }
+    ],
+    "theme": "general"
+  },
+  {
+    "id": "m-social-media",
+    "motion": "This House would ban social media for under-16s.",
+    "keywords": [
+      { "word": "ban", "hint": null },
+      { "word": "social media", "hint": "Does this include messaging apps and YouTube?" },
+      { "word": "under-16s", "hint": "How would this even be enforced?" }
+    ],
+    "theme": "general"
+  }
+]
