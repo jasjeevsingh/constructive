@@ -90,7 +90,8 @@ stepped wizard).
   - **Never rewrites the argument for the student.** It nudges only.
 
 ### Modality
-- **Voice-first** everywhere (Deepgram), with a quiet "type instead" fallback on every input.
+- **Voice-first** on the reflective single-answer steps (restate, keyword), via Deepgram, with a quiet "type instead" fallback.
+- **Carve-out:** Step 3's six-box argument grid is text-only for the prototype — a deliberate exception to voice-first, since the rapid brainstorm grid would be cluttered by six separate mic affordances. Voice on the argument boxes is a possible fast-follow.
 - Interactive/clickable elements are core to step 2.
 
 ## Content model
