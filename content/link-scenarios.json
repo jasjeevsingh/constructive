@@ -1,0 +1,35 @@
+[
+  {
+    "id": "ls-homework",
+    "claim": "This House would ban homework.",
+    "impact": "Kids get more time for family, sleep, and play.",
+    "candidates": [
+      { "id": "c1", "text": "Without homework, evenings are freed for rest and family.", "material": "reasoning", "verdict": "fits", "explanation": "Directly connects banning homework to the extra family time." },
+      { "id": "c2", "text": "Research links heavy homework loads to student stress and lost sleep.", "material": "evidence", "verdict": "fits", "explanation": "Evidence that removing homework supports sleep and wellbeing." },
+      { "id": "c3", "text": "A Harvard study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive and real, but it argues FOR homework — it does not bridge to this impact." },
+      { "id": "c4", "text": "Homework teaches time-management skills.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A point about a different impact; it does not connect to family/sleep/play time." }
+    ]
+  },
+  {
+    "id": "ls-phones",
+    "claim": "This House would ban phones in classrooms.",
+    "impact": "Students focus better and learn more.",
+    "candidates": [
+      { "id": "c1", "text": "Without phones, students aren't pulled away by notifications mid-lesson.", "material": "reasoning", "verdict": "fits", "explanation": "Links the ban to sustained attention, which supports learning." },
+      { "id": "c2", "text": "Schools that restricted phones reported higher test results the next year.", "material": "evidence", "verdict": "fits", "explanation": "Evidence tying the ban to improved learning outcomes." },
+      { "id": "c3", "text": "Smartphones are the best-selling consumer electronic of all time.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "A strong-sounding fact that has nothing to do with classroom focus." },
+      { "id": "c4", "text": "Phones can be used as calculators.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Argues the other way and doesn't connect to the focus impact." }
+    ]
+  },
+  {
+    "id": "ls-voting-age",
+    "claim": "This House would lower the voting age to 16.",
+    "impact": "Young people become lifelong, engaged voters.",
+    "candidates": [
+      { "id": "c1", "text": "Voting while still in school builds a habit that carries into adulthood.", "material": "reasoning", "verdict": "fits", "explanation": "Connects early voting to lifelong engagement." },
+      { "id": "c2", "text": "Turnout studies show first voting at 16-17 predicts higher lifelong turnout.", "material": "evidence", "verdict": "fits", "explanation": "Evidence directly supporting the lifelong-engagement impact." },
+      { "id": "c3", "text": "A famous economist won a Nobel Prize for work on voting systems.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative but irrelevant to whether 16-year-olds become engaged voters." },
+      { "id": "c4", "text": "16-year-olds can already drive in some places.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "An analogy about maturity, not a bridge to lifelong voting engagement." }
+    ]
+  }
+]

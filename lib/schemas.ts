@@ -52,3 +52,28 @@ export const CoachResponseSchema = z.discriminatedUnion("kind", [
 ]);
 export type CoachResponse = z.infer<typeof CoachResponseSchema>;
 export type RefineVerdict = z.infer<typeof RefineVerdictSchema>;
+
+export const LinkMaterialSchema = z.enum(["evidence", "reasoning"]);
+export type LinkMaterial = z.infer<typeof LinkMaterialSchema>;
+
+export const LinkVerdictSchema = z.enum(["fits", "doesnt-fit", "great-but-wrong"]);
+export type LinkVerdict = z.infer<typeof LinkVerdictSchema>;
+
+export const LinkCandidateSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  material: LinkMaterialSchema,
+  verdict: LinkVerdictSchema,
+  explanation: z.string().min(1),
+});
+export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
+
+export const LinkScenarioSchema = z.object({
+  id: z.string().min(1),
+  claim: z.string().min(1),
+  impact: z.string().min(1),
+  candidates: z.array(LinkCandidateSchema).min(2),
+});
+export type LinkScenario = z.infer<typeof LinkScenarioSchema>;
+
+export const LinkScenariosFileSchema = z.array(LinkScenarioSchema);
