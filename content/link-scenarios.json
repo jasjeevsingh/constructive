@@ -31,5 +31,38 @@
       { "id": "c3", "text": "A famous economist won a Nobel Prize for work on voting systems.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative but irrelevant to whether 16-year-olds become engaged voters." },
       { "id": "c4", "text": "16-year-olds can already drive in some places.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "An analogy about maturity, not a bridge to lifelong voting engagement." }
     ]
+  },
+  {
+    "id": "ls-uniforms",
+    "claim": "This House would require school uniforms.",
+    "impact": "Students focus on learning instead of fashion competition.",
+    "candidates": [
+      { "id": "c1", "text": "When students wear the same uniform, they stop comparing clothes and judging each other's style, freeing mental energy for classwork.", "material": "reasoning", "verdict": "fits", "explanation": "Directly links uniforms to reduced fashion distraction and increased focus on learning." },
+      { "id": "c2", "text": "Schools in the UK that adopted uniforms reported a 5-10% increase in grades within a year.", "material": "evidence", "verdict": "fits", "explanation": "Evidence showing uniforms improve academic outcomes by reducing social comparison." },
+      { "id": "c3", "text": "Uniforms are worn by military personnel, flight crews, and elite athletes, demonstrating their power to build discipline and professionalism.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds authoritative but does not establish a link between uniforms and classroom focus or reduced fashion pressure." },
+      { "id": "c4", "text": "Uniforms are expensive to buy and sometimes hard for families to afford.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Raises a cost concern, not a bridge to the learning-focus impact." }
+    ]
+  },
+  {
+    "id": "ls-recess",
+    "claim": "This House would increase school recess time.",
+    "impact": "Students perform better academically and have improved mental health.",
+    "candidates": [
+      { "id": "c1", "text": "Time outdoors helps kids burn physical energy and return to class refreshed, allowing them to focus better on lessons.", "material": "reasoning", "verdict": "fits", "explanation": "Connects increased recess to classroom focus and learning readiness." },
+      { "id": "c2", "text": "Research shows students who get 30+ minutes of daily unstructured play improve reading and math scores by an average of 10%.", "material": "evidence", "verdict": "fits", "explanation": "Evidence linking play time to improved academic performance." },
+      { "id": "c3", "text": "Playing sports and outdoor games teaches teamwork, leadership, and resilience—all essential life skills.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "True and impressive, but these soft-skills benefits do not necessarily translate to better academic performance or mental health." },
+      { "id": "c4", "text": "More recess time means fewer hours for teaching core subjects like math and reading.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Argues the opposite position and does not address the learning or mental-health impact." }
+    ]
+  },
+  {
+    "id": "ls-screen-time",
+    "claim": "This House would restrict student screen time during school hours.",
+    "impact": "Students concentrate better in class and retain information more effectively.",
+    "candidates": [
+      { "id": "c1", "text": "Without personal devices available during lessons, students' attention spans recover and they can follow along with classroom instruction for longer stretches.", "material": "reasoning", "verdict": "fits", "explanation": "Directly connects screen restrictions to improved focus and sustained attention in class." },
+      { "id": "c2", "text": "Schools that banned personal devices during lessons saw test scores rise by 8% within six months, especially in reading comprehension and retention.", "material": "evidence", "verdict": "fits", "explanation": "Evidence showing screen restrictions lead to better academic retention and test performance." },
+      { "id": "c3", "text": "Technology and digital literacy are essential to modern careers and students must be prepared for a digital-first future.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Important-sounding but argues FOR unrestricted screen use during school, directly opposing the motion." },
+      { "id": "c4", "text": "Screen-based learning tools help students with visual or auditory disabilities access classroom content.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Raises accessibility benefits, not a bridge to the concentration or retention impact." }
+    ]
   }
 ]
