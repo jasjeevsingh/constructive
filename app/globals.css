@@ -1,0 +1,23 @@
+:root {
+  --navy: #0A1628;
+  --navy-mid: #112240;
+  --navy-light: #1B3461;
+  --gold: #C8962E;
+  --orange: #F4732A;
+  --orange-light: #FF9A5C;
+  --paper: #F7F6F2;
+  --ink: #111E2B;
+  --dim: #9AA5B4;
+  --text: #E8E8E0;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--navy);
+  color: var(--text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.serif { font-family: "Playfair Display", Georgia, serif; }
+.accent { font-family: "Bebas Neue", sans-serif; letter-spacing: 1px; }
