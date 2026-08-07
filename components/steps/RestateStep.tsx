@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { speakCoach } from "@/lib/voice/playSpeech";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function RestateStep({
@@ -30,7 +31,10 @@ export function RestateStep({
         return;
       }
       const data: CoachResponse = await res.json();
-      if (data.kind === "restate") setReaction(data.reaction);
+      if (data.kind === "restate") {
+        setReaction(data.reaction);
+        void speakCoach(data.reaction);
+      }
     } catch {
       setError("The coach is unavailable right now — you can keep going.");
     }

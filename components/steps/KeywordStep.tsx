@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { speakCoach } from "@/lib/voice/playSpeech";
 import { segmentMotion } from "@/lib/keywordMatch";
 import type { Motion, CoachResponse } from "@/lib/schemas";
 
@@ -33,7 +34,10 @@ export function KeywordStep({
         return;
       }
       const data: CoachResponse = await res.json();
-      if (data.kind === "keyword") setReaction(data.reaction);
+      if (data.kind === "keyword") {
+        setReaction(data.reaction);
+        void speakCoach(data.reaction);
+      }
     } catch {
       setError("The coach is unavailable right now — you can keep going.");
     }
