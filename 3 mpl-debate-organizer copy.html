@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPL Debate Organizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600;700&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+
+  @media print {
+    body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none; }
+    .page { box-shadow: none; margin: 0; page-break-after: always; }
+  }
+
+  :root {
+    --navy:   #0A1628;
+    --orange: #F4732A;
+    --gold:   #C8962E;
+    --slate:  #3B5268;
+    --white:  #FFFFFF;
+    --off:    #F7F6F2;
+    --border: #D8D4CC;
+    --text:   #111E2B;
+    --dim:    #5A6A7A;
+
+    --r-bg:   #FEF0E7;
+    --r-rule: #F4732A;
+    --r-text: #7A2E06;
+
+    --e-bg:   #FDF6E3;
+    --e-rule: #C8962E;
+    --e-text: #5C3D00;
+
+    --s-bg:   #E8EEF5;
+    --s-rule: #3B5268;
+    --s-text: #1A2E42;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #E8E4DC;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    padding: 24px 16px 40px;
+  }
+
+  .no-print {
+    max-width: 816px;
+    margin: 0 auto 12px;
+    text-align: right;
+  }
+  .no-print button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    background: var(--navy); color: var(--white);
+    border: none; padding: 9px 18px; border-radius: 2px; cursor: pointer;
+  }
+  .no-print button:hover { background: var(--orange); }
+
+  /* ── PAGE ── */
+  .page {
+    width: 816px;
+    min-height: 1056px;
+    margin: 0 auto 32px;
+    background: var(--white);
+    padding: 28px 28px 28px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.14);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--navy);
+  }
+  .brand-eyebrow {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 3px;
+  }
+  .brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 0.04em; color: var(--navy); line-height: 1;
+  }
+  .brand-title span { color: var(--orange); }
+
+  .side-selector { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .side-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+  .side-options { display: flex; gap: 10px; align-items: center; }
+  .side-option { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .side-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid; display: inline-block; flex-shrink: 0; }
+  .side-option.prop { color: var(--orange); }
+  .side-option.prop .side-circle { border-color: var(--orange); }
+  .side-option.opp  { color: var(--slate); }
+  .side-option.opp  .side-circle { border-color: var(--slate); }
+  .side-divider { font-size: 11px; color: var(--dim); }
+
+  /* ── MOTION ── */
+  .motion-row {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--navy);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    min-height: 54px;
+  }
+  .motion-tag {
+    background: var(--navy);
+    color: var(--orange);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 0 14px;
+    display: flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .motion-field {
+    flex: 1;
+    padding: 12px 14px;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 700; font-style: italic; color: var(--navy);
+    border-left: 1.5px solid var(--navy);
+    display: flex; align-items: center;
+  }
+  .motion-line {
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+    margin-left: 6px;
+    height: 20px;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    background: var(--off);
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    align-items: center;
+  }
+  .legend-label { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-text { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
+  .legend-item.r .legend-swatch { background: var(--r-rule); }
+  .legend-item.r .legend-text   { color: var(--r-text); }
+  .legend-item.e .legend-swatch { background: var(--e-rule); }
+  .legend-item.e .legend-text   { color: var(--e-text); }
+  .legend-item.s .legend-swatch { background: var(--s-rule); }
+  .legend-item.s .legend-text   { color: var(--s-text); }
+  .legend-instruction { margin-left: auto; font-size: 10px; font-style: italic; color: var(--dim); }
+
+  /* ── COLUMNS ── */
+  .columns-wrap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    flex: 1;
+  }
+
+  .arg-col {
+    display: flex;
+    flex-direction: column;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  /* claim header — light bg so it's writeable */
+  .arg-claim {
+    background: var(--off);
+    border-bottom: 1.5px solid var(--navy);
+    padding: 10px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-height: 90px;
+  }
+  .claim-label {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--navy);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+  .claim-lines { display: flex; flex-direction: column; gap: 0; flex: 1; }
+  .claim-line { border-bottom: 1px solid #CECCCC; height: 20px; }
+
+  /* layers */
+  .arg-layer {
+    padding: 8px 10px;
+    border-top: 1.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+  .arg-layer.r { background: var(--r-bg); border-top-color: var(--r-rule); }
+  .arg-layer.e { background: var(--e-bg); border-top-color: var(--e-rule); }
+  .arg-layer.s { background: var(--s-bg); border-top-color: var(--s-rule); }
+
+  .layer-label { font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+  .layer-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .arg-layer.r .layer-label { color: var(--r-text); }
+  .arg-layer.r .layer-dot   { background: var(--r-rule); }
+  .arg-layer.e .layer-label { color: var(--e-text); }
+  .arg-layer.e .layer-dot   { background: var(--e-rule); }
+  .arg-layer.s .layer-label { color: var(--s-text); }
+  .arg-layer.s .layer-dot   { background: var(--s-rule); }
+
+  .layer-prompt { font-size: 9px; font-style: italic; line-height: 1.3; margin-bottom: 2px; }
+  .arg-layer.r .layer-prompt { color: rgba(122,46,6,0.5); }
+  .arg-layer.e .layer-prompt { color: rgba(92,61,0,0.45); }
+  .arg-layer.s .layer-prompt { color: rgba(26,46,66,0.45); }
+
+  .write-lines { display: flex; flex-direction: column; flex: 1; }
+  .write-line  { border-bottom: 1px solid; height: 20px; }
+  .arg-layer.r .write-line { border-color: rgba(244,115,42,0.22); }
+  .arg-layer.e .write-line { border-color: rgba(200,150,46,0.22); }
+  .arg-layer.s .write-line { border-color: rgba(59,82,104,0.18); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .footer-instruction { font-size: 9px; font-style: italic; color: var(--dim); line-height: 1.55; max-width: 480px; }
+  .footer-instruction strong { color: var(--text); font-style: normal; }
+  .footer-right { text-align: right; }
+  .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.06em; color: var(--navy); }
+  .footer-brand span { color: var(--orange); }
+  .footer-url { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; color: var(--dim); text-decoration: none; display: block; }
+
+  /* ══════════════════════════
+     PAGE 2 — SAMPLE (BACK)
+  ══════════════════════════ */
+  .page-back {
+    width: 816px;
+    min-height: 1056px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 28px 28px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.14);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .back-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--navy);
+  }
+  .back-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--orange); margin-bottom: 3px; }
+  .back-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--navy); line-height: 1; }
+  .back-subtitle { font-size: 10px; color: var(--dim); margin-top: 3px; font-style: italic; }
+  .sample-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    background: var(--orange); color: var(--white);
+    padding: 4px 10px; border-radius: 2px; align-self: flex-start;
+  }
+
+  /* sample motion */
+  .sample-motion {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--navy);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    min-height: 50px;
+  }
+  .sample-motion .motion-tag { background: var(--navy); }
+  .sample-motion-text {
+    flex: 1;
+    padding: 10px 14px;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px; font-weight: 700; font-style: italic; color: var(--navy);
+    border-left: 1.5px solid var(--navy);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .side-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    background: var(--orange); color: var(--white);
+    padding: 3px 8px; border-radius: 2px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* sample legend */
+  .sample-note {
+    font-size: 10px; font-style: italic; color: var(--dim);
+    padding: 6px 12px;
+    background: var(--off); border-radius: 3px; border: 1px solid var(--border);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .sample-note strong { color: var(--text); font-style: normal; }
+
+  /* handwritten fill */
+  .hw { font-family: 'Caveat', cursive; font-weight: 600; color: #1A2A44; }
+
+  /* sample columns — same grid */
+  .sample-columns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    flex: 1;
+  }
+
+  /* ranked badge */
+  .rank-badge {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 700;
+    background: var(--navy); color: var(--white);
+    flex-shrink: 0;
+  }
+  .rank-badge.selected { background: var(--orange); }
+  .rank-badge.crossed { background: var(--border); color: var(--dim); text-decoration: line-through; }
+
+  .sample-claim-header {
+    background: var(--off);
+    border-bottom: 1.5px solid var(--navy);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 90px;
+  }
+  .sample-claim-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .sample-claim-label { font-size: 8px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--navy); }
+  .sample-claim-text { font-family: 'Caveat', cursive; font-weight: 600; font-size: 14px; color: #1A2A44; line-height: 1.35; flex: 1; }
+
+  .sample-layer {
+    padding: 7px 10px;
+    border-top: 1.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+  .sample-layer.r { background: var(--r-bg); border-top-color: var(--r-rule); }
+  .sample-layer.e { background: var(--e-bg); border-top-color: var(--e-rule); }
+  .sample-layer.s { background: var(--s-bg); border-top-color: var(--s-rule); }
+
+  .sample-layer .layer-label { font-size: 8px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .sample-layer.r .layer-label { color: var(--r-text); }
+  .sample-layer.r .layer-dot   { background: var(--r-rule); }
+  .sample-layer.e .layer-label { color: var(--e-text); }
+  .sample-layer.e .layer-dot   { background: var(--e-rule); }
+  .sample-layer.s .layer-label { color: var(--s-text); }
+  .sample-layer.s .layer-dot   { background: var(--s-rule); }
+
+  .sample-text { font-family: 'Caveat', cursive; font-weight: 400; font-size: 13px; line-height: 1.45; }
+  .sample-layer.r .sample-text { color: #6B2804; }
+  .sample-layer.e .sample-text { color: #4A3000; }
+  .sample-layer.s .sample-text { color: #162338; }
+
+  /* strikethrough col */
+  .struck { position: relative; }
+  .struck::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(0,0,0,0.04) 8px,
+      rgba(0,0,0,0.04) 9px
+    );
+    pointer-events: none;
+  }
+  .x-mark {
+    font-family: 'Caveat', cursive;
+    font-size: 28px; font-weight: 700;
+    color: rgba(90,106,122,0.35);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    pointer-events: none;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  .back-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .back-footer-note { font-size: 9px; font-style: italic; color: var(--dim); }
+  .back-footer-note strong { font-style: normal; color: var(--text); }
+
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button onclick="window.print()">Print / Save as PDF (2 pages)</button>
+</div>
+
+<!-- ══════════════ PAGE 1 — BLANK WORKSHEET ══════════════ -->
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="brand-eyebrow">Miri · The Intellectual Core</div>
+      <div class="brand-title">Debate <span>Organizer</span></div>
+    </div>
+    <div class="side-selector">
+      <div class="side-label">Circle your side</div>
+      <div class="side-options">
+        <div class="side-option prop"><div class="side-circle"></div>Proposition</div>
+        <div class="side-divider">/</div>
+        <div class="side-option opp"><div class="side-circle"></div>Opposition</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="motion-row">
+    <div class="motion-tag">Motion</div>
+    <div class="motion-field">
+      This House believes that&nbsp;
+      <div class="motion-line"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">Key</span>
+    <div class="legend-item r"><div class="legend-swatch"></div><span class="legend-text">Reasoning — the "because"</span></div>
+    <div class="legend-item e"><div class="legend-swatch"></div><span class="legend-text">Evidence — the proof</span></div>
+    <div class="legend-item s"><div class="legend-swatch"></div><span class="legend-text">Significance — the "so what"</span></div>
+    <div class="legend-instruction">Brainstorm 4 arguments · Rank 1–3 · Cross out the weakest</div>
+  </div>
+
+  <div class="columns-wrap">
+
+    <!-- COL A -->
+    <div class="arg-col">
+      <div class="arg-claim">
+        <div class="claim-label">Claim / Assertion</div>
+        <div class="claim-lines">
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer r">
+        <div class="layer-label"><div class="layer-dot"></div>Reasoning</div>
+        <div class="layer-prompt">Why is this true? The "because…"</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer e">
+        <div class="layer-label"><div class="layer-dot"></div>Evidence</div>
+        <div class="layer-prompt">Study, stat, example, or story</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer s">
+        <div class="layer-label"><div class="layer-dot"></div>Significance</div>
+        <div class="layer-prompt">Who's affected? How many? Why now?</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL B -->
+    <div class="arg-col">
+      <div class="arg-claim">
+        <div class="claim-label">Claim / Assertion</div>
+        <div class="claim-lines">
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer r">
+        <div class="layer-label"><div class="layer-dot"></div>Reasoning</div>
+        <div class="layer-prompt">Why is this true? The "because…"</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer e">
+        <div class="layer-label"><div class="layer-dot"></div>Evidence</div>
+        <div class="layer-prompt">Study, stat, example, or story</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer s">
+        <div class="layer-label"><div class="layer-dot"></div>Significance</div>
+        <div class="layer-prompt">Who's affected? How many? Why now?</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL C -->
+    <div class="arg-col">
+      <div class="arg-claim">
+        <div class="claim-label">Claim / Assertion</div>
+        <div class="claim-lines">
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer r">
+        <div class="layer-label"><div class="layer-dot"></div>Reasoning</div>
+        <div class="layer-prompt">Why is this true? The "because…"</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer e">
+        <div class="layer-label"><div class="layer-dot"></div>Evidence</div>
+        <div class="layer-prompt">Study, stat, example, or story</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer s">
+        <div class="layer-label"><div class="layer-dot"></div>Significance</div>
+        <div class="layer-prompt">Who's affected? How many? Why now?</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL D -->
+    <div class="arg-col">
+      <div class="arg-claim">
+        <div class="claim-label">Claim / Assertion</div>
+        <div class="claim-lines">
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+          <div class="claim-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer r">
+        <div class="layer-label"><div class="layer-dot"></div>Reasoning</div>
+        <div class="layer-prompt">Why is this true? The "because…"</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer e">
+        <div class="layer-label"><div class="layer-dot"></div>Evidence</div>
+        <div class="layer-prompt">Study, stat, example, or story</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+      <div class="arg-layer s">
+        <div class="layer-label"><div class="layer-dot"></div>Significance</div>
+        <div class="layer-prompt">Who's affected? How many? Why now?</div>
+        <div class="write-lines">
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div><div class="write-line"></div>
+          <div class="write-line"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /columns -->
+
+  <div class="footer">
+    <div class="footer-instruction">
+      <strong>How to use:</strong> Write one claim per column — don't filter yet. Fill in Reasoning and Evidence for each. Then rank your best three (write 1, 2, 3 in the top corner of each column) and cross out the one you won't use. Start with the column you're least sure about — fill it together as a team before anyone works alone.
+    </div>
+    <div class="footer-right">
+      <div class="footer-brand">Miri-Piri <span>Leaders</span></div>
+      <a class="footer-url" href="https://miripirileaders.com/debate">miripirileaders.com/debate</a>
+    </div>
+  </div>
+
+</div><!-- /page 1 -->
+
+
+<!-- ══════════════ PAGE 2 — SAMPLE FILLED IN ══════════════ -->
+<div class="page-back">
+
+  <div class="back-header">
+    <div>
+      <div class="back-eyebrow">Miri · The Intellectual Core — Example</div>
+      <div class="back-title">Debate Organizer · Filled In</div>
+      <div class="back-subtitle">Use this as a reference. Your arguments should be specific to your motion and evidence packet.</div>
+    </div>
+    <div class="sample-badge">Sample — Proposition Side</div>
+  </div>
+
+  <div class="sample-motion">
+    <div class="motion-tag">Motion</div>
+    <div class="sample-motion-text">
+      <span class="side-tag">Proposition ✓</span>
+      This House believes that homework should be banned.
+    </div>
+  </div>
+
+  <div class="sample-note">
+    <strong>What you're seeing:</strong> Three arguments ranked 1–3 with Reasoning, Evidence, and Significance filled in using the homework motion. The fourth column was brainstormed but crossed out — the team decided it overlapped with Argument 2. Notice each claim is specific, not just a theme.
+  </div>
+
+  <div class="sample-columns">
+
+    <!-- SAMPLE COL 1 — ranked #2 -->
+    <div class="arg-col" style="position:relative;">
+      <div class="sample-claim-header">
+        <div class="sample-claim-top">
+          <div class="sample-claim-label">Claim / Assertion</div>
+          <div class="rank-badge selected hw" style="font-family:'Caveat',cursive;font-size:13px;width:22px;height:22px;">2</div>
+        </div>
+        <div class="sample-claim-text">Homework cuts into the sleep and recovery time students need to actually learn.</div>
+      </div>
+      <div class="sample-layer r">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--r-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Reasoning</div>
+        <div class="sample-text">Sleep is when the brain consolidates what it learned that day. A student who stays up until midnight doing worksheets is actively undermining the learning from that same day.</div>
+      </div>
+      <div class="sample-layer e">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--e-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Evidence</div>
+        <div class="sample-text">Stanford study (4,300 students): more than 3 hrs/night of homework = higher stress, worse health, less sleep. These were motivated, high-performing kids.</div>
+      </div>
+      <div class="sample-layer s">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--s-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Significance</div>
+        <div class="sample-text">Millions of students nightly. Kids from lower-income homes have less support &amp; shorter evenings — the harm is bigger there, not smaller.</div>
+      </div>
+    </div>
+
+    <!-- SAMPLE COL 2 — ranked #1 -->
+    <div class="arg-col" style="position:relative;">
+      <div class="sample-claim-header">
+        <div class="sample-claim-top">
+          <div class="sample-claim-label">Claim / Assertion</div>
+          <div class="rank-badge selected hw" style="font-family:'Caveat',cursive;font-size:13px;width:22px;height:22px;background:var(--navy);">1</div>
+        </div>
+        <div class="sample-claim-text">Homework takes up too much student free time without improving learning outcomes.</div>
+      </div>
+      <div class="sample-layer r">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--r-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Reasoning</div>
+        <div class="sample-text">Free time isn't wasted time — it's when kids develop independence, creativity, and relationships. When homework consumes evenings, those things disappear and so does intrinsic motivation.</div>
+      </div>
+      <div class="sample-layer e">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--e-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Evidence</div>
+        <div class="sample-text">Harris Cooper meta-analysis: homework has zero measurable benefit for elementary students. For middle school, benefit only appears at small amounts — not the hours most kids face.</div>
+      </div>
+      <div class="sample-layer s">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--s-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Significance</div>
+        <div class="sample-text">This affects every student in every school — every single evening. A ban doesn't reduce learning; it reclaims the part of childhood that makes learning sustainable.</div>
+      </div>
+    </div>
+
+    <!-- SAMPLE COL 3 — ranked #3 -->
+    <div class="arg-col" style="position:relative;">
+      <div class="sample-claim-header">
+        <div class="sample-claim-top">
+          <div class="sample-claim-label">Claim / Assertion</div>
+          <div class="rank-badge selected hw" style="font-family:'Caveat',cursive;font-size:13px;width:22px;height:22px;background:var(--slate);">3</div>
+        </div>
+        <div class="sample-claim-text">Homework widens the gap between students with support at home and those without.</div>
+      </div>
+      <div class="sample-layer r">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--r-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Reasoning</div>
+        <div class="sample-text">A student with a tutor, a quiet room, and a parent who can explain the math has a fundamentally different homework experience than one who doesn't. Same assignment, completely different outcome.</div>
+      </div>
+      <div class="sample-layer e">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--e-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Evidence</div>
+        <div class="sample-text">PISA data: in low-income schools, homework completion rates are significantly lower — not because of effort, but because of environment. The gap it creates is measurable by 8th grade.</div>
+      </div>
+      <div class="sample-layer s">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--s-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Significance</div>
+        <div class="sample-text">Homework is supposed to help everyone learn equally. Instead it advantages kids who are already advantaged. A ban levels the field — the classroom becomes the only arena that counts.</div>
+      </div>
+    </div>
+
+    <!-- SAMPLE COL 4 — crossed out -->
+    <div class="arg-col struck" style="position:relative;">
+      <div class="x-mark">not using</div>
+      <div class="sample-claim-header" style="opacity:0.5;">
+        <div class="sample-claim-top">
+          <div class="sample-claim-label">Claim / Assertion</div>
+          <div class="rank-badge crossed hw" style="font-family:'Caveat',cursive;font-size:11px;width:22px;height:22px;">✕</div>
+        </div>
+        <div class="sample-claim-text">Teachers can cover material more effectively in class than students can practice alone at home.</div>
+      </div>
+      <div class="sample-layer r" style="opacity:0.5;">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--r-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Reasoning</div>
+        <div class="sample-text">A teacher can correct a misconception in 30 seconds. A student doing homework alone can practice the wrong thing for an hour and never know it.</div>
+      </div>
+      <div class="sample-layer e" style="opacity:0.5;">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--e-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Evidence</div>
+        <div class="sample-text">Too similar to Arg 2 — cut. Could strengthen if we had a specific study on in-class vs at-home practice retention.</div>
+      </div>
+      <div class="sample-layer s" style="opacity:0.5;">
+        <div class="layer-label"><div class="layer-dot" style="background:var(--s-rule);border-radius:50%;width:7px;height:7px;flex-shrink:0;"></div>Significance</div>
+        <div class="sample-text">Left blank — team couldn't agree on the scale claim.</div>
+      </div>
+    </div>
+
+  </div><!-- /sample columns -->
+
+  <div class="back-footer">
+    <div class="back-footer-note">
+      <strong>Notice:</strong> The crossed-out column isn't failure — it's the work. The team brainstormed it, saw it overlapped with Argument 2, and cut it. That decision is part of debate prep.
+    </div>
+    <div class="footer-right">
+      <div class="footer-brand">Miri-Piri <span>Leaders</span></div>
+      <a class="footer-url" href="https://miripirileaders.com/debate">miripirileaders.com/debate</a>
+    </div>
+  </div>
+
+</div><!-- /page 2 -->
+
+</body>
+</html>

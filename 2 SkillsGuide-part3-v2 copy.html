@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Skills Guide Preview — MPLR 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A1628;
+    --navy-mid: #112240;
+    --navy-light: #1B3461;
+    --orange: #F4732A;
+    --orange-light: #FF9A5C;
+    --charcoal: #2C2C2C;
+    --text: #E8E8E0;
+    --text-dim: #9AA5B4;
+    --white: #FFFFFF;
+    --gold: #C8962E;
+    --light-bg: #F7F6F2;
+    --light-bg-2: #FFFFFF;
+    --light-text: #111E2B;
+    --light-text-dim: #2A3A4A;
+    --light-border: #E2E0D8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── SHARED SECTION BASE ── */
+  .part-section {
+    padding: 80px 40px;
+  }
+  .part-section.light-bg  { background: var(--light-bg); }
+  .part-section.white-bg  { background: var(--light-bg-2); }
+  .part-section.navy-bg   { background: var(--navy); }
+
+  .part-num {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .part-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 4.5vw, 36px); font-weight: 900;
+    color: var(--light-text); line-height: 1.2; margin-bottom: 16px;
+  }
+  .part-title.light { color: var(--white); }
+  .part-intro {
+    font-size: 15px; color: var(--light-text-dim);
+    line-height: 1.8; max-width: 620px; margin-bottom: 40px;
+  }
+  .part-intro strong { color: var(--light-text); }
+
+  /* ════════════════════════════════
+     PART 2 — HOW TO READ A MOTION
+     Dark navy treatment to contrast
+     with the light ARESR section
+  ════════════════════════════════ */
+
+  .motion-block {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .motion-header {
+    background: rgba(244,115,42,0.12);
+    border-bottom: 1px solid rgba(244,115,42,0.2);
+    padding: 20px 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .motion-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 0.08em;
+    color: var(--orange);
+    background: rgba(244,115,42,0.15);
+    border: 1px solid rgba(244,115,42,0.3);
+    padding: 4px 10px; border-radius: 2px;
+    white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .motion-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(14px, 2.5vw, 17px); font-weight: 700;
+    color: var(--white); line-height: 1.5; font-style: italic;
+  }
+  .dissect-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .dissect-item {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .dissect-item:nth-child(even) { border-right: none; }
+  .dissect-item:nth-child(3),
+  .dissect-item:nth-child(4) { border-bottom: none; }
+  .dissect-q {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .dissect-a {
+    font-size: 13px; color: var(--text-dim); line-height: 1.65;
+  }
+  .deeper-q-bar {
+    background: rgba(244,115,42,0.06);
+    border-top: 1px solid rgba(244,115,42,0.15);
+    padding: 16px 24px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .deeper-q-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--orange);
+    white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .deeper-q-body {
+    font-size: 13px; color: var(--text-dim);
+    line-height: 1.65; font-style: italic;
+  }
+  .motion-footer-note {
+    font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-top: 8px;
+  }
+  .motion-footer-note a {
+    color: var(--orange); text-decoration: none; font-weight: 600;
+  }
+  .sikh-history-box {
+    margin-top: 28px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,150,46,0.2);
+    border-left: 3px solid rgba(200,150,46,0.5);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+  .sikh-history-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
+  }
+  .sikh-history-body {
+    font-size: 14px; color: var(--text-dim); line-height: 1.75;
+  }
+
+  /* transition bridge between sections */
+  .section-bridge {
+    background: var(--navy);
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .bridge-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(244,115,42,0.2);
+  }
+  .bridge-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--orange);
+    white-space: nowrap;
+  }
+
+  /* ════════════════════════════════
+     PART 3 — ARESR FRAMEWORK
+     Light background, structured
+  ════════════════════════════════ */
+
+  .part-section.aresr { background: var(--light-bg-2); }
+
+  /* ARESR strip */
+  .ares-strip {
+    display: flex; gap: 0;
+    margin-bottom: 56px;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    background: var(--white);
+  }
+  .ares-letter {
+    flex: 1; padding: 20px 12px 18px;
+    text-align: center;
+    border-right: 1px solid var(--light-border);
+    cursor: pointer; transition: background 0.2s; text-decoration: none;
+  }
+  .ares-letter:last-child { border-right: none; }
+  .ares-letter:hover { background: rgba(244,115,42,0.05); }
+  .ares-letter.active { background: var(--orange); }
+  .ares-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; letter-spacing: 0.04em;
+    color: var(--orange); line-height: 1;
+    display: block; margin-bottom: 4px;
+  }
+  .ares-letter.active .ares-big { color: var(--white); }
+  .ares-word {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--light-text-dim); display: block;
+  }
+  .ares-letter.active .ares-word { color: rgba(255,255,255,0.8); }
+
+  /* domain block */
+  .domain { margin-bottom: 64px; }
+  .domain:last-child { margin-bottom: 0; }
+
+  .domain-header {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 2px solid var(--light-border);
+  }
+  .domain-letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; letter-spacing: 0.02em;
+    color: var(--orange); line-height: 1; flex-shrink: 0;
+  }
+  .domain-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3vw, 24px); font-weight: 900;
+    color: var(--light-text); line-height: 1.2;
+  }
+  .domain-sub {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-dim);
+    display: block; margin-top: 2px;
+  }
+  .domain-body {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px; align-items: start;
+  }
+
+  .what-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .what-body {
+    font-size: 14px; color: var(--light-text-dim);
+    line-height: 1.75; margin-bottom: 20px;
+  }
+  .what-body strong { color: var(--light-text); font-weight: 600; }
+  .what-body em { color: var(--light-text); }
+
+  .tip-box {
+    background: rgba(244,115,42,0.06);
+    border: 1px solid rgba(244,115,42,0.18);
+    border-left: 3px solid var(--orange);
+    border-radius: 3px; padding: 14px 18px;
+    font-size: 13px; color: var(--light-text-dim);
+    line-height: 1.7; margin-bottom: 20px;
+  }
+  .tip-box em { color: var(--light-text); font-style: italic; }
+  .tip-box strong { color: var(--light-text); font-weight: 600; }
+
+  /* action stack */
+  .action-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--navy); margin-bottom: 12px;
+  }
+  .action-stack {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+  }
+  .action-row {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--light-border);
+  }
+  .action-row:last-child { border-bottom: none; }
+  .action-row.dim { opacity: 0.35; }
+  .action-tag {
+    width: 104px; min-width: 104px;
+    padding: 12px 14px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--white);
+    background: var(--navy);
+    display: flex; align-items: flex-start; line-height: 1.4;
+  }
+  .action-row.active .action-tag { background: var(--orange); }
+  .action-text {
+    flex: 1; padding: 12px 16px;
+    font-size: 13px; color: var(--light-text-dim);
+    line-height: 1.65; font-style: italic;
+    background: var(--white);
+  }
+  .action-row.active .action-text {
+    color: var(--light-text); font-style: normal;
+    font-weight: 500; background: rgba(244,115,42,0.04);
+  }
+
+  /* compare weak/strong */
+  .compare-pair { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .compare-item { border: 1px solid var(--light-border); border-radius: 3px; overflow: hidden; }
+  .compare-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; padding: 6px 14px; display: block;
+  }
+  .compare-tag.weak {
+    background: rgba(0,0,0,0.04); color: #8A9AAA;
+    border-bottom: 1px solid var(--light-border);
+  }
+  .compare-tag.strong {
+    background: rgba(244,115,42,0.08); color: var(--orange);
+    border-bottom: 1px solid rgba(244,115,42,0.2);
+  }
+  .compare-body {
+    padding: 10px 14px; font-size: 13px;
+    color: var(--light-text-dim); line-height: 1.65;
+    font-style: italic; background: var(--white);
+  }
+  .compare-note {
+    font-size: 11px; font-style: normal;
+    color: #8A9AAA; margin-top: 4px; display: block;
+  }
+  .compare-note.good { color: var(--orange); }
+
+  /* roles */
+  .roles-row {
+    margin-top: 20px; display: flex; flex-wrap: wrap;
+    align-items: center; gap: 8px;
+  }
+  .roles-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .role-chip {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--navy);
+    background: rgba(244,115,42,0.12);
+    border: 1px solid rgba(244,115,42,0.25);
+    border-radius: 2px; padding: 3px 10px;
+  }
+
+  /* logic tables */
+  .logic-table {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    font-size: 13px; margin-bottom: 16px;
+  }
+  .logic-table thead tr { background: var(--navy); }
+  .logic-table th {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange);
+    padding: 10px 14px; text-align: left;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .logic-table th:last-child { border-right: none; }
+  .logic-table td {
+    padding: 10px 14px; color: var(--light-text-dim);
+    line-height: 1.6; border-bottom: 1px solid var(--light-border);
+    border-right: 1px solid var(--light-border);
+    background: var(--white); vertical-align: top;
+  }
+  .logic-table td:last-child { border-right: none; }
+  .logic-table tr:last-child td { border-bottom: none; }
+  .logic-table td strong { color: var(--light-text); font-weight: 600; }
+  .logic-table td em {
+    color: var(--orange); font-style: normal;
+    font-weight: 600; font-size: 11px;
+  }
+
+  .fallacy-table {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    font-size: 13px; margin-top: 16px;
+  }
+  .fallacy-table thead tr { background: var(--navy); }
+  .fallacy-table th {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange);
+    padding: 10px 14px; text-align: left;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .fallacy-table th:last-child { border-right: none; }
+  .fallacy-table td {
+    padding: 10px 14px; color: var(--light-text-dim);
+    line-height: 1.6; border-bottom: 1px solid var(--light-border);
+    border-right: 1px solid var(--light-border);
+    background: var(--white); vertical-align: top;
+  }
+  .fallacy-table td:first-child { font-weight: 600; color: var(--light-text); }
+  .fallacy-table td:last-child { border-right: none; }
+  .fallacy-table tr:last-child td { border-bottom: none; }
+
+  /* evidence types */
+  .ev-types {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .ev-type {
+    background: var(--white);
+    border: 1px solid var(--light-border);
+    border-top: 2px solid var(--orange);
+    border-radius: 3px; padding: 12px 14px;
+  }
+  .ev-type-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 4px;
+  }
+  .ev-type-desc {
+    font-size: 12px; color: var(--light-text-dim); line-height: 1.55;
+  }
+
+  /* refutation steps */
+  .refute-steps {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden; margin-bottom: 20px;
+  }
+  .refute-step {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--light-border);
+    background: var(--white);
+  }
+  .refute-step:last-child { border-bottom: none; }
+  .refute-keyword {
+    width: 110px; min-width: 110px;
+    padding: 14px 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 0.06em; color: var(--orange);
+    background: var(--light-bg);
+    border-right: 1px solid var(--light-border);
+    display: flex; align-items: flex-start;
+  }
+  .refute-content { flex: 1; padding: 14px 18px; }
+  .refute-what {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--light-text); margin-bottom: 4px;
+  }
+  .refute-why {
+    font-size: 12px; color: var(--text-dim);
+    font-style: italic; line-height: 1.5;
+  }
+
+  /* POI */
+  .poi-box {
+    background: var(--navy);
+    border-radius: 4px; padding: 20px 24px; margin: 20px 0;
+  }
+  .poi-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .poi-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 0.04em;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .poi-body {
+    font-size: 13px; color: var(--text-dim); line-height: 1.7;
+  }
+  .poi-body strong { color: var(--orange-light); font-weight: 600; }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--light-border);
+    margin: 56px 0 0;
+  }
+
+  @media (max-width: 760px) {
+    .domain-body { grid-template-columns: 1fr; }
+    .dissect-grid { grid-template-columns: 1fr; }
+    .ares-word { display: none; }
+    .part-section { padding: 56px 20px; }
+    .ev-types { grid-template-columns: 1fr; }
+    .section-bridge { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PART 2 — HOW TO READ A MOTION
+     Dark navy — foundational skill
+══════════════════════════════════ -->
+<section class="part-section navy-bg" id="part2">
+  <div class="part-num">Foundational Skill</div>
+  <h2 class="part-title light">How to read<br>a debate motion</h2>
+  <p class="part-intro" style="color:var(--text-dim);">Every debate starts with a <strong style="color:var(--text);">motion</strong> — a statement your team either supports (Proposition) or challenges (Opposition). Before you build a single argument, run the motion through five moves.</p>
+
+  <div class="motion-block">
+    <div class="motion-header">
+      <div class="motion-badge">Motion</div>
+      <div class="motion-text">"This House believes that homework should be banned."</div>
+    </div>
+    <div class="dissect-grid">
+      <div class="dissect-item">
+        <div class="dissect-q">1 · Core claim</div>
+        <div class="dissect-a">Assigning homework causes more harm than good and schools should stop requiring it.</div>
+      </div>
+      <div class="dissect-item">
+        <div class="dissect-q">2 · Key words to define</div>
+        <div class="dissect-a">"Homework" — all assigned work, or just busywork? "Banned" — eliminated, or capped? For which students? What age, what grade, what context? Define your terms before the other side defines them for you.</div>
+      </div>
+      <div class="dissect-item">
+        <div class="dissect-q">3 · Three strong arguments for this side</div>
+        <div class="dissect-a">Homework increases stress and cuts into sleep, exercise, and family time. It widens the gap between students who have support at home and those who don't. And it's assigned relentlessly despite little evidence it improves learning.<br><br>
+        <em style="font-size:12px;color:var(--text-dim);">Introduce all three up front: "Homework should be banned because, first, it increases student stress; second, it deepens inequality; and third, it lacks any proven benefit." That's signposting — it tells the room where you're going before you go there.</em></div>
+      </div>
+      <div class="dissect-item">
+        <div class="dissect-q">4 · What the other side will say</div>
+        <div class="dissect-a">Homework builds discipline, reinforces classroom learning, and prepares students for the independent demands of high school and college.</div>
+      </div>
+    </div>
+    <div class="deeper-q-bar">
+      <div class="deeper-q-label">Deeper question</div>
+      <div class="deeper-q-body">This motion looks like a question about schoolwork — but it's really about what school is for. Is it to maximize learning? Build character? Prepare kids for a world that demands output regardless of how they feel? Whoever frames that question first usually controls the debate.</div>
+    </div>
+  </div>
+
+  <div class="motion-block" style="margin-top:20px;">
+    <div class="motion-header" style="background:rgba(200,150,46,0.15);border-bottom:1px solid rgba(200,150,46,0.25);">
+      <div class="motion-badge" style="color:var(--gold);background:rgba(200,150,46,0.15);border-color:rgba(200,150,46,0.35);">5 · World Visualization</div>
+      <div class="motion-text" style="color:var(--text-dim);font-style:normal;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;">Imagine the world where the motion is true. What does it actually look like — and how does it compare to the status quo?</div>
+    </div>
+    <div class="dissect-grid">
+      <div class="dissect-item">
+        <div class="dissect-q" style="color:var(--gold);">Proposition world</div>
+        <div class="dissect-a">No homework. Students leave school at 3pm with the afternoon free. They sleep longer, play sports, spend time with family. Teachers adjust — more learning happens in class. Students come in rested and ready.</div>
+      </div>
+      <div class="dissect-item">
+        <div class="dissect-q" style="color:var(--gold);">Opposition world</div>
+        <div class="dissect-a">No homework. Students fall behind on practice and reading. Material from class fades without reinforcement. By the time they reach high school, they've never had to manage their own study time — and it shows.</div>
+      </div>
+    </div>
+    <div class="deeper-q-bar" style="background:rgba(200,150,46,0.06);border-top:1px solid rgba(200,150,46,0.15);">
+      <div class="deeper-q-label" style="color:var(--gold);">Why this matters</div>
+      <div class="deeper-q-body">World visualization is how you build your Significance and frame your opening. It's especially powerful for the Introducer — it lets you paint a picture before you've presented a single piece of evidence. It also forces you to think through the real consequences of winning, not just the logic of your argument.</div>
+    </div>
+  </div>
+
+  <p class="motion-footer-note" style="margin-top:24px;">Work through all five moves before your first team prep call. When you can answer them, you're ready to build.</p>
+
+  <div class="sikh-history-box">
+    <div class="sikh-history-label">From Sikh History</div>
+    <p class="sikh-history-body">When Mughal Emperor Babar invaded the Punjab, Guru Nanak Sahib witnessed it firsthand. Everyone around him was asking: <em>who won?</em> The Guru asked the deeper question: <em>where were the millions of spiritual leaders when the people needed them — and what does it mean when those who claim moral authority disappear at the moment of real consequence?</em> That question, from the Babarvani composed in the early 1500s, is still one of the sharpest debate motions ever posed. Finding the question beneath the question is not a debate technique. It is a Sikh instinct.</p>
+  </div>
+</section>
+
+<!-- bridge -->
+<div class="section-bridge">
+  <div class="bridge-line"></div>
+  <div class="bridge-label">Now build the argument</div>
+  <div class="bridge-line"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     PART 3 — ARESR FRAMEWORK
+     Light background
+══════════════════════════════════ -->
+<section class="part-section aresr" id="part3">
+  <div class="part-num">Part 3</div>
+  <h2 class="part-title">How to build<br>an argument</h2>
+  <p class="part-intro">Every strong argument is built from five domains — <strong>ARESR</strong>. You don't always deliver all five in one breath, but every complete argument needs all five. Learn each one, then watch how they stack on a single motion throughout this section.</p>
+
+  <!-- ARESR strip -->
+  <div class="ares-strip">
+    <a href="#domain-a" class="ares-letter active">
+      <span class="ares-big">A</span>
+      <span class="ares-word">Assertion</span>
+    </a>
+    <a href="#domain-r1" class="ares-letter">
+      <span class="ares-big">R</span>
+      <span class="ares-word">Reasoning</span>
+    </a>
+    <a href="#domain-e" class="ares-letter">
+      <span class="ares-big">E</span>
+      <span class="ares-word">Evidence</span>
+    </a>
+    <a href="#domain-s" class="ares-letter">
+      <span class="ares-big">S</span>
+      <span class="ares-word">Significance</span>
+    </a>
+    <a href="#domain-r2" class="ares-letter">
+      <span class="ares-big">R</span>
+      <span class="ares-word">Refutation</span>
+    </a>
+    <a href="#domain-poi" class="ares-letter">
+      <span class="ares-big">POI</span>
+      <span class="ares-word">Point of Info</span>
+    </a>
+  </div>
+
+  <!-- ── A: ASSERTION ── -->
+  <div class="domain" id="domain-a">
+    <div class="domain-header">
+      <div class="domain-letter">A</div>
+      <div>
+        <div class="domain-heading">Assertion</div>
+        <span class="domain-sub">Your position, stated plainly</span>
+      </div>
+    </div>
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">A clear, direct claim that takes a side. Not a question, not a fact — a position. The other side should be able to disagree with it.</div>
+        <div class="tip-box">Open with <em>"I believe that..."</em> or skip straight to the point. What matters is that your claim is <strong>specific and contestable</strong>. Push for specificity — vague claims are hard to defend and easy for the other side to sidestep.</div>
+        <div class="compare-pair">
+          <div class="compare-item">
+            <span class="compare-tag weak">✗ Broad — not specific enough</span>
+            <div class="compare-body">"Homework is bad for students."
+              <span class="compare-note">This is a theme, not a claim. It doesn't say why or what the impact is — nothing for the other side to grab onto.</span>
+            </div>
+          </div>
+          <div class="compare-item">
+            <span class="compare-tag strong">✓ Specific and contestable</span>
+            <div class="compare-body">"Homework takes up too much student free time."
+              <span class="compare-note good">Specific. Contestable. Implies a real impact. The other side has something to fight.</span>
+            </div>
+          </div>
+        </div>
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">Introducer</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — Motion: Homework Should Be Banned</div>
+        <div class="action-stack">
+          <div class="action-row active">
+            <div class="action-tag">Assertion</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Reasoning</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Evidence</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Significance</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── R: REASONING ── -->
+  <div class="domain" id="domain-r1" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter">R</div>
+      <div>
+        <div class="domain-heading">Reasoning</div>
+        <span class="domain-sub">The "because" — why your claim is true</span>
+      </div>
+    </div>
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">The logic that connects your assertion to reality. Don't repeat the claim — explain the chain of cause and effect that makes it true.</div>
+        <div class="tip-box"><strong>One-sentence test:</strong> Can you complete <em>"[Assertion] because [Reasoning]"</em> and have it make sense? If yes, you're on track.</div>
+
+        <div class="what-label">Aristotle's three appeals — a useful lens, not a checklist</div>
+        <div class="what-body" style="margin-bottom:12px;">These categories can help you check whether your reasoning is grounded. But don't chase all three — a single, clear logical chain is better than trying to hit every appeal. <strong>Logos</strong> is almost always what wins in a debate round.</div>
+        <table class="logic-table">
+          <thead>
+            <tr><th>Appeal</th><th>What it means</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Ethos</strong><br><em>Credibility</em></td>
+              <td>Cite strong sources or real expertise</td>
+              <td>"Studies from Stanford show..."</td>
+            </tr>
+            <tr>
+              <td><strong>Pathos</strong><br><em>Emotion</em></td>
+              <td>Connect to real experiences and real stakes</td>
+              <td>"Imagine getting home from practice with three more hours of work..."</td>
+            </tr>
+            <tr>
+              <td><strong>Logos</strong><br><em>Logic</em></td>
+              <td>Build a clean chain of cause and effect</td>
+              <td>"If students are tired, they retain less. If they retain less, the homework achieves nothing."</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="what-label" style="margin-top:20px;">Fallacies — reasoning that feels right but isn't</div>
+        <table class="fallacy-table">
+          <thead><tr><th>Fallacy</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td>Ad Hominem</td><td>Attacking the person, not their argument</td></tr>
+            <tr><td>False Dilemma</td><td>Pretending there are only two options when there are more</td></tr>
+            <tr><td>Appeal to Authority</td><td>Saying something is true just because an important person said it</td></tr>
+            <tr><td>Slippery Slope</td><td>Claiming one thing automatically leads to an extreme outcome — with no proof</td></tr>
+            <tr><td>Bandwagon</td><td>Arguing something is right because everyone believes it</td></tr>
+            <tr><td>False Cause</td><td>Assuming one thing caused another just because they happened at the same time</td></tr>
+            <tr><td>Straw Man</td><td>Misrepresenting the other side's argument — making it sound weaker than it is, then knocking that version down. The opposite of charitable interpretation.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">Introducer</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">1st Rebuttalist</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — building up</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Assertion</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and the things outside school that shape who they become — and an exhausted student doesn't learn well anyway.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Evidence</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Significance</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── E: EVIDENCE ── -->
+  <div class="domain" id="domain-e" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter">E</div>
+      <div>
+        <div class="domain-heading">Evidence</div>
+        <span class="domain-sub">Proof that your reasoning isn't just opinion</span>
+      </div>
+    </div>
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">A specific fact, study, statistic, or real-world example that backs up your reasoning. Evidence shows the judges your logic is grounded in something real. You'll receive a packet of articles before the retreat — that's your foundation. You can also bring in your own research if you want to go further.</div>
+        <div class="ev-types">
+          <div class="ev-type">
+            <div class="ev-type-name">Data / Stats</div>
+            <div class="ev-type-desc">Numbers from a study or report</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Expert Opinion</div>
+            <div class="ev-type-desc">What researchers or specialists have found</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Anecdote</div>
+            <div class="ev-type-desc">A real story that illustrates the point</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Historical Example</div>
+            <div class="ev-type-desc">Something that already happened in the world</div>
+          </div>
+        </div>
+        <div class="tip-box">
+          <strong>Don't just drop a fact. Frame it.</strong><br>
+          <em>"According to [source], [finding] — which shows that [connection to your reasoning]."</em>
+        </div>
+        <div class="what-label" style="margin-top:16px;">Evidence-specific pitfalls</div>
+        <div class="what-body" style="margin-bottom:0;">
+          <strong>Appeal to Authority:</strong> Don't cite a source just because it sounds impressive. "Harvard researchers say..." means nothing if you can't explain what they found and why it applies. Good evidence is specific, not just credentialed.<br><br>
+          <strong>Generalization:</strong> Make sure your evidence actually applies to the situation you're arguing about. A study on college students may not apply to middle schoolers. A statistic about one country may not apply to another.
+        </div>
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">Rebuttalists</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — building up</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Assertion</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and things that shape who they become.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Evidence</div>
+            <div class="action-text">Stanford researchers studied over 4,300 high school students and found that more than three hours of nightly homework led to higher stress, more health problems, and less time for friends and family. These weren't students who didn't care — they were working hard. And it was still hurting them.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Significance</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── S: SIGNIFICANCE ── -->
+  <div class="domain" id="domain-s" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter">S</div>
+      <div>
+        <div class="domain-heading">Significance</div>
+        <span class="domain-sub">The "so what" — who's affected and how much</span>
+      </div>
+    </div>
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">Where you zoom out and explain the real-world impact. Two questions to answer: <strong>Who is affected, and how many?</strong> And: <strong>What actually changes if your side is right?</strong></div>
+        <div class="tip-box">
+          <strong>A strong Significance makes one or more clear comparisons.</strong><br><br>
+          Three tools that help you build those comparisons:<br><br>
+          <strong>Magnitude</strong> — How many people are affected? The bigger the scale, the stronger the case.<br><br>
+          <strong>Probability</strong> — How likely is this outcome? Certain harms matter more than speculative ones.<br><br>
+          <strong>Timeframe</strong> — When does this happen? Immediate impacts often outweigh distant ones.<br><br>
+          Use the ones that apply. Don't force all three into every argument — only include a comparison if it actually sharpens your point.
+        </div>
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">Rebuttalists</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — the full argument</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Assertion</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and things that shape who they become.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Evidence</div>
+            <div class="action-text">Stanford researchers found more than three hours of nightly homework increased stress and health problems — even among motivated students who were working hard.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Significance</div>
+            <div class="action-text">This isn't one school's problem — it's happening to millions of students right now. The ones hit hardest are often the ones with the least support at home: kids whose parents work late, who don't have a quiet place to study, who are already stretched. Piling on homework doesn't raise standards. It widens the gap between kids who can absorb the pressure and kids who can't.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── R: REFUTATION ── -->
+  <div class="domain" id="domain-r2" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter">R</div>
+      <div>
+        <div class="domain-heading">Refutation</div>
+        <span class="domain-sub">Taking apart the other side's argument</span>
+      </div>
+    </div>
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">Refutation isn't just disagreeing — and it isn't about proving the other side is wrong. It's about showing why <em>your</em> point matters more. Good refutation is offensive, not defensive: you're not defending your position, you're attacking theirs. The goal is to show that even if they have a valid point, yours has greater significance.</div>
+
+        <div class="what-label" style="margin-bottom:12px;">The four-step structure</div>
+        <div class="refute-steps">
+          <div class="refute-step">
+            <div class="refute-keyword">They say</div>
+            <div class="refute-content">
+              <div class="refute-what">Summarize in 3–7 words</div>
+              <div class="refute-why">Shows you listened. Keeps it clean.</div>
+            </div>
+          </div>
+          <div class="refute-step">
+            <div class="refute-keyword">But</div>
+            <div class="refute-content">
+              <div class="refute-what">State your counter directly</div>
+              <div class="refute-why">Plants your flag before the explanation.</div>
+            </div>
+          </div>
+          <div class="refute-step">
+            <div class="refute-keyword">Because</div>
+            <div class="refute-content">
+              <div class="refute-what">Your reasoning and evidence</div>
+              <div class="refute-why">This is where you do the work.</div>
+            </div>
+          </div>
+          <div class="refute-step">
+            <div class="refute-keyword">Therefore</div>
+            <div class="refute-content">
+              <div class="refute-what">Compare both arguments</div>
+              <div class="refute-why">Helps the room see who won the point.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="what-label">Ways to win a refutation</div>
+        <div class="what-body" style="margin-bottom:16px;">
+          Their logic has a flaw — name the fallacy if you can.<br>
+          Their evidence is outdated, weak, or from a biased source.<br>
+          Their point actually supports your side if you think it through.<br>
+          Your argument has greater significance — more people, higher stakes.
+        </div>
+        <div class="tip-box">
+          <strong>The "Even if" move:</strong> You don't always need to prove the other side is wrong. You can acknowledge their point and still win the refutation.<br><br>
+          <em>"Even if homework does build some discipline, the Stanford evidence shows it causes more harm than that benefit is worth. Their gain doesn't outweigh our loss."</em><br><br>
+          This shows you're engaging with their argument seriously — which is also what charitable interpretation looks like in practice.
+        </div>
+
+        <div class="poi-box">
+          <div class="poi-eyebrow">Tactic</div>
+          <div class="poi-title">Point of Information (POI)</div>
+          <div class="poi-body">During any speech, you can rise and say <strong>"Point of information."</strong> If the speaker accepts, you have 15 seconds to ask a question that challenges what they just said. A well-timed POI can shake the other side mid-argument. Have your question ready before you stand.</div>
+        </div>
+
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">1st Rebuttalist</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+          <span class="role-chip">Any speaker (POI)</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — Opposition argues: "Homework builds discipline."</div>
+        <div class="action-stack">
+          <div class="action-row active">
+            <div class="action-tag">They say</div>
+            <div class="action-text">Homework builds discipline.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">But</div>
+            <div class="action-text">Discipline built through exhaustion isn't real discipline — it's compliance.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Because</div>
+            <div class="action-text">Students do their best learning when they're rested and motivated, not grinding through assignments at 11pm. If the habit being built is "push through no matter how you feel," that's a recipe for burnout — not a skill. The Stanford evidence shows heavy homework increases stress and reduces learning quality, which means the reinforcement they're describing isn't even happening.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Therefore</div>
+            <div class="action-text">The opposition's strongest argument — that homework builds good habits — falls apart under the evidence. Their case doesn't just fail. It supports banning the kind of homework that produces these outcomes.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── POI: POINT OF INFORMATION ── -->
+  <div class="domain" id="domain-poi" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter" style="font-size:32px;letter-spacing:0.01em;">POI</div>
+      <div>
+        <div class="domain-heading">Point of Information</div>
+        <span class="domain-sub">The live interruption — used by all speakers</span>
+      </div>
+    </div>
+
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">A POI is a brief interruption during an opponent's speech. You stand, say "Point of information," and if the speaker accepts, you have 15 seconds to challenge what they just said. POIs are one of the only moments in the debate where the two sides are directly in conversation — and judges notice how you handle them on both sides of the exchange.</div>
+
+        <div class="what-label" style="margin-top:20px;">The rules</div>
+        <div class="what-body">
+          POIs can only be offered during the <strong>open window</strong> — after the first minute and before the last minute of any open speech. The open window applies to: 1st Speaker, 2nd Speaker, and 1st Rebuttalist speeches. The 2nd Rebuttalist's speeches are <strong>fully protected</strong> — no POIs, on either side.<br><br>
+          The speaker holding the floor decides whether to accept. They are not required to take every POI — but they <strong>should accept at least one or two per speech</strong>. Judges mark down speakers who accept none, and also mark down speakers who never bother to offer any.
+        </div>
+
+        <div class="what-label" style="margin-top:20px;">How to offer a good POI</div>
+        <div class="what-body" style="margin-bottom:0;">
+          <strong>Ask it as a question, not a statement.</strong> "Doesn't your evidence only apply to high school students, not middle schoolers?" forces the speaker to engage. A flat statement they can ignore without answering.<br><br>
+          <strong>Target a point that sets up your refutation.</strong> A POI on a weak claim wastes your 15 seconds on something the room already doubts. A POI on a strong claim that you can directly counter shows you're engaging the debate at its core — and it opens the door for your next speech.<br><br>
+          <strong>Have your counter ready before you stand.</strong> If they accept, you have 15 seconds. Know exactly what you're going to say.<br><br>
+          <strong>Keep it short and sharp.</strong> Long POIs ramble and lose the room. One clear challenge is more effective than a mini-speech.
+        </div>
+
+        <div class="what-label" style="margin-top:20px;">How to respond when you accept</div>
+        <div class="what-body" style="margin-bottom:0;">
+          You don't have to fully answer the question — you have to control the exchange. Three options:<br><br>
+          <strong>Answer and move on.</strong> If their point is weak, dispatch it in one sentence and return to yours.<br><br>
+          <strong>Flip it.</strong> Show how their question actually supports your side. "Exactly — and that's why we argue…"<br><br>
+          <strong>Defer and return.</strong> "I'll address that point directly in my next argument." Only works if you actually do.
+        </div>
+
+        <div class="roles-row" style="margin-top:20px;">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">All speakers during open window</span>
+          <span class="role-chip">Not available: 2nd Rebuttalist speeches · First and last minute of any open speech</span>
+        </div>
+      </div>
+
+      <div class="domain-right">
+        <div class="action-label">See it in action — Offering a POI</div>
+        <div class="action-stack">
+          <div class="action-row active">
+            <div class="action-tag">Stand + offer</div>
+            <div class="action-text">"Point of information."</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">If accepted</div>
+            <div class="action-text">"Your Stanford study covered high schoolers with more than three hours of homework. Doesn't that mean it says nothing about students who have less?"</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Speaker responds</div>
+            <div class="action-text">"The Stanford study is one piece of evidence among several we're citing. Studies across age groups and homework loads consistently show the same pattern: when homework exceeds what students can reasonably absorb, stress rises and learning drops. The issue isn't the specific number — it's that the load routinely exceeds what's beneficial. Our argument doesn't depend on a single data point."</div>
+          </div>
+        </div>
+
+        <div class="action-label" style="margin-top:24px;">See it in action — Declining a POI</div>
+        <div class="action-stack">
+          <div class="action-row active">
+            <div class="action-tag">Stand + offer</div>
+            <div class="action-text">"Point of information."</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Speaker declines</div>
+            <div class="action-text">"Not now, thank you." <em style="font-size:12px;color:var(--text-dim);font-weight:400;"> — and continues their speech. The POI-offerer sits down. They can try again later in the open window.</em></div>
+          </div>
+        </div>
+
+        <div class="tip-box" style="margin-top:24px;">
+          <strong>Judges are watching both sides of the exchange.</strong> Offering sharp POIs shows you're tracking the debate. Handling them well when you accept shows you can think on your feet. Both count toward your score.
+        </div>
+        <div class="tip-box" style="margin-top:12px;">
+          <strong>Give your teammates space.</strong> If one person on your team is offering POI after POI, other speakers miss their chance to be heard by the judges. Spread the offers across your team — and if a teammate stands first, sit down.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>

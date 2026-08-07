@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Skills Guide Preview — MPLR 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A1628;
+    --navy-mid: #112240;
+    --navy-light: #1B3461;
+    --orange: #F4732A;
+    --orange-light: #FF9A5C;
+    --charcoal: #2C2C2C;
+    --text: #E8E8E0;
+    --text-dim: #9AA5B4;
+    --white: #FFFFFF;
+    --gold: #C8962E;
+    --light-bg: #F7F6F2;
+    --light-bg-2: #FFFFFF;
+    --light-text: #111E2B;
+    --light-text-dim: #2A3A4A;
+    --light-border: #E2E0D8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── SHARED SECTION BASE ── */
+  .part-section {
+    padding: 80px 40px;
+  }
+  .part-section.light-bg  { background: var(--light-bg); }
+  .part-section.white-bg  { background: var(--light-bg-2); }
+  .part-section.navy-bg   { background: var(--navy); }
+
+  .part-num {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .part-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 4.5vw, 36px); font-weight: 900;
+    color: var(--light-text); line-height: 1.2; margin-bottom: 16px;
+  }
+  .part-title.light { color: var(--white); }
+  .part-intro {
+    font-size: 15px; color: var(--light-text-dim);
+    line-height: 1.8; max-width: 620px; margin-bottom: 40px;
+  }
+  .part-intro strong { color: var(--light-text); }
+
+  /* ════════════════════════════════
+     PART 2 — HOW TO READ A MOTION
+     Dark navy treatment to contrast
+     with the light ARESR section
+  ════════════════════════════════ */
+
+  .motion-block {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .motion-header {
+    background: rgba(244,115,42,0.12);
+    border-bottom: 1px solid rgba(244,115,42,0.2);
+    padding: 20px 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .motion-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 0.08em;
+    color: var(--orange);
+    background: rgba(244,115,42,0.15);
+    border: 1px solid rgba(244,115,42,0.3);
+    padding: 4px 10px; border-radius: 2px;
+    white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .motion-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(14px, 2.5vw, 17px); font-weight: 700;
+    color: var(--white); line-height: 1.5; font-style: italic;
+  }
+  .dissect-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .dissect-item {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .dissect-item:nth-child(even) { border-right: none; }
+  .dissect-item:nth-child(3),
+  .dissect-item:nth-child(4) { border-bottom: none; }
+  .dissect-q {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .dissect-a {
+    font-size: 13px; color: var(--text-dim); line-height: 1.65;
+  }
+  .deeper-q-bar {
+    background: rgba(244,115,42,0.06);
+    border-top: 1px solid rgba(244,115,42,0.15);
+    padding: 16px 24px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .deeper-q-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--orange);
+    white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .deeper-q-body {
+    font-size: 13px; color: var(--text-dim);
+    line-height: 1.65; font-style: italic;
+  }
+  .motion-footer-note {
+    font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-top: 8px;
+  }
+  .motion-footer-note a {
+    color: var(--orange); text-decoration: none; font-weight: 600;
+  }
+  .sikh-history-box {
+    margin-top: 28px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,150,46,0.2);
+    border-left: 3px solid rgba(200,150,46,0.5);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+  .sikh-history-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
+  }
+  .sikh-history-body {
+    font-size: 14px; color: var(--text-dim); line-height: 1.75;
+  }
+
+  /* transition bridge between sections */
+  .section-bridge {
+    background: var(--navy);
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .bridge-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(244,115,42,0.2);
+  }
+  .bridge-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--orange);
+    white-space: nowrap;
+  }
+
+  /* ════════════════════════════════
+     PART 3 — ARESR FRAMEWORK
+     Light background, structured
+  ════════════════════════════════ */
+
+  .part-section.aresr { background: var(--light-bg-2); }
+
+  /* ARESR strip */
+  .ares-strip {
+    display: flex; gap: 0;
+    margin-bottom: 56px;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    background: var(--white);
+  }
+  .ares-letter {
+    flex: 1; padding: 20px 12px 18px;
+    text-align: center;
+    border-right: 1px solid var(--light-border);
+    cursor: pointer; transition: background 0.2s; text-decoration: none;
+  }
+  .ares-letter:last-child { border-right: none; }
+  .ares-letter:hover { background: rgba(244,115,42,0.05); }
+  .ares-letter.active { background: var(--orange); }
+  .ares-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; letter-spacing: 0.04em;
+    color: var(--orange); line-height: 1;
+    display: block; margin-bottom: 4px;
+  }
+  .ares-letter.active .ares-big { color: var(--white); }
+  .ares-word {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--light-text-dim); display: block;
+  }
+  .ares-letter.active .ares-word { color: rgba(255,255,255,0.8); }
+
+  /* domain block */
+  .domain { margin-bottom: 64px; }
+  .domain:last-child { margin-bottom: 0; }
+
+  .domain-header {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 2px solid var(--light-border);
+  }
+  .domain-letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; letter-spacing: 0.02em;
+    color: var(--orange); line-height: 1; flex-shrink: 0;
+  }
+  .domain-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3vw, 24px); font-weight: 900;
+    color: var(--light-text); line-height: 1.2;
+  }
+  .domain-sub {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-dim);
+    display: block; margin-top: 2px;
+  }
+  .domain-body {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px; align-items: start;
+  }
+
+  .what-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .what-body {
+    font-size: 14px; color: var(--light-text-dim);
+    line-height: 1.75; margin-bottom: 20px;
+  }
+  .what-body strong { color: var(--light-text); font-weight: 600; }
+  .what-body em { color: var(--light-text); }
+
+  .tip-box {
+    background: rgba(244,115,42,0.06);
+    border: 1px solid rgba(244,115,42,0.18);
+    border-left: 3px solid var(--orange);
+    border-radius: 3px; padding: 14px 18px;
+    font-size: 13px; color: var(--light-text-dim);
+    line-height: 1.7; margin-bottom: 20px;
+  }
+  .tip-box em { color: var(--light-text); font-style: italic; }
+  .tip-box strong { color: var(--light-text); font-weight: 600; }
+
+  /* action stack */
+  .action-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--navy); margin-bottom: 12px;
+  }
+  .action-stack {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+  }
+  .action-row {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--light-border);
+  }
+  .action-row:last-child { border-bottom: none; }
+  .action-row.dim { opacity: 0.35; }
+  .action-tag {
+    width: 104px; min-width: 104px;
+    padding: 12px 14px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--white);
+    background: var(--navy);
+    display: flex; align-items: flex-start; line-height: 1.4;
+  }
+  .action-row.active .action-tag { background: var(--orange); }
+  .action-text {
+    flex: 1; padding: 12px 16px;
+    font-size: 13px; color: var(--light-text-dim);
+    line-height: 1.65; font-style: italic;
+    background: var(--white);
+  }
+  .action-row.active .action-text {
+    color: var(--light-text); font-style: normal;
+    font-weight: 500; background: rgba(244,115,42,0.04);
+  }
+
+  /* compare weak/strong */
+  .compare-pair { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .compare-item { border: 1px solid var(--light-border); border-radius: 3px; overflow: hidden; }
+  .compare-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; padding: 6px 14px; display: block;
+  }
+  .compare-tag.weak {
+    background: rgba(0,0,0,0.04); color: #8A9AAA;
+    border-bottom: 1px solid var(--light-border);
+  }
+  .compare-tag.strong {
+    background: rgba(244,115,42,0.08); color: var(--orange);
+    border-bottom: 1px solid rgba(244,115,42,0.2);
+  }
+  .compare-body {
+    padding: 10px 14px; font-size: 13px;
+    color: var(--light-text-dim); line-height: 1.65;
+    font-style: italic; background: var(--white);
+  }
+  .compare-note {
+    font-size: 11px; font-style: normal;
+    color: #8A9AAA; margin-top: 4px; display: block;
+  }
+  .compare-note.good { color: var(--orange); }
+
+  /* roles */
+  .roles-row {
+    margin-top: 20px; display: flex; flex-wrap: wrap;
+    align-items: center; gap: 8px;
+  }
+  .roles-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .role-chip {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--navy);
+    background: rgba(244,115,42,0.12);
+    border: 1px solid rgba(244,115,42,0.25);
+    border-radius: 2px; padding: 3px 10px;
+  }
+
+  /* logic tables */
+  .logic-table {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    font-size: 13px; margin-bottom: 16px;
+  }
+  .logic-table thead tr { background: var(--navy); }
+  .logic-table th {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange);
+    padding: 10px 14px; text-align: left;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .logic-table th:last-child { border-right: none; }
+  .logic-table td {
+    padding: 10px 14px; color: var(--light-text-dim);
+    line-height: 1.6; border-bottom: 1px solid var(--light-border);
+    border-right: 1px solid var(--light-border);
+    background: var(--white); vertical-align: top;
+  }
+  .logic-table td:last-child { border-right: none; }
+  .logic-table tr:last-child td { border-bottom: none; }
+  .logic-table td strong { color: var(--light-text); font-weight: 600; }
+  .logic-table td em {
+    color: var(--orange); font-style: normal;
+    font-weight: 600; font-size: 11px;
+  }
+
+  .fallacy-table {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden;
+    font-size: 13px; margin-top: 16px;
+  }
+  .fallacy-table thead tr { background: var(--navy); }
+  .fallacy-table th {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--orange);
+    padding: 10px 14px; text-align: left;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .fallacy-table th:last-child { border-right: none; }
+  .fallacy-table td {
+    padding: 10px 14px; color: var(--light-text-dim);
+    line-height: 1.6; border-bottom: 1px solid var(--light-border);
+    border-right: 1px solid var(--light-border);
+    background: var(--white); vertical-align: top;
+  }
+  .fallacy-table td:first-child { font-weight: 600; color: var(--light-text); }
+  .fallacy-table td:last-child { border-right: none; }
+  .fallacy-table tr:last-child td { border-bottom: none; }
+
+  /* evidence types */
+  .ev-types {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .ev-type {
+    background: var(--white);
+    border: 1px solid var(--light-border);
+    border-top: 2px solid var(--orange);
+    border-radius: 3px; padding: 12px 14px;
+  }
+  .ev-type-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 4px;
+  }
+  .ev-type-desc {
+    font-size: 12px; color: var(--light-text-dim); line-height: 1.55;
+  }
+
+  /* refutation steps */
+  .refute-steps {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--light-border);
+    border-radius: 4px; overflow: hidden; margin-bottom: 20px;
+  }
+  .refute-step {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--light-border);
+    background: var(--white);
+  }
+  .refute-step:last-child { border-bottom: none; }
+  .refute-keyword {
+    width: 110px; min-width: 110px;
+    padding: 14px 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 0.06em; color: var(--orange);
+    background: var(--light-bg);
+    border-right: 1px solid var(--light-border);
+    display: flex; align-items: flex-start;
+  }
+  .refute-content { flex: 1; padding: 14px 18px; }
+  .refute-what {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--light-text); margin-bottom: 4px;
+  }
+  .refute-why {
+    font-size: 12px; color: var(--text-dim);
+    font-style: italic; line-height: 1.5;
+  }
+
+  /* POI */
+  .poi-box {
+    background: var(--navy);
+    border-radius: 4px; padding: 20px 24px; margin: 20px 0;
+  }
+  .poi-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .poi-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 0.04em;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .poi-body {
+    font-size: 13px; color: var(--text-dim); line-height: 1.7;
+  }
+  .poi-body strong { color: var(--orange-light); font-weight: 600; }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--light-border);
+    margin: 56px 0 0;
+  }
+
+  @media (max-width: 760px) {
+    .domain-body { grid-template-columns: 1fr; }
+    .dissect-grid { grid-template-columns: 1fr; }
+    .ares-word { display: none; }
+    .part-section { padding: 56px 20px; }
+    .ev-types { grid-template-columns: 1fr; }
+    .section-bridge { padding: 24px 20px; }
+  }
+
+  /* ── JASJEEV DESIGN NOTES ── */
+  .j-note {
+    background: #1a2744;
+    border: 1px dashed rgba(200,150,46,0.5);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .j-note::before {
+    content: '🛠 FOR JASJEEV';
+    display: block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .j-note p {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.75;
+    margin: 0 0 8px 0;
+  }
+  .j-note p:last-child { margin-bottom: 0; }
+  .j-note strong { color: rgba(255,255,255,0.95); }
+  .j-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: rgba(200,150,46,0.15);
+    color: var(--gold);
+    border: 1px solid rgba(200,150,46,0.35);
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-right: 4px;
+    margin-bottom: 6px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PART 2 — HOW TO READ A MOTION
+     Dark navy — foundational skill
+══════════════════════════════════ -->
+<section class="part-section navy-bg" id="part2">
+  <div class="part-num">Foundational Skill</div>
+  <h2 class="part-title light">How to read<br>a debate motion</h2>
+  <p class="part-intro" style="color:var(--text-dim);">Every debate starts with a <strong style="color:var(--text);">motion</strong> — a statement your team either supports (Proposition) or challenges (Opposition). Before you build a single argument, run the motion through four moves.</p>
+
+  <div class="j-note">
+    <p><strong>Section purpose:</strong> This is the entry point — the first skill the participant encounters. The goal is not to overwhelm but to give them a repeatable mental checklist they can run on any motion. Four moves, each with a clear job.</p>
+    <p><strong>AI teaching approach for this section:</strong> Present the motion on screen first, alone. Let it sit. Then reveal one move at a time — the learner works through each before the next appears. Don't show all four at once.</p>
+    <p><span class="j-tag">Voice-first</span> After presenting the motion, the first prompt should be spoken: <em>"Read this motion out loud. Then tell me in your own words — what is this debate actually asking?"</em> This mirrors exactly how EJ opens sessions with Vir. The learner's restatement is the first generative act, not a multiple-choice selection.</p>
+    <p><span class="j-tag">Quizlet-style</span> A small bank of 3 motions (easy → harder) lets learners practice the full 4-move checklist repeatedly before the retreat. The homework motion is Motion 1 — familiar and low-stakes. Motions 2 and 3 should come from the topic bank being developed by the coaches on the Wednesday call.</p>
+    <p><span class="j-tag">World Visualization</span> Held for the retreat (Saturday AM). Do not include in the pre-retreat tool — it requires live coaching to teach well. Flag here as "coming at the retreat" so participants aren't surprised.</p>
+  </div>
+
+  <div class="motion-block">
+    <div class="motion-header">
+      <div class="motion-badge">Motion</div>
+      <div class="motion-text">"This House believes that homework should be banned."</div>
+    </div>
+    <div class="dissect-grid">
+
+      <div class="dissect-item">
+        <div class="dissect-q">1 · What is this debate really asking?</div>
+        <div class="dissect-a">Don't just read the words — find the real question underneath. This motion looks like a question about schoolwork. But it's really about what school is for. Whoever frames that question first usually controls the debate.</div>
+        <div class="j-note" style="margin:12px 0 0 0;">
+          <p><span class="j-tag">AI prompt</span> After the learner gives their restatement: <em>"Good. Now go one level deeper — what is the bigger question this debate is really about?"</em> If their answer stays surface-level (e.g. "whether homework is good or bad"), push with: <em>"What does it say about what school should be for?"</em> Don't supply the answer — ask until they arrive at it.</p>
+        </div>
+      </div>
+
+      <div class="dissect-item">
+        <div class="dissect-q">2 · Define the key words</div>
+        <div class="dissect-a">"Homework" — all assigned work, or just busywork? "Banned" — eliminated entirely, or capped? For which students? What age, what grade, what context? Define your terms before the other side defines them for you.</div>
+        <div class="j-note" style="margin:12px 0 0 0;">
+          <p><span class="j-tag">AI prompt</span> Highlight each key word interactively. Tapping a word opens a prompt: <em>"What does '[word]' mean in this debate? What counts — and what doesn't?"</em> The learner types or speaks their definition. If the definition is too broad (e.g. "homework means all school stuff"), follow with: <em>"Does that include studying for a test you chose to do on your own?"</em> Edge cases sharpen definitions.</p>
+          <p><span class="j-tag">Discovery mode</span> For Motion 1, show example definitions after the learner submits theirs. For Motions 2–3, remove the example — learner defines cold.</p>
+        </div>
+      </div>
+
+      <div class="dissect-item">
+        <div class="dissect-q">3 · Three strong arguments for your side</div>
+        <div class="dissect-a">Homework increases stress and cuts into sleep, exercise, and family time. It widens the gap between students who have support at home and those who don't. And it's assigned relentlessly despite little evidence it improves learning.
+        <br><br>
+        <em style="font-size:12px;color:var(--text-dim);">Signpost all three up front: "Homework should be banned because, first, it increases student stress; second, it deepens inequality; and third, it lacks any proven benefit." That tells the room where you're going before you go there.</em></div>
+        <div class="j-note" style="margin:12px 0 0 0;">
+          <p><span class="j-tag">AI prompt</span> <em>"What's one reason your side is right? Don't worry about evidence yet — just tell me why you think this is true."</em> After first argument: <em>"Good. What's a second reason — something different from what you just said?"</em> After second: <em>"One more. Try to pick something the other side can't easily dismiss."</em></p>
+          <p><span class="j-tag">Generative over discovery</span> Do not offer a menu of arguments to choose from. The learner generates all three. Only after they've submitted all three, show the example arguments from this guide as a compare — not as a correction.</p>
+          <p><span class="j-tag">Signposting</span> Once they have three arguments, prompt: <em>"Now put them together in one sentence that starts with 'We believe this because...' and lists all three."</em> That's the signpost. Hearing it back in their own words is the learning.</p>
+        </div>
+      </div>
+
+      <div class="dissect-item">
+        <div class="dissect-q">4 · What will the other side say?</div>
+        <div class="dissect-a">Homework builds discipline, reinforces classroom learning, and prepares students for the independent demands of high school and college.</div>
+        <div class="j-note" style="margin:12px 0 0 0;">
+          <p><span class="j-tag">AI prompt</span> <em>"Now switch sides for a moment. What's the strongest argument against your position — the one that would actually give you trouble?"</em> This is harder than it sounds. If the learner gives a weak counter (e.g. "the other side would say homework is good"), push: <em>"That's the position, not the argument. Why would they say it's good — what would they point to?"</em></p>
+          <p><span class="j-tag">Inversion move</span> EJ's suggestion: after they generate the other side's arguments, ask: <em>"Does any part of what you just said actually support your side too, if you look at it differently?"</em> This plants the seed of refutation — taught live at the retreat, but this moment primes the thinking.</p>
+          <p><span class="j-tag">Scope</span> Keep this move focused on identifying the other side's position, not defeating it. Refutation is a retreat skill. The goal here is just: can the learner name what they're up against?</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="motion-footer-note" style="margin-top:24px;">Work through all four moves before your first Zoom call. When you can answer them, you're ready to build your argument.</p>
+
+</section>
+
+<!-- bridge -->
+<div class="section-bridge">
+  <div class="bridge-line"></div>
+  <div class="bridge-label">Now build the argument</div>
+  <div class="bridge-line"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     CLI FRAMEWORK
+     Claim → Link → Impact
+══════════════════════════════════ -->
+<section class="part-section aresr" id="part3">
+  <div class="part-num">The Argument</div>
+  <h2 class="part-title">Claim → Link → Impact</h2>
+  <p class="part-intro">Every strong argument has three parts. A <strong>Claim</strong> — your position. A <strong>Link</strong> — the bridge that connects your claim to reality. And an <strong>Impact</strong> — why it matters at scale. Learn each one in order. You'll use all three in every argument you make.</p>
+
+  <!-- CLI strip -->
+  <div class="ares-strip">
+    <a href="#domain-claim" class="ares-letter active">
+      <span class="ares-big">C</span>
+      <span class="ares-word">Claim</span>
+    </a>
+    <a href="#domain-link" class="ares-letter">
+      <span class="ares-big">L</span>
+      <span class="ares-word">Link</span>
+    </a>
+    <a href="#domain-impact" class="ares-letter">
+      <span class="ares-big">I</span>
+      <span class="ares-word">Impact</span>
+    </a>
+  </div>
+
+  <div class="j-note">
+    <p><strong>Framework rename:</strong> ARESR is replaced by CLI (Claim → Link → Impact) as the participant-facing framework. ARESR remains intact as the coach reference guide. This document is the participant guide.</p>
+    <p><strong>Architecture:</strong> The three sections below map as follows: Claim = Assertion. Link = Reasoning (Level 1) + Evidence (Level 2). Impact = Significance. Refutation and POI are retreat-taught and do not appear in this guide.</p>
+    <p><span class="j-tag">Navigation</span> The CLI strip above should function as sticky navigation — tapping C, L, or I scrolls to that section and highlights it. The learner should always know where they are in the argument structure.</p>
+    <p><span class="j-tag">Progressive reveal</span> The "See it in action" panel on the right should build cumulatively as the learner advances through C → L → I. When they're in Claim, only Claim is lit. When they reach Link, Claim + Link are lit. By Impact, the full argument is visible. This mirrors how EJ builds with Vir — one layer at a time, never the whole picture at once.</p>
+  </div>
+
+  <!-- ── CLAIM ── -->
+  <div class="domain" id="domain-claim">
+    <div class="domain-header">
+      <div class="domain-letter" style="background:var(--navy);">C</div>
+      <div>
+        <div class="domain-heading">Claim</div>
+        <span class="domain-sub">Your position, stated plainly and specifically</span>
+      </div>
+    </div>
+
+    <div class="j-note">
+      <p><strong>Source:</strong> This section draws from ARESR's Assertion domain. The core content — specific vs. broad, contestable, weak/strong compare — is preserved. The name changes from "Assertion" to "Claim" throughout.</p>
+      <p><span class="j-tag">AI prompt — entry</span> Before showing any instruction, ask: <em>"What do you think your team should argue? Just say it in one sentence — don't worry about getting it perfect yet."</em> Take their answer as the raw claim. Then guide them to sharpen it using the prompts below. EJ's method: she never corrects the first attempt — she asks questions until the student arrives at the better version themselves.</p>
+      <p><span class="j-tag">AI prompt — specificity</span> After they state their claim: <em>"Is that specific enough that the other team would know exactly what to argue against? Or could they sidestep it?"</em> If the claim is vague (e.g. "homework is bad"), follow with: <em>"What specifically about homework? And for which students?"</em></p>
+      <p><span class="j-tag">AI prompt — contestability</span> <em>"Could someone reasonably disagree with what you just said — and would they have something real to argue back?"</em> If yes: strong claim. If no: too obvious or too broad.</p>
+      <p><span class="j-tag">Cohort note</span> For Surat (grades 5–7), use the CER framing informally ("Claim, then your reason, then why it matters") and keep the motion familiar — homework or screen time. For Darshan and Pyaas, full CLI with evidence packet.</p>
+    </div>
+
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">A clear, direct statement that takes a side. Not a question, not a fact — a position. The other side should be able to disagree with it and have something real to argue back.</div>
+        <div class="tip-box"><strong>Two tests for a strong claim:</strong><br><br>
+        <strong>Specific:</strong> Does it say something precise — not just a general theme? Vague claims are hard to defend and easy to sidestep.<br><br>
+        <strong>Contestable:</strong> Could a reasonable person disagree? If everyone would agree, it's not a claim — it's a fact.</div>
+        <div class="compare-pair">
+          <div class="compare-item">
+            <span class="compare-tag weak">✗ Too broad</span>
+            <div class="compare-body">"Homework is bad for students."
+              <span class="compare-note">A theme, not a claim. Doesn't say why or what the impact is. Nothing for the other side to grab onto.</span>
+            </div>
+          </div>
+          <div class="compare-item">
+            <span class="compare-tag strong">✓ Specific and contestable</span>
+            <div class="compare-body">"Homework takes up too much student free time."
+              <span class="compare-note good">Specific. Contestable. Implies a real impact. The other side has something to fight.</span>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box" style="margin-top:16px;border-left-color:rgba(200,150,46,0.6);">
+          <strong>Watch out: the Straw Man</strong><br><br>
+          A Straw Man is when you misrepresent the other side's claim — making it sound weaker than it actually is — and then argue against that weaker version. Judges catch it. It's the opposite of charitable interpretation.<br><br>
+          <em>The antidote: before you refute anything, restate the other side's claim accurately enough that they would nod. If they wouldn't nod, you're arguing against a straw man.</em>
+        </div>
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">Introducer</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — building up</div>
+        <div class="action-stack">
+          <div class="action-row active">
+            <div class="action-tag">Claim</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Link</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Impact</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── LINK ── -->
+  <div class="domain" id="domain-link" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter" style="background:var(--navy);">L</div>
+      <div>
+        <div class="domain-heading">Link</div>
+        <span class="domain-sub">The bridge between your Claim and your Impact</span>
+      </div>
+    </div>
+
+    <div class="j-note">
+      <p><strong>Source mapping:</strong> This section draws from ARESR's Reasoning (R1) and Evidence (E) domains, unified under the bridge metaphor. The two levels are introduced in sequence — Reasoning first, Evidence second — mirroring EJ's teaching hierarchy and the Jasjeev/EJ session agreement that Evidence should enter only after the logical chain is built.</p>
+      <p><strong>The bridge metaphor:</strong> EJ coined this live in the July 27 session. The Link is the bridge between your Claim and your Impact. Bridges can be built from different materials — pure reasoning, evidence, or both. A bridge built only on evidence with no logic underneath is a bridge the other side can knock down by questioning the source. A bridge built on clear reasoning that evidence then reinforces is much harder to collapse.</p>
+      <p><span class="j-tag">Visual design opportunity</span> Consider an interactive bridge illustration at the top of this section. When the learner selects "Reasoning only," the bridge renders as a simple arch. When they add "Evidence," reinforcing cables or supports appear. This makes the relationship between the two levels visceral, not abstract. Jasjeev flagged this as a strong UI moment.</p>
+      <p><span class="j-tag">AI prompt — entry</span> Before instruction begins: <em>"You've made your Claim. Now I'm going to ask you one question: Why is that true? Don't give me evidence yet — just tell me why it follows."</em> This is the Reasoning prompt. The learner's first answer is almost always the right instinct, just not yet articulated cleanly. Ask once more before offering structure: <em>"Say that again, but finish this sentence: 'This is true because...'"</em></p>
+      <p><span class="j-tag">Sequencing</span> Reasoning must be established before Evidence is introduced. The tool should not surface the Evidence level until the learner has submitted a Reasoning answer. This is not gatekeeping — it's the right learning order. A student who reaches for evidence before reasoning has skipped the hardest and most important step.</p>
+    </div>
+
+    <!-- LEVEL 1: REASONING -->
+    <div style="margin-bottom:12px;">
+      <div class="what-label">Level 1 · Reasoning</div>
+      <div class="what-body" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">The "because" — why your Claim is true</div>
+    </div>
+
+    <div class="j-note">
+      <p><span class="j-tag">AI prompt — reasoning quality</span> After the learner submits their reasoning: <em>"Does that explain why your Claim is true — or does it just restate the Claim in different words?"</em> Many first attempts are restatements. E.g., Claim: "Homework takes up too much free time." Reasoning attempt: "Because students have too much homework." That's circular. The prompt should push: <em>"Why does having a lot of homework lead to a real problem? What's the chain?"</em></p>
+      <p><span class="j-tag">One-sentence test</span> Surface this test to the learner as a tool they can use themselves: <em>"Try finishing this sentence out loud: '[Your Claim] because [your reasoning].' Does it make sense? Would someone who disagreed understand what you're claiming to prove?"</em></p>
+      <p><span class="j-tag">Fallacy introduction</span> After the learner builds their reasoning chain, introduce the bridge failure concept: <em>"Some bridges look solid but aren't. Here are three reasoning moves that feel right but fall apart under pressure."</em> Then show the three fallacy boxes below. Don't introduce fallacies before the learner has attempted their own reasoning — they need to build first, then learn what to watch for.</p>
+    </div>
+
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-body">The logic that connects your Claim to reality. Don't repeat the Claim — explain the chain of cause and effect that makes it true. The Reasoning is your argument in its purest form: no sources needed, just clear thinking.</div>
+        <div class="tip-box"><strong>One-sentence test:</strong> Complete this sentence — <em>"[Your Claim] because [your reasoning]."</em> If it makes sense and someone who disagreed would understand what you're proving, you're on track. If it sounds circular, keep pushing.</div>
+
+        <!-- FALLACIES AS BRIDGE FAILURES -->
+        <div class="what-label" style="margin-top:20px;">Watch out: weak bridges</div>
+        <div class="what-body" style="margin-bottom:14px;">Some reasoning moves feel convincing but collapse when the other side pushes back. The Friday night skit will go deeper — but here are three to know before the retreat.</div>
+
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-bottom:10px;">
+          <strong>Slippery Slope</strong><br>
+          Claiming one thing automatically leads to an extreme — without proving the steps in between.<br>
+          <em style="font-size:12px;color:var(--text-dim);">"If we ban homework, students will stop learning altogether and fall behind every other country." — No bridge. Just a leap.</em>
+        </div>
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-bottom:10px;">
+          <strong>False Dilemma</strong><br>
+          Pretending there are only two options when more exist.<br>
+          <em style="font-size:12px;color:var(--text-dim);">"Either we keep homework exactly as it is, or students learn nothing." — The real world has more than two options.</em>
+        </div>
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-bottom:10px;">
+          <strong>False Cause</strong><br>
+          Assuming one thing caused another just because they happened at the same time.<br>
+          <em style="font-size:12px;color:var(--text-dim);">"Countries with less homework have higher test scores — so homework must be causing low scores." — Correlation isn't causation. What else might explain it?</em>
+        </div>
+
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">Introducer</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">1st Rebuttalist</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — building up</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Claim</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Link · Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and the things outside school that shape who they become — and an exhausted student doesn't learn well anyway.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Link · Evidence</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Impact</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider" style="margin:40px 0 36px;">
+
+    <!-- LEVEL 2: EVIDENCE -->
+    <div style="margin-bottom:12px;">
+      <div class="what-label">Level 2 · Evidence</div>
+      <div class="what-body" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Proof that your Reasoning isn't just opinion</div>
+    </div>
+
+    <div class="j-note">
+      <p><strong>Closed universe note:</strong> Evidence in MPLR comes exclusively from the article packet sent September 5. The AI tool surfaces relevant passages from those articles contextually — the learner does not search. This levels the field between experienced researchers and first-timers, and keeps the focus on reasoning over excavation. The "you can also bring your own research" line from the ARESR guide is removed.</p>
+      <p><span class="j-tag">AI prompt — entry</span> After Reasoning is established: <em>"Now let's strengthen your bridge. Does anything in your evidence packet support what you just said? What did the articles say that connects to this?"</em> Surface 1–2 relevant passages from the closed packet if the learner is stuck. Frame it as: <em>"Here's something from your articles — does this help build your bridge?"</em></p>
+      <p><span class="j-tag">Framing before fact</span> The most common error: dropping a stat with no setup. The tool should catch this. If the learner submits evidence without a framing sentence, prompt: <em>"Good — now tell me what that proves. Finish this: 'According to [source], [finding] — which shows that...'"</em> The "which shows that" is the connection back to Reasoning. Without it, the evidence floats.</p>
+      <p><span class="j-tag">Fallacy — Appeal to Authority</span> Surface this at the Evidence level, not Reasoning. It's specifically an evidence error: citing a source because it sounds impressive rather than because the finding is specific and applicable. Introduce it here with the "Watch out" box format.</p>
+      <p><span class="j-tag">Fallacy — Generalization</span> Same: surfaces naturally here. A study on college students may not apply to middle schoolers. A stat from one country may not apply to another. Ask the learner: <em>"Does this evidence actually apply to the students in your motion — the age group, the context?"</em></p>
+    </div>
+
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-body">A specific fact, study, statistic, or example from your evidence packet that backs up your Reasoning. Evidence shows that your logic is grounded in something real — not just your opinion. Reasoning first, always. Evidence strengthens the bridge. It doesn't replace it.</div>
+
+        <div class="ev-types">
+          <div class="ev-type">
+            <div class="ev-type-name">Data / Stats</div>
+            <div class="ev-type-desc">Numbers from a study or report</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Expert Opinion</div>
+            <div class="ev-type-desc">What researchers or specialists have found</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Anecdote</div>
+            <div class="ev-type-desc">A real story that illustrates the point</div>
+          </div>
+          <div class="ev-type">
+            <div class="ev-type-name">Historical Example</div>
+            <div class="ev-type-desc">Something that already happened in the world</div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>Don't just drop a fact. Frame it.</strong><br><br>
+          <em>"According to [source], [finding] — which shows that [connection back to your Reasoning]."</em><br><br>
+          The "which shows that" is the most important part. Without it, the evidence floats. With it, the bridge holds.
+        </div>
+
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-top:10px;margin-bottom:10px;">
+          <strong>Watch out: Appeal to Authority</strong><br>
+          Citing a source because it sounds impressive — without explaining what it found or why it applies.<br>
+          <em style="font-size:12px;color:var(--text-dim);">"Harvard researchers say homework is harmful." — What did they find, specifically? Does it apply to your motion's age group and context? A credentialed source with no specific finding proves nothing.</em>
+        </div>
+
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-bottom:10px;">
+          <strong>Watch out: Generalization</strong><br>
+          Using evidence that doesn't actually apply to the situation you're arguing.<br>
+          <em style="font-size:12px;color:var(--text-dim);">A study on college students may not apply to middle schoolers. A statistic from one country may not apply to another. Before you cite it, ask: does this evidence fit our motion?</em>
+        </div>
+
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">1st Rebuttalist</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">See it in action — building up</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Claim</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Link · Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and things that shape who they become.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Link · Evidence</div>
+            <div class="action-text">Stanford researchers studied over 4,300 high school students and found that more than three hours of nightly homework led to higher stress, more health problems, and less time for friends and family — which shows that the harm isn't theoretical. It's documented, at scale, even among students who were working hard.</div>
+          </div>
+          <div class="action-row dim">
+            <div class="action-tag">Impact</div>
+            <div class="action-text">Coming next →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ── IMPACT ── -->
+  <div class="domain" id="domain-impact" style="margin-top:56px;">
+    <div class="domain-header">
+      <div class="domain-letter" style="background:var(--navy);">I</div>
+      <div>
+        <div class="domain-heading">Impact</div>
+        <span class="domain-sub">Why your Claim matters — at scale</span>
+      </div>
+    </div>
+
+    <div class="j-note">
+      <p><strong>Source mapping:</strong> This section draws from ARESR's Significance (S) domain. "Significance" is renamed "Impact" throughout the participant guide. The three comparison tools (Magnitude, Probability, Timeframe) are preserved but repositioned as optional tools, not a checklist — per the EJ/Manmeet decision that a strong Impact makes one or more clear comparisons, not necessarily all three.</p>
+      <p><strong>Why Impact is the hardest step:</strong> EJ flagged this in the July 27 session as the most commonly skipped element — and the one most aligned with MPLR's values. Kids can usually state a Claim and attempt a Link, but they stop there. The Impact is where the argument connects to the world. It's also where judges decide who wins. Skipping it is the most common reason a technically sound argument loses.</p>
+      <p><span class="j-tag">AI prompt — entry</span> After Link is built: <em>"Your argument is taking shape. Now one more question: so what? If your side is right, who does it actually affect — and how much does it matter to them?"</em> Don't offer the three tools yet. Let the learner attempt Impact cold first. Their first answer reveals exactly what they understand and what needs sharpening.</p>
+      <p><span class="j-tag">AI prompt — scale push</span> Most first Impact attempts stay personal or small-scale. ("It matters because students are stressed.") Push with: <em>"How many students? Is this just one school, or is this happening everywhere? How long has it been happening — and what's changed because of it?"</em> These questions map to Magnitude, Probability, and Timeframe without naming them yet.</p>
+      <p><span class="j-tag">AI prompt — introduce the tools</span> After the learner has attempted their own Impact: <em>"Here are three tools debaters use to build stronger impact comparisons. Look at what you wrote — which of these did you already use? Which one would make your argument stronger if you added it?"</em> Then reveal the three tools. This is the right sequence: attempt first, tools second. The learner finds their own gap.</p>
+      <p><span class="j-tag">Next level signal</span> Magnitude, Probability, and Timeframe are tools for building the learner's own Impact — they belong here in the pre-retreat guide. Impact Calculus (comparing your Impact against the other team's) is a more advanced skill that lives closer to Refutation than Impact-building. The "at the retreat" signal at the end of this section should point to Refutation — not Impact Calculus — as the natural next skill. Refutation is introduced live Saturday AM by the coaches.</p>
+      <p><span class="j-tag">Progressive reveal</span> By the time the learner reaches Impact, all three rows in the "See it in action" panel should be lit — Claim, Link · Reasoning, Link · Evidence — with Impact the final active row. This is the payoff moment: the complete argument visible for the first time.</p>
+    </div>
+
+    <div class="domain-body">
+      <div class="domain-left">
+        <div class="what-label">What it is</div>
+        <div class="what-body">Where you zoom out and explain why your argument matters to the world — not just why it's logically correct. Two questions to answer: <strong>Who is affected, and how many?</strong> And: <strong>What actually changes if your side is right?</strong><br><br>A strong Impact doesn't just restate the Claim or the Link. It shows the judges that the consequences of this debate extend beyond the motion — into real lives, at real scale.</div>
+
+        <div class="tip-box">
+          <strong>Three tools for building Impact comparisons.</strong><br><br>
+          You don't need all three. Use the ones that actually sharpen your argument.<br><br>
+          <strong>Magnitude</strong> — How many people are affected? The bigger the scale, the stronger the case. Millions beats hundreds. Every student beats one school.<br><br>
+          <strong>Probability</strong> — How likely is this outcome? Certain harms matter more than speculative ones. "This is already happening" beats "this might eventually happen."<br><br>
+          <strong>Timeframe</strong> — When does this happen? Immediate impacts often outweigh distant ones. "Right now, tonight" beats "sometime in the next decade."
+        </div>
+
+        <div class="tip-box" style="border-left-color:rgba(200,150,46,0.6);margin-top:10px;">
+          <strong>Watch out: Impact without a bridge</strong><br>
+          Jumping straight from Claim to Impact — skipping the Link — is the most common structural error in debate. The Impact sounds important, but without the reasoning and evidence underneath it, the other side can dismiss it in one sentence: "They haven't shown why that would actually happen."<br><br>
+          <em style="font-size:12px;color:var(--text-dim);">The full argument: Claim → Link → Impact. In that order, every time.</em>
+        </div>
+
+        <div style="margin-top:20px;padding:14px 18px;background:rgba(200,150,46,0.06);border:1px solid rgba(200,150,46,0.2);border-radius:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">At the retreat: what comes next</div>
+          <div style="font-size:13px;color:var(--text-dim);line-height:1.7;">Once you can build a complete Claim → Link → Impact, the next skill is learning how to take apart the other side's argument. That's called <strong style="color:var(--text);">Refutation</strong> — and your coaches will introduce it live on Saturday. It's where everything you've built here gets tested against a real opponent.</div>
+        </div>
+
+        <div style="margin-top:20px;padding:14px 18px;background:rgba(200,150,46,0.06);border:1px solid rgba(200,150,46,0.2);border-radius:4px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">At the retreat: what comes next</div>
+          <div style="font-size:13px;color:var(--text-dim);line-height:1.7;">Once you can build a complete Claim → Link → Impact, the next skill is learning how to take apart the other side's argument. That's called <strong style="color:var(--text);">Refutation</strong> — and your coaches will introduce it live on Saturday. It's where everything you've built here gets tested against a real opponent.</div>
+        </div>
+        <div class="roles-row">
+          <span class="roles-label">Roles:</span>
+          <span class="role-chip">1st Speaker</span>
+          <span class="role-chip">2nd Speaker</span>
+          <span class="role-chip">1st Rebuttalist</span>
+          <span class="role-chip">2nd Rebuttalist</span>
+        </div>
+      </div>
+      <div class="domain-right">
+        <div class="action-label">The complete argument</div>
+        <div class="action-stack">
+          <div class="action-row">
+            <div class="action-tag">Claim</div>
+            <div class="action-text">Homework takes up too much student free time.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Link · Reasoning</div>
+            <div class="action-text">When students spend hours on homework every night, they lose time for sleep, exercise, and things that shape who they become.</div>
+          </div>
+          <div class="action-row">
+            <div class="action-tag">Link · Evidence</div>
+            <div class="action-text">Stanford researchers found more than three hours of nightly homework increased stress and health problems — even among motivated students who were working hard.</div>
+          </div>
+          <div class="action-row active">
+            <div class="action-tag">Impact</div>
+            <div class="action-text">This isn't one school's problem — it's happening to millions of students right now. The ones hit hardest are often the ones with the least support at home: kids whose parents work late, who don't have a quiet place to study, who are already stretched. Piling on homework doesn't raise standards. It widens the gap between kids who can absorb the pressure and kids who can't.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="section-divider">
+
+
+</section>
+
+</body>
+</html>
