@@ -120,13 +120,19 @@ export async function startLiveSession(apiKey: string): Promise<string> {
   sessions.set(id, session);
   // Self-expiry: tear down an abandoned (warmed-but-never-finished) session
   // on its own instead of relying solely on the next startLiveSession sweep.
-  session.expiryTimer = setTimeout(() => {
+  const reap = () => {
     const cur = sessions.get(id);
-    if (cur) {
+    if (!cur) return;
+    const remaining = cur.expiresAt - Date.now();
+    if (remaining > 0) {
+      // Session still active (expiresAt slid forward); check again later.
+      cur.expiryTimer = setTimeout(reap, remaining + 1000);
+    } else {
       teardown(cur);
       sessions.delete(id);
     }
-  }, SESSION_TTL_MS + 1000);
+  };
+  session.expiryTimer = setTimeout(reap, SESSION_TTL_MS + 1000);
   await session.ready;
   return id;
 }
