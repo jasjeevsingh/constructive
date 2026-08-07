@@ -34,6 +34,17 @@ describe("POST /api/transcribe/live", () => {
     expect(sendLiveAudio).toHaveBeenCalledWith("session-1", expect.any(Buffer));
   });
 
+  it("returns 400 for audio chunks over the size cap", async () => {
+    const req = new Request("http://test/api/transcribe/live?sessionId=session-1", {
+      method: "POST",
+      body: Buffer.from(new Uint8Array(2 * 1024 * 1024 + 1)),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "audio chunk too large" });
+    expect(sendLiveAudio).not.toHaveBeenCalled();
+  });
+
   it("finishes a live session", async () => {
     const req = new Request("http://test/api/transcribe/live?action=stop&sessionId=session-1", {
       method: "POST",

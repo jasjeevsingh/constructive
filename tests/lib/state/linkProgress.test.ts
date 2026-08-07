@@ -30,4 +30,16 @@ describe("linkProgress store", () => {
     localStorage.setItem(LINK_STORAGE_KEY, "{nope");
     expect(loadLinkProgress(localStorage, "s1")).toEqual(emptyLinkProgress());
   });
+
+  it("drops malformed per-scenario entries but keeps valid ones", () => {
+    localStorage.setItem(
+      LINK_STORAGE_KEY,
+      JSON.stringify({
+        s1: { placedIds: "nope", held: false },
+        s2: { placedIds: ["c1"], held: true },
+      })
+    );
+    expect(loadLinkProgress(localStorage, "s1")).toEqual(emptyLinkProgress());
+    expect(loadLinkProgress(localStorage, "s2")).toEqual({ placedIds: ["c1"], held: true });
+  });
 });

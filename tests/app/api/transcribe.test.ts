@@ -26,4 +26,10 @@ describe("POST /api/transcribe", () => {
     const res = await POST(post(new Uint8Array([])));
     expect(res.status).toBe(400);
   });
+
+  it("returns 400 for audio over the size cap", async () => {
+    const res = await POST(post(new Uint8Array(10 * 1024 * 1024 + 1)));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "audio too large" });
+  });
 });

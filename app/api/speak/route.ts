@@ -1,4 +1,5 @@
 import { speakText } from "@/lib/ai/deepgram";
+import { MAX_SPEAK_TEXT_LENGTH } from "@/lib/ai/limits";
 
 export async function POST(req: Request): Promise<Response> {
   let body: { text?: string };
@@ -11,6 +12,9 @@ export async function POST(req: Request): Promise<Response> {
   const text = body.text?.trim();
   if (!text) {
     return Response.json({ error: "empty text" }, { status: 400 });
+  }
+  if (text.length > MAX_SPEAK_TEXT_LENGTH) {
+    return Response.json({ error: "text too long" }, { status: 400 });
   }
 
   try {

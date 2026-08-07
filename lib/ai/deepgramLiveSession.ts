@@ -1,6 +1,18 @@
 import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import type { ListenLiveClient } from "@deepgram/sdk";
 
+/**
+ * Serverless caveat: session state below (the `sessions` map, the open
+ * WebSocket client, and its keepAlive interval) lives in module memory and is
+ * scoped to a single process/instance. On serverless platforms (e.g. Vercel
+ * lambdas) separate invocations of this route may land on different
+ * instances, so a `sessionId` minted by one invocation is not guaranteed to
+ * resolve on a later one — the connection and any in-progress transcript can
+ * simply vanish. This module is only durable on a long-running server
+ * process. Callers on serverless should treat live-session failures as
+ * expected and fall back to the batch `/api/transcribe` endpoint.
+ */
+
 const LISTEN_MODEL = process.env.DEEPGRAM_LISTEN_MODEL ?? "nova-2";
 const SESSION_TTL_MS = 5 * 60 * 1000;
 
@@ -11,6 +23,7 @@ type SessionRecord = {
   ready: Promise<void>;
   expiresAt: number;
   keepAlive: ReturnType<typeof setInterval> | null;
+  expiryTimer: ReturnType<typeof setTimeout> | null;
 };
 
 const sessions = new Map<string, SessionRecord>();
@@ -27,6 +40,7 @@ function sweepSessions() {
 
 function teardown(session: SessionRecord) {
   if (session.keepAlive) clearInterval(session.keepAlive);
+  if (session.expiryTimer) clearTimeout(session.expiryTimer);
   try {
     session.client.requestClose();
   } catch {
@@ -63,6 +77,7 @@ function createSession(apiKey: string): SessionRecord {
     }),
     expiresAt: Date.now() + SESSION_TTL_MS,
     keepAlive: null,
+    expiryTimer: null,
   };
 
   client.on(LiveTranscriptionEvents.Transcript, (data) => {
@@ -103,6 +118,15 @@ export async function startLiveSession(apiKey: string): Promise<string> {
   const id = crypto.randomUUID();
   const session = createSession(apiKey);
   sessions.set(id, session);
+  // Self-expiry: tear down an abandoned (warmed-but-never-finished) session
+  // on its own instead of relying solely on the next startLiveSession sweep.
+  session.expiryTimer = setTimeout(() => {
+    const cur = sessions.get(id);
+    if (cur) {
+      teardown(cur);
+      sessions.delete(id);
+    }
+  }, SESSION_TTL_MS + 1000);
   await session.ready;
   return id;
 }

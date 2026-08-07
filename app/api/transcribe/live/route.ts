@@ -1,4 +1,5 @@
 import { startLiveSession, sendLiveAudio, finishLiveSession } from "@/lib/ai/deepgramLiveSession";
+import { MAX_LIVE_CHUNK_BYTES } from "@/lib/ai/limits";
 
 function apiKey(): string {
   const key = process.env.DEEPGRAM_API_KEY;
@@ -29,6 +30,9 @@ export async function POST(req: Request): Promise<Response> {
     const chunk = Buffer.from(await req.arrayBuffer());
     if (chunk.length === 0) {
       return Response.json({ error: "empty audio chunk" }, { status: 400 });
+    }
+    if (chunk.length > MAX_LIVE_CHUNK_BYTES) {
+      return Response.json({ error: "audio chunk too large" }, { status: 400 });
     }
     const { text } = await sendLiveAudio(sessionId, chunk);
     return Response.json({ text }, { status: 200 });

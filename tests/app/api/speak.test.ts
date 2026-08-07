@@ -30,4 +30,10 @@ describe("POST /api/speak", () => {
     const res = await POST(post({ text: "  " }));
     expect(res.status).toBe(400);
   });
+
+  it("returns 400 for text over the length cap", async () => {
+    const res = await POST(post({ text: "a".repeat(4001) }));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "text too long" });
+  });
 });
