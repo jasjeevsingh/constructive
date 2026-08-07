@@ -82,3 +82,25 @@ export const LinkScenarioSchema = z.object({
 export type LinkScenario = z.infer<typeof LinkScenarioSchema>;
 
 export const LinkScenariosFileSchema = z.array(LinkScenarioSchema);
+
+export const FlowClaimSchema = z.object({
+  id: z.string().min(1),
+  claim: z.string().min(1),
+  impact: z.string().min(1),
+  candidates: z.array(LinkCandidateSchema).min(2),
+});
+export type FlowClaim = z.infer<typeof FlowClaimSchema>;
+
+export const FlowSideSchema = z.object({
+  claims: z.array(FlowClaimSchema),
+});
+
+export const FlowMotionSchema = z.object({
+  id: z.string().min(1),
+  motion: z.string().min(1),
+  keywords: z.array(KeywordSchema),
+  sides: z.object({ for: FlowSideSchema, against: FlowSideSchema }),
+});
+export type FlowMotion = z.infer<typeof FlowMotionSchema>;
+
+export const FlowMotionsFileSchema = z.array(FlowMotionSchema);
