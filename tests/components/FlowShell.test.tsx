@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FlowShell } from "@/components/FlowShell";
+import { FLOW_STORAGE_KEY } from "@/lib/state/flowProgress";
 import type { FlowMotion } from "@/lib/schemas";
 
 const motion: FlowMotion = {
@@ -46,5 +47,17 @@ describe("FlowShell", () => {
     await userEvent.click(await screen.findByRole("button", { name: /next: keywords/i }));
     // Keyword stage renders the clickable motion (the gold keyword "kids").
     expect(await screen.findByText("kids")).toBeInTheDocument();
+  });
+
+  it("shows a completion state (not the Impact input) once the FOR side is complete", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+    }));
+    const onExit = vi.fn();
+    render(<FlowShell motion={motion} onExit={onExit} />);
+    expect(await screen.findByText(/all the way through the for side/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
+    expect(onExit).toHaveBeenCalled();
   });
 });

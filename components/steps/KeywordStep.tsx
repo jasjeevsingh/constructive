@@ -70,7 +70,7 @@ export function KeywordStep({
         </div>
       )}
       <button type="button" style={{ marginTop: 14 }} onClick={onNext}>
-        Next: arguments →
+        Next: claim →
       </button>
     </div>
   );
