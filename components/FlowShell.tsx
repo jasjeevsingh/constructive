@@ -62,7 +62,7 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
                 )}
                 {progress.stage === "link" && mappedClaim && (
                   <LinkCard
-                    scenario={claimToScenario(mappedClaim)}
+                    scenario={claimToScenario(motion.id, mappedClaim)}
                     onExit={onExit}
                     onComplete={() => update({ stage: "impact" })}
                   />

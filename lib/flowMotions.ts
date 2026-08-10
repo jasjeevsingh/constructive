@@ -23,7 +23,12 @@ export function flowMotionToMotion(fm: FlowMotion): Motion {
   return { id: fm.id, motion: fm.motion, keywords: fm.keywords, theme: "general" };
 }
 
-/** LinkCard expects a LinkScenario; an authored claim already carries that shape. */
-export function claimToScenario(claim: FlowClaim): LinkScenario {
-  return { id: claim.id, claim: claim.claim, impact: claim.impact, candidates: claim.candidates };
+/**
+ * LinkCard expects a LinkScenario; an authored claim already carries that shape.
+ * Claim ids are not globally unique across motions, so the scenario id is
+ * namespaced by motion id to keep per-motion Link progress (localStorage) from
+ * colliding across motions that happen to share a claim id.
+ */
+export function claimToScenario(motionId: string, claim: FlowClaim): LinkScenario {
+  return { id: `${motionId}:${claim.id}`, claim: claim.claim, impact: claim.impact, candidates: claim.candidates };
 }

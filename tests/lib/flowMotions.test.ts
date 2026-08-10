@@ -30,7 +30,7 @@ describe("flow motions bank", () => {
   });
   it("adapts a claim to a LinkScenario (for LinkCard)", () => {
     const c = getFlowMotion("m-kids-vote")!.sides.for.claims[0];
-    const s = claimToScenario(c);
-    expect(s).toEqual({ id: c.id, claim: c.claim, impact: c.impact, candidates: c.candidates });
+    const s = claimToScenario("m-kids-vote", c);
+    expect(s).toEqual({ id: `m-kids-vote:${c.id}`, claim: c.claim, impact: c.impact, candidates: c.candidates });
   });
 });
