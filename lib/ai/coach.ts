@@ -2,6 +2,8 @@ import { restatePrompt } from "@/lib/prompts/restate";
 import { keywordPrompt } from "@/lib/prompts/keyword";
 import { refinePrompt } from "@/lib/prompts/refine";
 import { linkPrompt } from "@/lib/prompts/link";
+import { claimPrompt } from "@/lib/prompts/claim";
+import { impactPrompt } from "@/lib/prompts/impact";
 import { CoachResponseSchema, type CoachRequest, type CoachResponse } from "@/lib/schemas";
 import type { ChatClient } from "@/lib/ai/claude";
 
@@ -30,6 +32,20 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
         candidateText: String(p.candidateText ?? ""),
         verdict: String(p.verdict ?? ""),
       });
+    case "claim":
+      return claimPrompt({
+        motion: req.motion,
+        side: String(p.side ?? ""),
+        studentClaim: String(p.studentClaim ?? ""),
+        authoredClaims: (p.authoredClaims as { id: string; claim: string }[]) ?? [],
+      });
+    case "impact":
+      return impactPrompt({
+        motion: req.motion,
+        claim: String(p.claim ?? ""),
+        authoredImpact: String(p.authoredImpact ?? ""),
+        studentImpact: String(p.studentImpact ?? ""),
+      });
   }
 }
 
@@ -42,5 +58,12 @@ export async function runCoach(req: CoachRequest, client: ChatClient): Promise<C
   } catch {
     throw new Error("Coach returned non-JSON output");
   }
-  return CoachResponseSchema.parse(parsed);
+  const result = CoachResponseSchema.parse(parsed);
+  if (result.kind === "claim") {
+    const ids = ((req.payload.authoredClaims as { id: string }[] | undefined) ?? []).map((c) => c.id);
+    if (!ids.includes(result.mappedClaimId)) {
+      throw new Error("coach mapped claim to an id outside the authored set");
+    }
+  }
+  return result;
 }

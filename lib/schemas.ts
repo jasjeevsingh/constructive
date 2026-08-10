@@ -16,7 +16,7 @@ export type Motion = z.infer<typeof MotionSchema>;
 
 export const MotionsFileSchema = z.array(MotionSchema);
 
-export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link"]);
+export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link", "claim", "impact"]);
 export type CoachStep = z.infer<typeof CoachStepSchema>;
 
 export const CoachRequestSchema = z.object({
@@ -49,11 +49,22 @@ export const LinkResponseSchema = z.object({
   kind: z.literal("link"),
   reaction: z.string(),
 });
+export const ClaimResponseSchema = z.object({
+  kind: z.literal("claim"),
+  reaction: z.string(),
+  mappedClaimId: z.string(),
+});
+export const ImpactResponseSchema = z.object({
+  kind: z.literal("impact"),
+  reaction: z.string(),
+});
 export const CoachResponseSchema = z.discriminatedUnion("kind", [
   RestateResponseSchema,
   KeywordResponseSchema,
   RefineResponseSchema,
   LinkResponseSchema,
+  ClaimResponseSchema,
+  ImpactResponseSchema,
 ]);
 export type CoachResponse = z.infer<typeof CoachResponseSchema>;
 export type RefineVerdict = z.infer<typeof RefineVerdictSchema>;
