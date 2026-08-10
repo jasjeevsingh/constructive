@@ -8,18 +8,21 @@ describe("flow motions bank", () => {
   it("finds a motion by id", () => {
     expect(getFlowMotion("m-kids-vote")?.motion).toContain("let kids vote");
   });
-  it("every authored FOR side has exactly 3 claims", () => {
+  it("every motion has exactly 3 claims on BOTH sides", () => {
     for (const m of getFlowMotions()) {
-      if (m.sides.for.claims.length > 0) expect(m.sides.for.claims.length).toBe(3);
+      expect(m.sides.for.claims.length).toBe(3);
+      expect(m.sides.against.claims.length).toBe(3);
     }
   });
-  it("every claim's bank is winnable and has a great-but-wrong trap", () => {
+  it("every claim on both sides is winnable and has a great-but-wrong trap", () => {
     for (const m of getFlowMotions()) {
-      for (const c of m.sides.for.claims) {
-        const fits = c.candidates.filter((x) => x.verdict === "fits");
-        expect(fits.some((x) => x.material === "evidence")).toBe(true);
-        expect(fits.some((x) => x.material === "reasoning")).toBe(true);
-        expect(c.candidates.some((x) => x.verdict === "great-but-wrong")).toBe(true);
+      for (const side of ["for", "against"] as const) {
+        for (const c of m.sides[side].claims) {
+          const fits = c.candidates.filter((x) => x.verdict === "fits");
+          expect(fits.some((x) => x.material === "evidence")).toBe(true);
+          expect(fits.some((x) => x.material === "reasoning")).toBe(true);
+          expect(c.candidates.some((x) => x.verdict === "great-but-wrong")).toBe(true);
+        }
       }
     }
   });
