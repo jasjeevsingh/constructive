@@ -1,5 +1,5 @@
-import { Deck } from "@/components/Deck";
+import { redirect } from "next/navigation";
 
 export default function MotionsPage() {
-  return <Deck />;
+  redirect("/");
 }

@@ -1,6 +1,5 @@
-import { LinkDeck } from "@/components/LinkDeck";
+import { redirect } from "next/navigation";
 
 export default function LinkPage() {
-  return <LinkDeck />;
+  redirect("/");
 }
-
