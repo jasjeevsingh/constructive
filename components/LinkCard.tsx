@@ -5,7 +5,7 @@ import { useLinkProgress } from "@/lib/state/useLinkProgress";
 import { speakCoach } from "@/lib/voice/playSpeech";
 import type { LinkScenario, LinkCandidate, CoachResponse } from "@/lib/schemas";
 
-export function LinkCard({ scenario, onExit }: { scenario: LinkScenario; onExit: () => void }) {
+export function LinkCard({ scenario, onExit, onComplete }: { scenario: LinkScenario; onExit: () => void; onComplete?: () => void }) {
   const [progress, update] = useLinkProgress(scenario.id);
   const placed = progress.placedIds;
   const [grade, setGrade] = useState<BridgeGrade | null>(null);
@@ -115,6 +115,12 @@ export function LinkCard({ scenario, onExit }: { scenario: LinkScenario; onExit:
               Not yet{!(grade.hasEvidence && grade.hasReasoning) ? " — a strong bridge needs both evidence and reasoning." : " — check the flagged planks."}
             </span>)}
       </div>
+
+      {onComplete && grade?.held && (
+        <div style={{ marginTop: 12 }}>
+          <button type="button" onClick={onComplete}>Continue →</button>
+        </div>
+      )}
     </div>
   );
 }
