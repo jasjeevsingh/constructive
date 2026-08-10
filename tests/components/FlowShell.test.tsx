@@ -19,7 +19,15 @@ const motion: FlowMotion = {
         ] },
       ],
     },
-    against: { claims: [] },
+    against: {
+      claims: [
+        { id: "a-maturity", claim: "Kids lack the experience to weigh trade-offs.", impact: "Worse decisions.", candidates: [
+          { id: "e1", text: "Judgment keeps developing.", material: "evidence", verdict: "fits", explanation: "x" },
+          { id: "r1", text: "Trade-offs need context.", material: "reasoning", verdict: "fits", explanation: "x" },
+          { id: "gbw", text: "A prize was won on voting math.", material: "evidence", verdict: "great-but-wrong", explanation: "x" },
+        ] },
+      ],
+    },
   },
 };
 
@@ -56,7 +64,31 @@ describe("FlowShell", () => {
     }));
     const onExit = vi.fn();
     render(<FlowShell motion={motion} onExit={onExit} />);
-    expect(await screen.findByText(/all the way through the for side/i)).toBeInTheDocument();
+    expect(await screen.findByText(/built the for case/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
+    expect(onExit).toHaveBeenCalled();
+  });
+
+  it("offers a switch to the AGAINST side once FOR is complete, landing on the AGAINST Claim stage", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+    }));
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    const switchBtn = await screen.findByRole("button", { name: /argue the other side/i });
+    await userEvent.click(switchBtn);
+    // Now on the AGAINST Claim stage — its prompt asks for a claim "against" the motion.
+    expect(await screen.findByText(/against this motion/i)).toBeInTheDocument();
+  });
+
+  it("shows a both-sides-complete closure once AGAINST is also done", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+    }));
+    const onExit = vi.fn();
+    render(<FlowShell motion={motion} onExit={onExit} />);
+    expect(await screen.findByText(/argued both sides/i)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
     expect(onExit).toHaveBeenCalled();
   });

@@ -23,22 +23,41 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
             <div className="serif" style={{ fontSize: 19, color: "#fff" }}>{motion.motion}</div>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
-            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999, background: "rgba(200,150,46,.16)", border: "1px solid var(--gold)", color: "var(--gold)", fontWeight: 700 }}>FOR</span>
-            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999, border: "1px solid #24344f", color: "#4a5a6f" }}>
-              🔒 AGAINST · soon
+            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999,
+              background: progress.side === "for" ? "rgba(200,150,46,.16)" : "transparent",
+              border: `1px solid ${progress.side === "for" ? "var(--gold)" : "#24344f"}`,
+              color: progress.side === "for" ? "var(--gold)" : "#4a5a6f", fontWeight: 700 }}>
+              {progress.forComplete ? "✓ FOR" : "FOR"}
+            </span>
+            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999,
+              background: progress.side === "against" ? "rgba(200,150,46,.16)" : "transparent",
+              border: `1px solid ${progress.side === "against" ? "var(--gold)" : "#24344f"}`,
+              color: progress.side === "against" ? "var(--gold)" : "#4a5a6f", fontWeight: 700 }}>
+              {progress.againstComplete ? "✓ AGAINST" : progress.forComplete ? "AGAINST" : "🔒 AGAINST · soon"}
             </span>
           </div>
         </div>
         <div style={{ display: "flex", minHeight: 320 }}>
           <FlowRail stage={progress.stage} />
           <div style={{ flex: 1, padding: "20px 22px" }}>
-            {progress.side === "for" && progress.forComplete ? (
+            {progress.forComplete && progress.againstComplete ? (
               <div>
                 <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>Complete</div>
                 <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>
-                  You&apos;ve worked this motion all the way through the FOR side — claim, link, and impact. 🎉
+                  You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
                 </p>
                 <button type="button" onClick={onExit}>← back to motions</button>
+              </div>
+            ) : progress.side === "for" && progress.forComplete ? (
+              <div>
+                <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>FOR side complete</div>
+                <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>
+                  Nice — you built the FOR case: claim, link, and impact. Now flip it and argue the other side.
+                </p>
+                <button type="button" onClick={() => update({ side: "against", stage: "claim", mappedClaimId: null, impact: "" })}>
+                  Now argue the other side →
+                </button>
+                <button type="button" onClick={onExit} style={{ marginLeft: 10 }}>← back to motions</button>
               </div>
             ) : (
               <>
