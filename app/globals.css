@@ -1,23 +1,63 @@
-:root {
-  --navy: #0A1628;
-  --navy-mid: #112240;
-  --navy-light: #1B3461;
-  --gold: #C8962E;
-  --orange: #F4732A;
-  --orange-light: #FF9A5C;
-  --paper: #F7F6F2;
-  --ink: #111E2B;
-  --dim: #9AA5B4;
-  --text: #E8E8E0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #FAF9F6;
+    --foreground: #0F1E2E;
+    --card: #FFFFFF;
+    --card-foreground: #0F1E2E;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F1E2E;
+    --primary: #1E5AA8;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1EEE8;
+    --secondary-foreground: #0F1E2E;
+    --muted: #F1EEE8;
+    --muted-foreground: #6B6156;
+    --accent: #F1EEE8;
+    --accent-foreground: #0F1E2E;
+    --destructive: #DC2626;
+    --destructive-foreground: #FFFFFF;
+    --border: #E7E3DA;
+    --input: #E7E3DA;
+    --ring: #1E5AA8;
+    --radius: 0.75rem;
+    --evidence: #C8962E;
+    --evidence-foreground: #1A1205;
+    --reasoning: #F4732A;
+    --reasoning-foreground: #1A0E05;
+    --success: #2E9E5B;
+    --success-foreground: #FFFFFF;
+
+    /* Legacy brand vars — kept so not-yet-migrated inline-styled screens still render. */
+    --navy: #0A1628;
+    --navy-mid: #112240;
+    --navy-light: #1B3461;
+    --gold: #C8962E;
+    --orange: #F4732A;
+    --orange-light: #FF9A5C;
+    --paper: #F7F6F2;
+    --ink: #111E2B;
+    --dim: #9AA5B4;
+    --text: #E8E8E0;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  background: var(--navy);
-  color: var(--text);
-  font-family: "DM Sans", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* Legacy helper classes — kept for un-migrated components; now map to the new fonts. */
+.serif {
+  font-family: var(--font-display), Georgia, serif;
 }
-.serif { font-family: "Playfair Display", Georgia, serif; }
-.accent { font-family: "Bebas Neue", sans-serif; letter-spacing: 1px; }
+.accent {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}

@@ -1,20 +1,28 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import { Fraunces, DM_Sans } from "next/font/google";
+
+const display = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+const sans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata = {
-  title: "Constructive — Motion Reader",
-  description: "Learn to read a debate motion, one card at a time.",
+  title: "Constructive",
+  description: "Learn to build an argument — claim, link, and impact.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Bebas+Neue&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body>{children}</body>
     </html>
   );
