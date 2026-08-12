@@ -7,6 +7,10 @@ import { ClaimStage } from "@/components/stages/ClaimStage";
 import { ImpactStage } from "@/components/stages/ImpactStage";
 import { LinkCard } from "@/components/LinkCard";
 import { FlowRail } from "@/components/FlowRail";
+import { AppShell } from "@/components/ui/app-shell";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import type { FlowMotion } from "@/lib/schemas";
 
 export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () => void }) {
@@ -14,50 +18,70 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
   const sideClaims = motion.sides[progress.side].claims;
   const mappedClaim = sideClaims.find((c) => c.id === progress.mappedClaimId) ?? null;
 
+  const forPill = progress.forComplete ? (
+    <Badge variant="success">✓ FOR</Badge>
+  ) : (
+    <Badge variant={progress.side === "for" ? "default" : "secondary"}>FOR</Badge>
+  );
+
+  const againstPill = progress.againstComplete ? (
+    <Badge variant="success">✓ AGAINST</Badge>
+  ) : progress.side === "against" ? (
+    <Badge variant="default">AGAINST</Badge>
+  ) : progress.forComplete ? (
+    <Badge variant="secondary">AGAINST</Badge>
+  ) : (
+    <Badge variant="outline">🔒 AGAINST · soon</Badge>
+  );
+
+  const bothComplete = progress.forComplete && progress.againstComplete;
+  const forDone = progress.side === "for" && progress.forComplete && !progress.againstComplete;
+
   return (
-    <div style={{ maxWidth: 840, margin: "0 auto" }}>
-      <div style={{ background: "var(--navy)", border: "1px solid #22324c", borderRadius: 18, overflow: "hidden" }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid #22324c", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14 }}>
+    <AppShell>
+      <Card className="flex min-h-[70vh] flex-col overflow-hidden p-0">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border p-4 sm:p-5">
           <div>
-            <button type="button" onClick={onExit} style={{ fontSize: 12, marginBottom: 6 }}>← motions</button>
-            <div className="serif" style={{ fontSize: 19, color: "#fff" }}>{motion.motion}</div>
+            <Button variant="ghost" size="sm" onClick={onExit} className="mb-1 h-8 px-2 text-muted-foreground">
+              ← Motions
+            </Button>
+            <div className="font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
+              {motion.motion}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999,
-              background: progress.side === "for" ? "rgba(200,150,46,.16)" : "transparent",
-              border: `1px solid ${progress.side === "for" ? "var(--gold)" : "#24344f"}`,
-              color: progress.side === "for" ? "var(--gold)" : "#4a5a6f", fontWeight: 700 }}>
-              {progress.forComplete ? "✓ FOR" : "FOR"}
-            </span>
-            <span style={{ fontSize: 11, padding: "5px 12px", borderRadius: 999,
-              background: progress.side === "against" ? "rgba(200,150,46,.16)" : "transparent",
-              border: `1px solid ${progress.side === "against" ? "var(--gold)" : "#24344f"}`,
-              color: progress.side === "against" ? "var(--gold)" : "#4a5a6f", fontWeight: 700 }}>
-              {progress.againstComplete ? "✓ AGAINST" : progress.forComplete ? "AGAINST" : "🔒 AGAINST · soon"}
-            </span>
+          <div className="flex shrink-0 gap-2">
+            {forPill}
+            {againstPill}
           </div>
         </div>
-        <div style={{ display: "flex", minHeight: 320 }}>
+
+        <div className="flex flex-1 flex-col md:flex-row">
           <FlowRail stage={progress.stage} />
-          <div style={{ flex: 1, padding: "20px 22px" }}>
-            {progress.forComplete && progress.againstComplete ? (
-              <div>
-                <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>Complete</div>
-                <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>
+          <div className="flex-1 p-5 sm:p-6">
+            {bothComplete ? (
+              <div className="mx-auto max-w-md py-8 text-center">
+                <div className="text-xs font-semibold uppercase tracking-wide text-primary">Complete</div>
+                <p className="mt-2 font-display text-xl font-semibold text-foreground">
                   You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
                 </p>
-                <button type="button" onClick={onExit}>← back to motions</button>
+                <Button variant="secondary" className="mt-4" onClick={onExit}>
+                  ← back to motions
+                </Button>
               </div>
-            ) : progress.side === "for" && progress.forComplete ? (
-              <div>
-                <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>FOR side complete</div>
-                <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>
+            ) : forDone ? (
+              <div className="mx-auto max-w-md py-8 text-center">
+                <div className="text-xs font-semibold uppercase tracking-wide text-primary">FOR side complete</div>
+                <p className="mt-2 text-lg text-foreground">
                   Nice — you built the FOR case: claim, link, and impact. Now flip it and argue the other side.
                 </p>
-                <button type="button" onClick={() => update({ side: "against", stage: "claim", mappedClaimId: null, impact: "" })}>
-                  Now argue the other side →
-                </button>
-                <button type="button" onClick={onExit} style={{ marginLeft: 10 }}>← back to motions</button>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  <Button onClick={() => update({ side: "against", stage: "claim", mappedClaimId: null, impact: "" })}>
+                    Now argue the other side →
+                  </Button>
+                  <Button variant="ghost" onClick={onExit}>
+                    ← back to motions
+                  </Button>
+                </div>
               </div>
             ) : (
               <>
@@ -91,14 +115,20 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
                     motion={motion.motion}
                     claim={mappedClaim.claim}
                     authoredImpact={mappedClaim.impact}
-                    onComplete={(impact) => update({ impact, forComplete: progress.side === "for" ? true : progress.forComplete, againstComplete: progress.side === "against" ? true : progress.againstComplete })}
+                    onComplete={(impact) =>
+                      update({
+                        impact,
+                        forComplete: progress.side === "for" ? true : progress.forComplete,
+                        againstComplete: progress.side === "against" ? true : progress.againstComplete,
+                      })
+                    }
                   />
                 )}
               </>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </Card>
+    </AppShell>
   );
 }
