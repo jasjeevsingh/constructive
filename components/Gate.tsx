@@ -32,7 +32,9 @@ export function Gate() {
     <main className="grid min-h-[100dvh] place-items-center px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl">Constructive</CardTitle>
+          <CardTitle asChild className="text-3xl">
+            <h1>Constructive</h1>
+          </CardTitle>
           <CardDescription>Enter the password from your retreat packet.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -50,11 +52,14 @@ export function Gate() {
                 type="password"
                 value={password}
                 autoFocus
+                autoComplete="current-password"
+                aria-invalid={error || undefined}
+                aria-describedby={error ? "password-error" : undefined}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             {error && (
-              <p role="alert" className="text-sm font-medium text-destructive">
+              <p id="password-error" role="alert" className="text-sm font-medium text-destructive">
                 That password didn&apos;t work.
               </p>
             )}
