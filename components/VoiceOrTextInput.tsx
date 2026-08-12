@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { pickRecorderMimeType } from "@/lib/voice/deepgramLive";
 
 function voiceSupported(): boolean {
@@ -236,24 +237,18 @@ export function VoiceOrTextInput({
 
   return (
     <div>
-      <label style={{ display: "block", marginBottom: 8, color: "var(--dim)" }}>{label}</label>
+      <label className="mb-2 block text-sm text-muted-foreground">{label}</label>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={3}
-        style={{
-          width: "100%",
-          background: "var(--navy-mid)",
-          color: "var(--text)",
-          border: "1px solid #24344f",
-          borderRadius: 10,
-          padding: 10,
-        }}
+        className="w-full rounded-lg border border-input bg-background p-2.5 text-base text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       />
-      <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <div className="mt-2 flex flex-wrap items-center gap-2.5">
         {voiceSupported() && (
-          <button
+          <Button
             type="button"
+            variant="secondary"
             disabled={status === "transcribing"}
             aria-pressed={status === "listening"}
             onPointerDown={(e) => {
@@ -268,19 +263,17 @@ export function VoiceOrTextInput({
             style={{ touchAction: "none", opacity: status === "listening" ? 0.85 : 1 }}
           >
             🎤 {micLabel}
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           type="button"
           onClick={() => onSubmit(text)}
           disabled={status === "transcribing" || !text.trim()}
         >
           Submit
-        </button>
+        </Button>
       </div>
-      {voiceError && (
-        <p style={{ color: "var(--orange-light)", marginTop: 8, fontSize: 14 }}>{voiceError}</p>
-      )}
+      {voiceError && <p className="mt-2 text-sm text-muted-foreground">{voiceError}</p>}
     </div>
   );
 }

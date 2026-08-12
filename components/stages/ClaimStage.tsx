@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { Button } from "@/components/ui/button";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function ClaimStage({
@@ -45,32 +46,34 @@ export function ClaimStage({
 
   return (
     <div>
-      <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>Stage 2 · Claim</div>
-      <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Stage 2 · Claim</div>
+      <p className="my-2 text-lg text-foreground">
         What&apos;s your strongest claim {side === "for" ? "for" : "against"} this motion?
       </p>
       <VoiceOrTextInput label="Say or type your claim" onSubmit={submit} />
 
       {reaction && mapped && (
-        <div style={{ marginTop: 12 }}>
-          <p style={{ color: "var(--orange-light)" }}>💬 {reaction}</p>
-          <p style={{ color: "var(--dim)", fontSize: 13 }}>
-            We&apos;ll carry this forward as: <b style={{ color: "var(--gold)" }}>{mapped.claim}</b>
+        <div className="mt-3">
+          <p className="text-foreground">💬 {reaction}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We&apos;ll carry this forward as: <b className="text-evidence">{mapped.claim}</b>
           </p>
-          <button type="button" onClick={() => onComplete(mapped.id)} style={{ marginTop: 8 }}>
+          <Button type="button" className="mt-2" onClick={() => onComplete(mapped.id)}>
             Build the link →
-          </button>
+          </Button>
         </div>
       )}
 
       {fallback && (
-        <div style={{ marginTop: 12 }}>
-          <p style={{ color: "var(--orange-light)", fontSize: 13 }}>Coach unavailable — pick the claim closest to yours:</p>
-          {claims.map((c) => (
-            <button key={c.id} type="button" onClick={() => onComplete(c.id)} style={{ display: "block", textAlign: "left", margin: "6px 0", width: "100%" }}>
-              {c.claim}
-            </button>
-          ))}
+        <div className="mt-3">
+          <p className="text-sm text-muted-foreground">Coach unavailable — pick the claim closest to yours:</p>
+          <div className="mt-2 flex flex-col gap-2">
+            {claims.map((c) => (
+              <Button key={c.id} type="button" variant="outline" className="h-auto w-full justify-start whitespace-normal py-2 text-left" onClick={() => onComplete(c.id)}>
+                {c.claim}
+              </Button>
+            ))}
+          </div>
         </div>
       )}
     </div>

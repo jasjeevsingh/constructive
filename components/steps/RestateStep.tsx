@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { Button } from "@/components/ui/button";
 import { speakCoach } from "@/lib/voice/playSpeech";
 import type { CoachResponse } from "@/lib/schemas";
 
@@ -43,12 +44,12 @@ export function RestateStep({
   return (
     <div>
       <VoiceOrTextInput label="Say the motion in your own words — what's the core claim?" onSubmit={submit} />
-      {reaction && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>💬 {reaction}</p>}
-      {error && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>{error}</p>}
+      {reaction && <p className="mt-2.5 text-foreground">💬 {reaction}</p>}
+      {error && <p className="mt-2.5 text-muted-foreground">{error}</p>}
       {(reaction || error) && (
-        <button type="button" style={{ marginTop: 10 }} onClick={() => onNext(saved)}>
+        <Button type="button" className="mt-3" onClick={() => onNext(saved)}>
           Next: keywords →
-        </button>
+        </Button>
       )}
     </div>
   );
