@@ -67,3 +67,16 @@ export function saveFlowProgress(storage: Storage, motionId: string, p: FlowProg
   all[motionId] = p;
   storage.setItem(FLOW_STORAGE_KEY, JSON.stringify(all));
 }
+
+export type MotionStatus = "not-started" | "in-progress" | "for-done" | "complete";
+
+export function loadAllFlowProgress(storage: Storage): Record<string, FlowProgress> {
+  return readAll(storage);
+}
+
+export function motionStatus(entry: FlowProgress | undefined): MotionStatus {
+  if (!entry) return "not-started";
+  if (entry.forComplete && entry.againstComplete) return "complete";
+  if (entry.forComplete) return "for-done";
+  return "in-progress";
+}
