@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { Button } from "@/components/ui/button";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function ImpactStage({
@@ -38,15 +39,15 @@ export function ImpactStage({
 
   return (
     <div>
-      <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--gold)" }}>Stage 4 · Impact</div>
-      <p style={{ fontSize: 17, color: "#fff", margin: "6px 0 14px" }}>So what? Why does this claim matter — what&apos;s the bigger consequence?</p>
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Stage 4 · Impact</div>
+      <p className="my-2 text-lg text-foreground">So what? Why does this claim matter — what&apos;s the bigger consequence?</p>
       <VoiceOrTextInput label="Say or type the impact" onSubmit={submit} />
-      {reaction && <p style={{ color: "var(--orange-light)", marginTop: 12 }}>💬 {reaction}</p>}
-      {error && <p style={{ color: "var(--orange-light)", marginTop: 12 }}>Coach unavailable — keep going.</p>}
+      {reaction && <p className="mt-3 text-foreground">💬 {reaction}</p>}
+      {error && <p className="mt-3 text-muted-foreground">Coach unavailable — keep going.</p>}
       {(reaction || error) && (
-        <button type="button" onClick={() => onComplete(saved)} style={{ marginTop: 10 }}>
+        <Button type="button" className="mt-3" onClick={() => onComplete(saved)}>
           Finish this side ✓
-        </button>
+        </Button>
       )}
     </div>
   );

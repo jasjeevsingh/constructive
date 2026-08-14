@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
+import { Button } from "@/components/ui/button";
 import { speakCoach } from "@/lib/voice/playSpeech";
 import { segmentMotion } from "@/lib/keywordMatch";
 import type { Motion, CoachResponse } from "@/lib/schemas";
@@ -45,7 +46,7 @@ export function KeywordStep({
 
   return (
     <div>
-      <p className="serif" style={{ fontSize: 22 }}>
+      <p className="font-display text-xl leading-relaxed text-foreground">
         {segmentMotion(motion.motion, motion.keywords).map((segment, i) => {
           if (segment.keyword) {
             const kw = segment.keyword;
@@ -53,7 +54,7 @@ export function KeywordStep({
               <span
                 key={i}
                 onClick={() => { setActive(kw); setReaction(null); }}
-                style={{ cursor: "pointer", color: "var(--gold)", borderBottom: "2px dashed var(--gold)" }}
+                className="cursor-pointer border-b-2 border-dashed border-evidence text-evidence"
               >
                 {segment.text}
               </span>
@@ -63,15 +64,15 @@ export function KeywordStep({
         })}
       </p>
       {active && (
-        <div style={{ marginTop: 12 }}>
+        <div className="mt-3">
           <VoiceOrTextInput label={`What's the scope of "${active.word}" here — and why?`} onSubmit={submit} />
-          {reaction && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>💬 {reaction}</p>}
-          {error && <p style={{ color: "var(--orange-light)", marginTop: 10 }}>{error}</p>}
+          {reaction && <p className="mt-2.5 text-foreground">💬 {reaction}</p>}
+          {error && <p className="mt-2.5 text-muted-foreground">{error}</p>}
         </div>
       )}
-      <button type="button" style={{ marginTop: 14 }} onClick={onNext}>
+      <Button type="button" className="mt-3.5" onClick={onNext}>
         Next: claim →
-      </button>
+      </Button>
     </div>
   );
 }
