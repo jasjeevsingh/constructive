@@ -38,7 +38,12 @@ export function Bridge({
     const status = statusOf(c.id);
     if (!grade || !status || status === "correct-omit") return null;
     return (
-      <div className={cn("mt-2 text-sm", status === "correct" ? "text-success" : "text-reasoning")}>
+      <div
+        className={cn(
+          "mt-2 text-sm",
+          status === "correct" ? "text-success" : status === "wrong" ? "text-destructive" : "text-reasoning"
+        )}
+      >
         {status === "correct" && "✓ Holds — good plank."}
         {status === "missing" && <>This one actually fits — you left it out. {c.explanation}</>}
         {status === "wrong" && (
