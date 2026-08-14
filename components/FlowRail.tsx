@@ -53,7 +53,7 @@ export function FlowRail({ stage }: { stage: FlowStage }) {
       </nav>
 
       {/* Mobile: horizontal stepper */}
-      <div className="border-b border-border p-4 md:hidden">
+      <nav aria-label="Your progress" className="border-b border-border p-4 md:hidden">
         <Progress value={pct} className="mb-3" />
         <ol className="flex items-start justify-between gap-2">
           {STAGES.map((s, i) => {
@@ -68,7 +68,7 @@ export function FlowRail({ stage }: { stage: FlowStage }) {
             );
           })}
         </ol>
-      </div>
+      </nav>
     </>
   );
 }
