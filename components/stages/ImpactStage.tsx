@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
+import { StageHeader } from "@/components/stages/StageHeader";
+import { CoachBubble } from "@/components/CoachBubble";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function ImpactStage({
@@ -39,10 +41,9 @@ export function ImpactStage({
 
   return (
     <div>
-      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Stage 4 · Impact</div>
-      <p className="my-2 text-lg text-foreground">So what? Why does this claim matter — what&apos;s the bigger consequence?</p>
+      <StageHeader eyebrow="Stage 4 · Impact" prompt="So what? Why does this claim matter — what's the bigger consequence?" />
       <VoiceOrTextInput label="Say or type the impact" onSubmit={submit} />
-      {reaction && <p className="mt-3 text-foreground">💬 {reaction}</p>}
+      {reaction && <CoachBubble className="mt-3">{reaction}</CoachBubble>}
       {error && <p className="mt-3 text-muted-foreground">Coach unavailable — keep going.</p>}
       {(reaction || error) && (
         <Button type="button" className="mt-3" onClick={() => onComplete(saved)}>
