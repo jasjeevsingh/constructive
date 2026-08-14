@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
+import { StageHeader } from "@/components/stages/StageHeader";
+import { CoachBubble } from "@/components/CoachBubble";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function ClaimStage({
@@ -46,19 +48,22 @@ export function ClaimStage({
 
   return (
     <div>
-      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Stage 2 · Claim</div>
-      <p className="my-2 text-lg text-foreground">
-        What&apos;s your strongest claim {side === "for" ? "for" : "against"} this motion?
-      </p>
+      <StageHeader
+        eyebrow="Stage 2 · Claim"
+        prompt={`What's your strongest claim ${side === "for" ? "for" : "against"} this motion?`}
+      />
       <VoiceOrTextInput label="Say or type your claim" onSubmit={submit} />
 
       {reaction && mapped && (
         <div className="mt-3">
-          <p className="text-foreground">💬 {reaction}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            We&apos;ll carry this forward as: <b className="text-evidence">{mapped.claim}</b>
-          </p>
-          <Button type="button" className="mt-2" onClick={() => onComplete(mapped.id)}>
+          <CoachBubble>{reaction}</CoachBubble>
+          <div className="mt-3 rounded-lg border border-evidence bg-evidence/10 p-3">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              We&apos;ll carry this forward as
+            </div>
+            <p className="mt-0.5 font-medium text-foreground">{mapped.claim}</p>
+          </div>
+          <Button type="button" className="mt-3" onClick={() => onComplete(mapped.id)}>
             Build the link →
           </Button>
         </div>
@@ -69,7 +74,13 @@ export function ClaimStage({
           <p className="text-sm text-muted-foreground">Coach unavailable — pick the claim closest to yours:</p>
           <div className="mt-2 flex flex-col gap-2">
             {claims.map((c) => (
-              <Button key={c.id} type="button" variant="outline" className="h-auto w-full justify-start whitespace-normal py-2 text-left" onClick={() => onComplete(c.id)}>
+              <Button
+                key={c.id}
+                type="button"
+                variant="outline"
+                className="h-auto w-full justify-start whitespace-normal py-2 text-left"
+                onClick={() => onComplete(c.id)}
+              >
                 {c.claim}
               </Button>
             ))}
