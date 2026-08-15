@@ -7,14 +7,21 @@ export interface ChatClient {
 
 const ANTHROPIC_MODEL = process.env.COACH_MODEL ?? "claude-sonnet-5";
 const OPENAI_MODEL = process.env.OPENAI_COACH_MODEL ?? "gpt-4o-mini";
+const GENERATE_MODEL = process.env.GENERATE_MODEL ?? "claude-sonnet-5";
+const OPENAI_GENERATE_MODEL = process.env.OPENAI_GENERATE_MODEL ?? "gpt-4o";
 
-export function createAnthropicClient(apiKey: string): ChatClient {
+export function createAnthropicClient(
+  apiKey: string,
+  opts?: { model?: string; maxTokens?: number }
+): ChatClient {
   const anthropic = new Anthropic({ apiKey });
+  const model = opts?.model ?? ANTHROPIC_MODEL;
+  const maxTokens = opts?.maxTokens ?? 1024;
   return {
     async complete({ system, user }) {
       const msg = await anthropic.messages.create({
-        model: ANTHROPIC_MODEL,
-        max_tokens: 1024,
+        model,
+        max_tokens: maxTokens,
         system,
         messages: [{ role: "user", content: user }],
       });
@@ -26,13 +33,18 @@ export function createAnthropicClient(apiKey: string): ChatClient {
   };
 }
 
-export function createOpenAIClient(apiKey: string): ChatClient {
+export function createOpenAIClient(
+  apiKey: string,
+  opts?: { model?: string; maxTokens?: number }
+): ChatClient {
   const openai = new OpenAI({ apiKey });
+  const model = opts?.model ?? OPENAI_MODEL;
+  const maxTokens = opts?.maxTokens ?? 1024;
   return {
     async complete({ system, user }) {
       const msg = await openai.chat.completions.create({
-        model: OPENAI_MODEL,
-        max_tokens: 1024,
+        model,
+        max_tokens: maxTokens,
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -74,5 +86,15 @@ export function getChatClient(): ChatClient {
   return createFallbackClient(
     anthropicKey ? createAnthropicClient(anthropicKey) : null,
     openaiKey ? createOpenAIClient(openaiKey) : null
+  );
+}
+
+/** A stronger, higher-budget client for content generation (universe motions). */
+export function getGenerateClient(): ChatClient {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+  return createFallbackClient(
+    anthropicKey ? createAnthropicClient(anthropicKey, { model: GENERATE_MODEL, maxTokens: 8000 }) : null,
+    openaiKey ? createOpenAIClient(openaiKey, { model: OPENAI_GENERATE_MODEL, maxTokens: 8000 }) : null
   );
 }

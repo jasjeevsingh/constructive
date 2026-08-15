@@ -115,3 +115,38 @@ export const FlowMotionSchema = z.object({
 export type FlowMotion = z.infer<typeof FlowMotionSchema>;
 
 export const FlowMotionsFileSchema = z.array(FlowMotionSchema);
+
+// --- Fictional-universe generator (id-less generation variants; server assigns ids) ---
+
+export const GeneratedMotionCardSchema = z.object({
+  motion: z.string().min(1),
+  keywords: z.array(KeywordSchema).min(1),
+  hook: z.string().min(1),
+});
+export type GeneratedMotionCard = z.infer<typeof GeneratedMotionCardSchema>;
+
+export const GeneratedCandidateSchema = z.object({
+  text: z.string().min(1),
+  material: LinkMaterialSchema,
+  verdict: LinkVerdictSchema,
+  explanation: z.string().min(1),
+});
+export const GeneratedClaimSchema = z.object({
+  claim: z.string().min(1),
+  impact: z.string().min(1),
+  candidates: z.array(GeneratedCandidateSchema).min(2),
+});
+export const GeneratedSideSchema = z.object({ claims: z.array(GeneratedClaimSchema).min(1) });
+export const GeneratedSidesSchema = z.object({ for: GeneratedSideSchema, against: GeneratedSideSchema });
+export type GeneratedSides = z.infer<typeof GeneratedSidesSchema>;
+
+const GeneratedRefusalSchema = z.object({ refused: z.literal(true), reason: z.string().min(1) });
+
+export const GeneratedMotionsResponseSchema = z.union([
+  z.object({ motions: z.array(GeneratedMotionCardSchema).min(1).max(6) }),
+  GeneratedRefusalSchema,
+]);
+export const GeneratedScaffoldResponseSchema = z.union([
+  z.object({ sides: GeneratedSidesSchema }),
+  GeneratedRefusalSchema,
+]);
