@@ -120,6 +120,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void generate(); }}
           className="max-w-xs"
+          maxLength={100}
         />
         <Button type="button" onClick={() => void generate()} disabled={status === "loading" || !input.trim()}>
           {status === "loading" ? "Generating…" : "Generate"}

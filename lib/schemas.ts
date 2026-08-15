@@ -120,7 +120,7 @@ export const FlowMotionsFileSchema = z.array(FlowMotionSchema);
 
 export const GeneratedMotionCardSchema = z.object({
   motion: z.string().min(1),
-  keywords: z.array(KeywordSchema),
+  keywords: z.array(KeywordSchema).min(1),
   hook: z.string().min(1),
 });
 export type GeneratedMotionCard = z.infer<typeof GeneratedMotionCardSchema>;

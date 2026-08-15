@@ -39,6 +39,14 @@ describe("generateMotions", () => {
   it("throws when still invalid after repair", async () => {
     await expect(generateMotions("Naruto", stub(["nope", "still nope"]))).rejects.toThrow();
   });
+  it("throws when a motion has an empty keywords array", async () => {
+    const emptyKeywordsJson = JSON.stringify({
+      motions: [{ motion: "M", keywords: [], hook: "H" }],
+    });
+    await expect(
+      generateMotions("Naruto", stub([emptyKeywordsJson, emptyKeywordsJson]))
+    ).rejects.toThrow();
+  });
 });
 
 describe("generateScaffold", () => {

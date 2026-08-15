@@ -63,7 +63,7 @@ async function runStructured<S extends z.ZodTypeAny>(
 export async function generateMotions(universe: string, client: ChatClient): Promise<MotionsResult> {
   const { system, user } = generateMotionsPrompt(universe);
   const data = await runStructured(client, system, user, GeneratedMotionsResponseSchema);
-  return "refused" in data ? { refused: true, reason: data.reason } : { refused: false, motions: data.motions };
+  return "motions" in data ? { refused: false, motions: data.motions } : { refused: true, reason: data.reason };
 }
 
 export async function generateScaffold(
@@ -73,5 +73,5 @@ export async function generateScaffold(
 ): Promise<ScaffoldResult> {
   const { system, user } = generateScaffoldPrompt(universe, motion);
   const data = await runStructured(client, system, user, GeneratedScaffoldResponseSchema);
-  return "refused" in data ? { refused: true, reason: data.reason } : { refused: false, sides: data.sides };
+  return "sides" in data ? { refused: false, sides: data.sides } : { refused: true, reason: data.reason };
 }
