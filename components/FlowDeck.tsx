@@ -6,6 +6,9 @@ import { AppShell } from "@/components/ui/app-shell";
 import { Landing } from "@/components/Landing";
 import { Badge } from "@/components/ui/badge";
 import { UniverseGenerator } from "@/components/UniverseGenerator";
+import { PracticeDeck } from "@/components/PracticeDeck";
+import { PracticeShell } from "@/components/PracticeShell";
+import type { PracticePart } from "@/lib/practice";
 import type { FlowMotion } from "@/lib/schemas";
 import {
   loadAllFlowProgress,
@@ -27,6 +30,7 @@ const STATUS_META: Record<
 export function FlowDeck() {
   const motions = getFlowMotions();
   const [active, setActive] = useState<FlowMotion | null>(null);
+  const [practicePart, setPracticePart] = useState<PracticePart | null>(null);
   const [progress, setProgress] = useState<Record<string, FlowProgress>>({});
 
   useEffect(() => {
@@ -34,6 +38,7 @@ export function FlowDeck() {
   }, []);
 
   if (active) return <FlowShell motion={active} onExit={() => setActive(null)} />;
+  if (practicePart) return <PracticeShell part={practicePart} onExit={() => setPracticePart(null)} />;
 
   return (
     <AppShell>
@@ -66,6 +71,7 @@ export function FlowDeck() {
         </div>
       </section>
       <UniverseGenerator onOpen={setActive} />
+      <PracticeDeck onPick={setPracticePart} />
     </AppShell>
   );
 }
