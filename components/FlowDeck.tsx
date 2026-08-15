@@ -5,6 +5,8 @@ import { FlowShell } from "@/components/FlowShell";
 import { AppShell } from "@/components/ui/app-shell";
 import { Landing } from "@/components/Landing";
 import { Badge } from "@/components/ui/badge";
+import { UniverseGenerator } from "@/components/UniverseGenerator";
+import type { FlowMotion } from "@/lib/schemas";
 import {
   loadAllFlowProgress,
   motionStatus,
@@ -24,15 +26,14 @@ const STATUS_META: Record<
 
 export function FlowDeck() {
   const motions = getFlowMotions();
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [active, setActive] = useState<FlowMotion | null>(null);
   const [progress, setProgress] = useState<Record<string, FlowProgress>>({});
 
   useEffect(() => {
     setProgress(loadAllFlowProgress(window.localStorage));
   }, []);
 
-  const active = motions.find((m) => m.id === activeId);
-  if (active) return <FlowShell motion={active} onExit={() => setActiveId(null)} />;
+  if (active) return <FlowShell motion={active} onExit={() => setActive(null)} />;
 
   return (
     <AppShell>
@@ -47,7 +48,7 @@ export function FlowDeck() {
               <button
                 key={m.id}
                 type="button"
-                onClick={() => setActiveId(m.id)}
+                onClick={() => setActive(m)}
                 aria-label={`${m.motion} — ${meta.label}`}
                 data-complete={status === "complete"}
                 className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[complete=true]:ring-1 data-[complete=true]:ring-success"
@@ -64,6 +65,7 @@ export function FlowDeck() {
           })}
         </div>
       </section>
+      <UniverseGenerator onOpen={setActive} />
     </AppShell>
   );
 }
