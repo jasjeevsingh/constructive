@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/motion";
 import {
   loadUniverses,
   saveUniverses,
@@ -139,9 +140,10 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
             </Button>
           </div>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {u.motions.map((card) => (
-              <button
+            {u.motions.map((card, i) => (
+              <Pressable
                 key={card.id}
+                index={i}
                 type="button"
                 onClick={() => void openCard(key, card)}
                 disabled={openingId === card.id}
@@ -154,7 +156,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
                 <div className="mt-3 text-sm font-medium text-primary">
                   {openingId === card.id ? "Building…" : card.sides ? "Resume →" : "Start →"}
                 </div>
-              </button>
+              </Pressable>
             ))}
           </div>
         </div>
