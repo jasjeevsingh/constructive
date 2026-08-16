@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Pressable } from "@/components/ui/motion";
 import { loadPracticeCounts, type PracticeCounts } from "@/lib/state/practiceProgress";
 import type { PracticePart } from "@/lib/practice";
 
@@ -22,9 +23,10 @@ export function PracticeDeck({ onPick }: { onPick: (part: PracticePart) => void 
       <h2 className="font-display text-2xl font-semibold text-foreground">Practice a skill</h2>
       <p className="mt-1 text-sm text-muted-foreground">Drill one part of the framework with quick reps.</p>
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {CARDS.map((c) => (
-          <button
+        {CARDS.map((c, i) => (
+          <Pressable
             key={c.part}
+            index={i}
             type="button"
             onClick={() => onPick(c.part)}
             aria-label={`${c.title} — ${counts[c.part]} done`}
@@ -34,7 +36,7 @@ export function PracticeDeck({ onPick }: { onPick: (part: PracticePart) => void 
             <div className="mt-3 font-display text-lg font-semibold leading-snug text-foreground">{c.title}</div>
             <div className="mt-2 text-sm text-muted-foreground">{c.blurb}</div>
             <div className="mt-auto pt-4 text-sm font-semibold text-primary">Start drilling →</div>
-          </button>
+          </Pressable>
         ))}
       </div>
     </section>

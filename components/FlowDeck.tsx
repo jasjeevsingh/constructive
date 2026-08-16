@@ -10,6 +10,8 @@ import { PracticeDeck } from "@/components/PracticeDeck";
 import { PracticeShell } from "@/components/PracticeShell";
 import type { PracticePart } from "@/lib/practice";
 import type { FlowMotion } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
+import { Pressable } from "@/components/ui/motion";
 import {
   loadAllFlowProgress,
   motionStatus,
@@ -46,17 +48,20 @@ export function FlowDeck() {
       <section className="mt-12">
         <h2 className="font-display text-2xl font-semibold text-foreground">Pick a motion</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {motions.map((m) => {
+          {motions.map((m, i) => {
             const status = motionStatus(progress[m.id]);
             const meta = STATUS_META[status];
             return (
-              <button
+              <Pressable
                 key={m.id}
+                index={i}
                 type="button"
                 onClick={() => setActive(m)}
                 aria-label={`${m.motion} — ${meta.label}`}
-                data-complete={status === "complete"}
-                className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[complete=true]:ring-1 data-[complete=true]:ring-success"
+                className={cn(
+                  "group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  status === "complete" && "ring-1 ring-success"
+                )}
               >
                 <Badge variant={meta.variant} className="self-start">
                   {meta.badge}
@@ -65,7 +70,7 @@ export function FlowDeck() {
                   {m.motion}
                 </div>
                 <div className="mt-auto pt-4 text-sm font-semibold text-primary">{meta.cta} →</div>
-              </button>
+              </Pressable>
             );
           })}
         </div>
