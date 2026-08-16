@@ -37,8 +37,8 @@ export function Pressable({ index = 0, ...props }: HTMLMotionProps<"button"> & {
       variants={riseIn}
       initial="hidden"
       animate="show"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.02, transition: transitions.snappy }}
+      whileTap={{ scale: 0.98, transition: transitions.snappy }}
       transition={{ ...transitions.gentle, delay: index * 0.05 }}
       {...props}
     />
