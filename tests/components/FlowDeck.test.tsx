@@ -40,4 +40,10 @@ describe("FlowDeck", () => {
     render(<FlowDeck />);
     expect(await screen.findByText(/both sides/i)).toBeInTheDocument();
   });
+
+  it("opens a practice drill when a Practice card is clicked", async () => {
+    render(<FlowDeck />);
+    await userEvent.click(screen.getByRole("button", { name: /practice impacts/i }));
+    expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+  });
 });
