@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 
@@ -51,6 +51,10 @@ describe("VoiceOrTextInput hold-to-talk", () => {
     global.MediaRecorder.isTypeSupported = () => true;
   }
 
+  const originalMediaDevices = global.navigator.mediaDevices;
+  const originalSetPointerCapture = Element.prototype.setPointerCapture;
+  const originalMediaRecorder = (global as { MediaRecorder?: typeof MediaRecorder }).MediaRecorder;
+
   beforeEach(() => {
     stubMedia();
     // jsdom has no pointer capture
@@ -63,6 +67,21 @@ describe("VoiceOrTextInput hold-to-talk", () => {
           : new Response(JSON.stringify({ sessionId: "s1", text: "" }), { status: 200 })
       )
     );
+  });
+
+  afterEach(async () => {
+    // Unmount now (rather than letting RTL's automatic outer afterEach do it
+    // later) so the component's unmount effect-cleanup fetch, if any, still
+    // sees the stubbed fetch below instead of the real network.
+    cleanup();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    vi.unstubAllGlobals();
+    // @ts-expect-error restoring possibly-undefined original
+    global.navigator.mediaDevices = originalMediaDevices;
+    Element.prototype.setPointerCapture = originalSetPointerCapture;
+    // @ts-expect-error restoring possibly-undefined original
+    global.MediaRecorder = originalMediaRecorder;
   });
 
   it("fills the box on release without submitting", async () => {
