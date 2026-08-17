@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UniverseGenerator } from "@/components/UniverseGenerator";
+import { emptyFlowProgress } from "@/lib/state/flowProgress";
 import type { FlowMotion } from "@/lib/schemas";
 
 const solvable = {
@@ -46,5 +47,60 @@ describe("UniverseGenerator", () => {
     await userEvent.type(screen.getByRole("textbox", { name: /universe/i }), "nope");
     await userEvent.click(screen.getByRole("button", { name: /generate/i }));
     expect(await screen.findByText(/school-friendly universe/i)).toBeInTheDocument();
+  });
+
+  it("clears stale flow progress for a universe when it is removed", async () => {
+    // Seed a stored universe (slug "naruto" → ids gen:naruto:<index>).
+    localStorage.setItem(
+      "constructive:universes:v1",
+      JSON.stringify({
+        naruto: {
+          universe: "Naruto",
+          createdAt: new Date().toISOString(),
+          motions: [
+            {
+              id: "gen:naruto:0",
+              motion: "This House believes the Hidden Villages do more harm than good.",
+              keywords: [],
+              hook: "Fun to argue.",
+              sides: null,
+            },
+          ],
+        },
+      })
+    );
+    // seeded by the file's existing store fixture; ids are gen:<slug>:<index>
+    localStorage.setItem(
+      "constructive:flow:v1",
+      JSON.stringify({ "gen:naruto:0": emptyFlowProgress(), keep: emptyFlowProgress() })
+    );
+    render(<UniverseGenerator onOpen={() => {}} />);
+    await userEvent.click(await screen.findByRole("button", { name: /remove/i }));
+    const all = JSON.parse(localStorage.getItem("constructive:flow:v1") ?? "{}");
+    expect(all["gen:naruto:0"]).toBeUndefined();
+    expect(all.keep).toBeDefined();
+  });
+
+  it("normalizes a stale lowercase card motion in the deck list", async () => {
+    localStorage.setItem(
+      "constructive:universes:v1",
+      JSON.stringify({
+        naruto: {
+          universe: "Naruto",
+          createdAt: new Date().toISOString(),
+          motions: [
+            {
+              id: "gen:naruto:0",
+              motion: "this house believes the Hidden Villages do more harm than good.",
+              keywords: [],
+              hook: "Fun to argue.",
+              sides: null,
+            },
+          ],
+        },
+      })
+    );
+    render(<UniverseGenerator onOpen={() => {}} />);
+    expect(await screen.findByText(/^This House believes the Hidden Villages/)).toBeInTheDocument();
   });
 });

@@ -11,10 +11,12 @@ import {
   type GeneratedStore,
   type StoredMotionCard,
 } from "@/lib/state/generatedUniverses";
-import { assembleFlowMotion, motionCardId, normalizeMotionText } from "@/lib/generatedNormalize";
+import { clearFlowProgressForPrefix } from "@/lib/state/flowProgress";
+import { assembleFlowMotion, motionCardId, normalizeMotionText, slug } from "@/lib/generatedNormalize";
+import type { Side } from "@/lib/state/flowMachine";
 import type { FlowMotion, GeneratedSides } from "@/lib/schemas";
 
-export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => void }) {
+export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion, startSide: Side) => void }) {
   const [input, setInput] = useState("");
   const [store, setStore] = useState<GeneratedStore>({});
   const [status, setStatus] = useState<"idle" | "loading">("idle");
@@ -55,6 +57,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
         hook: m.hook,
         sides: null,
       }));
+      clearFlowProgressForPrefix(window.localStorage, `gen:${slug(universe)}:`);
       persist({ ...store, [key]: { universe, createdAt: new Date().toISOString(), motions } });
       setInput("");
     } catch {
@@ -67,7 +70,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
   async function openCard(key: string, card: StoredMotionCard) {
     if (openingId) return;
     if (card.sides) {
-      onOpen(assembleFlowMotion(card.id, card.motion, card.keywords, card.sides));
+      onOpen(assembleFlowMotion(card.id, card.motion, card.keywords, card.sides), "for");
       return;
     }
     setOpeningId(card.id);
@@ -91,7 +94,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
         [key]: { ...store[key], motions: store[key].motions.map((m) => (m.id === card.id ? nextCard : m)) },
       };
       persist(next);
-      onOpen(assembleFlowMotion(nextCard.id, nextCard.motion, nextCard.keywords, sides));
+      onOpen(assembleFlowMotion(nextCard.id, nextCard.motion, nextCard.keywords, sides), "for");
     } catch {
       setMessage("Couldn't build that debate — try another.");
     } finally {
@@ -100,6 +103,8 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
   }
 
   function removeUniverse(key: string) {
+    const universe = store[key]?.universe;
+    if (universe) clearFlowProgressForPrefix(window.localStorage, `gen:${slug(universe)}:`);
     const next = { ...store };
     delete next[key];
     persist(next);
@@ -151,7 +156,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
                 className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60"
               >
                 <Badge variant="secondary" className="self-start">✨ Generated</Badge>
-                <div className="mt-3 font-display text-lg font-semibold leading-snug text-foreground">{card.motion}</div>
+                <div className="mt-3 font-display text-lg font-semibold leading-snug text-foreground">{normalizeMotionText(card.motion)}</div>
                 <div className="mt-2 text-sm text-muted-foreground">{card.hook}</div>
                 <div className="mt-3 text-sm font-medium text-primary">
                   {openingId === card.id ? "Building…" : card.sides ? "Resume →" : "Start →"}

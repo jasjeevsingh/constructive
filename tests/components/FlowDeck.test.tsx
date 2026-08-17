@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FlowDeck } from "@/components/FlowDeck";
-import { FLOW_STORAGE_KEY } from "@/lib/state/flowProgress";
+import { FLOW_STORAGE_KEY, emptyFlowProgress } from "@/lib/state/flowProgress";
+import { getFlowMotions } from "@/lib/flowMotions";
 
 beforeEach(() => {
   localStorage.clear();
@@ -22,6 +23,8 @@ describe("FlowDeck", () => {
   it("opens the journey when a motion card is clicked", async () => {
     render(<FlowDeck />);
     await userEvent.click(screen.getByRole("button", { name: /let kids vote/i }));
+    // Fresh motion → side picker first.
+    await userEvent.click(screen.getByRole("button", { name: /argue for first/i }));
     // FlowShell → RestateStep prompt.
     expect(await screen.findByText(/your own words/i)).toBeInTheDocument();
   });
@@ -45,5 +48,24 @@ describe("FlowDeck", () => {
     render(<FlowDeck />);
     await userEvent.click(screen.getByRole("button", { name: /practice impacts/i }));
     expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+  });
+
+  it("asks which side to argue first, then opens that side", async () => {
+    render(<FlowDeck />);
+    await userEvent.click(screen.getAllByRole("button", { name: /This House/ })[0]);
+    expect(await screen.findByText(/which side/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /argue against first/i }));
+    expect(await screen.findByText(/🔒 FOR · Part 2/)).toBeInTheDocument();
+  });
+
+  it("resumes a motion with saved progress without asking for a side", async () => {
+    const motions = getFlowMotions();
+    localStorage.setItem(
+      "constructive:flow:v1",
+      JSON.stringify({ [motions[0].id]: { ...emptyFlowProgress("against"), stage: "claim" } })
+    );
+    render(<FlowDeck />);
+    await userEvent.click(screen.getAllByRole("button", { name: new RegExp(motions[0].motion.slice(0, 20)) })[0]);
+    expect(screen.queryByText(/which side/i)).toBeNull();
   });
 });
