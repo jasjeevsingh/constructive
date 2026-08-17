@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CoachBubble } from "@/components/CoachBubble";
 import { cn } from "@/lib/utils";
+import { BridgeScene } from "@/components/stages/BridgeScene";
 
 export function Bridge({
   claim,
@@ -33,6 +34,8 @@ export function Bridge({
   const statusOf = (id: string): PlankStatus | undefined =>
     grade?.perPlank.find((p) => p.id === id)?.status;
   const held = grade?.held ?? false;
+  const testResult: "held" | "failed" | null = grade == null ? null : grade.held ? "held" : "failed";
+  const sceneBeams = placed.map((c) => ({ id: c.id, material: c.material }));
 
   function feedback(c: LinkCandidate) {
     const status = statusOf(c.id);
@@ -88,6 +91,7 @@ export function Bridge({
 
   return (
     <div>
+      <BridgeScene placed={sceneBeams} testResult={testResult} />
       <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
         {/* Claim pier */}
         <div className="rounded-lg border border-border bg-muted/40 p-3 md:w-48 md:shrink-0">
