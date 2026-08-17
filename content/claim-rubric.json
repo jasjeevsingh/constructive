@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "intro": "A good claim is one clear, arguable point that a debater can actually defend.",
+  "criteria": [
+    {
+      "id": "one-idea",
+      "name": "One idea",
+      "test": "Makes a single point, not a bundle of points.",
+      "bad": "Phones cause cheating, distraction, and texting in class.",
+      "good": "Phones let students cheat on tests."
+    },
+    {
+      "id": "takes-a-side",
+      "name": "Takes a side",
+      "test": "Clearly argues for or against the motion, rather than describing the topic neutrally.",
+      "bad": "Lots of students bring phones to school these days.",
+      "good": "Schools should ban phones because they make cheating easy."
+    },
+    {
+      "id": "concrete",
+      "name": "Concrete",
+      "test": "Names a real situation, person, or mechanism instead of staying abstract.",
+      "bad": "Phones affect learning.",
+      "good": "Students look up answers on their phones in the middle of a test."
+    },
+    {
+      "id": "contestable",
+      "name": "Contestable",
+      "test": "A reasonable person could disagree. Not a truism, and not the motion restated in different words.",
+      "bad": "Cheating is bad.",
+      "good": "Banning phones cuts cheating enough to be worth the hassle of enforcing it."
+    }
+  ]
+}

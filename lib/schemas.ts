@@ -150,3 +150,18 @@ export const GeneratedScaffoldResponseSchema = z.union([
   z.object({ sides: GeneratedSidesSchema }),
   GeneratedRefusalSchema,
 ]);
+
+export const ClaimCriterionSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  test: z.string().min(1),
+  bad: z.string().min(1),
+  good: z.string().min(1),
+});
+export const ClaimRubricSchema = z.object({
+  version: z.number(),
+  intro: z.string().min(1),
+  criteria: z.array(ClaimCriterionSchema).min(1),
+});
+export type ClaimCriterion = z.infer<typeof ClaimCriterionSchema>;
+export type ClaimRubric = z.infer<typeof ClaimRubricSchema>;
