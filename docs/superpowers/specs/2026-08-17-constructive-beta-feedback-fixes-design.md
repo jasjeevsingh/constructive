@@ -188,9 +188,11 @@ flagged planks." — which is the reported "same two feedback points". Caching a
 are ruled out: no `revalidate`, no `unstable_cache`, no prompt caching, and the only AI in the
 exercise is the optional "Talk this through" reaction.
 
-Two structural amplifiers: every one of the 24 authored claims has the identical candidate
-shape (`reasoning/fits`, `evidence/fits`, `evidence/great-but-wrong`, `reasoning/doesnt-fit`),
-and candidates are never shuffled (`Bridge.tsx:32-33` preserves authored order).
+One structural amplifier, measured directly against `content/flow-motions.json`: **all 24
+authored claims share exactly one candidate shape, in identical order** —
+`reasoning/fits | evidence/fits | evidence/great-but-wrong | reasoning/doesnt-fit` (0 variation
+across the whole bank) — and candidates are never shuffled (`Bridge.tsx:32-33` preserves
+authored order). So the correct answer is always literally "the first two planks".
 
 **Fix (this branch — everything not requiring a rubric).**
 
@@ -216,13 +218,12 @@ counter, are deferred to Branch 2 where the rubric defines what good looks like.
 
 These were not reported as separate items but each produces a symptom the testers described.
 
-**7a — Practice Link key collision.** `lib/practice.ts:48` builds the drill scenario id as
-`practice:${motion.id}`, dropping the claim id (the journey uses `${motionId}:${claim.id}` per
-`lib/flowMotions.ts:32-33`). Since every claim reuses ids `c1..c4`, all claims of one motion
-collide on a single `useLinkProgress` key (`lib/state/linkProgress.ts:39-41`), so a new rep
-**restores the previous rep's plank placements** and pressing Test reproduces the previous
-result. This is a second driver of item 6's reported symptom.
-Fix: `practice:${motion.id}:${claim.id}`. `tests/lib/practice.test.ts` id assertions update.
+**7a — Practice Link key collision — FALSE POSITIVE, no fix needed.** Initial verification
+reported that `lib/practice.ts:48` drops the claim id from the drill scenario id. It does not.
+`claimToScenario(motionId, claim)` appends `:${claim.id}` itself (`lib/flowMotions.ts:32-33`),
+so passing `practice:${motion.id}` yields `practice:m1:c1` — already unique per claim, and
+already asserted by `tests/lib/practice.test.ts:43`. `lib/practice.ts` needs **no change**.
+Recorded here so the claim is not re-investigated later.
 
 **7b — Generated-universe id reuse → blank stage.** `motionCardId` is
 `gen:<slug>:<index>` (`lib/generatedNormalize.ts:15-17`). Regenerating the same universe
@@ -251,8 +252,7 @@ universe is regenerated or removed (a new function in `flowProgress.ts`, called 
 `components/PracticeShell.tsx` · `lib/state/flowProgress.ts` · `lib/state/useFlowProgress.ts` ·
 `lib/state/flowMachine.ts` · `components/FlowDeck.tsx` · `components/FlowShell.tsx` ·
 `components/VoiceOrTextInput.tsx` · `components/steps/RestateStep.tsx` ·
-`components/steps/KeywordStep.tsx` · `components/LinkCard.tsx` · `components/stages/Bridge.tsx` ·
-`lib/practice.ts`
+`components/steps/KeywordStep.tsx` · `components/LinkCard.tsx` · `components/stages/Bridge.tsx`
 
 **Untouched:** `lib/linkGrade.ts` (algebra unchanged), `lib/voice/*`, `app/api/speak/route.ts`,
 `app/api/transcribe/*`, `lib/ai/*`, `lib/prompts/claim.ts` (Branch 2), `content/*.json`,
@@ -295,7 +295,6 @@ New or updated coverage:
   needs a new harness.
 - Bridge — candidates shuffle under an injected `rand`; the failure summary names the specific
   plank; `LinkCard.test.tsx:33,51` rewritten off literal copy.
-- Practice Link scenario id is `practice:{motionId}:{claimId}`.
 - Regenerating a universe purges that slug's flow progress; `FlowShell` with a stale
   `mappedClaimId` renders the Claim stage rather than nothing.
 
