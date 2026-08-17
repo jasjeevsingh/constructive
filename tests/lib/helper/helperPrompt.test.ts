@@ -29,4 +29,15 @@ describe("helperPrompt", () => {
   it("includes the page context", () => {
     expect(helperPrompt(ctx)).toContain("This House would ban homework.");
   });
+
+  it("carves out on-task learning questions from the stay-on-task rule", () => {
+    const p = helperPrompt(ctx).toLowerCase();
+    expect(p).toContain("what a term means");
+    expect(p).toContain("on task");
+  });
+
+  it("tells the helper how to respond if a student seems upset or unsafe", () => {
+    const p = helperPrompt(ctx).toLowerCase();
+    expect(p).toContain("trusted adult");
+  });
 });
