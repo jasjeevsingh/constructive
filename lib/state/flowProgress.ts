@@ -14,9 +14,9 @@ export interface FlowProgress {
   againstComplete: boolean;
 }
 
-export function emptyFlowProgress(): FlowProgress {
+export function emptyFlowProgress(startSide: Side = "for"): FlowProgress {
   return {
-    side: "for",
+    side: startSide,
     stage: "read",
     readSubstep: "restate",
     restate: "",
@@ -58,8 +58,12 @@ function readAll(storage: Storage): Record<string, FlowProgress> {
   }
 }
 
-export function loadFlowProgress(storage: Storage, motionId: string): FlowProgress {
-  return readAll(storage)[motionId] ?? emptyFlowProgress();
+export function loadFlowProgress(
+  storage: Storage,
+  motionId: string,
+  startSide: Side = "for"
+): FlowProgress {
+  return readAll(storage)[motionId] ?? emptyFlowProgress(startSide);
 }
 
 export function saveFlowProgress(storage: Storage, motionId: string, p: FlowProgress): void {
@@ -68,7 +72,24 @@ export function saveFlowProgress(storage: Storage, motionId: string, p: FlowProg
   storage.setItem(FLOW_STORAGE_KEY, JSON.stringify(all));
 }
 
-export type MotionStatus = "not-started" | "in-progress" | "for-done" | "complete";
+export function hasFlowProgress(storage: Storage, motionId: string): boolean {
+  return readAll(storage)[motionId] !== undefined;
+}
+
+/** Drops every entry whose motion id starts with `prefix` (used when a generated universe is rebuilt, since its ids are reused). */
+export function clearFlowProgressForPrefix(storage: Storage, prefix: string): void {
+  const all = readAll(storage);
+  let changed = false;
+  for (const key of Object.keys(all)) {
+    if (key.startsWith(prefix)) {
+      delete all[key];
+      changed = true;
+    }
+  }
+  if (changed) storage.setItem(FLOW_STORAGE_KEY, JSON.stringify(all));
+}
+
+export type MotionStatus = "not-started" | "in-progress" | "one-side-done" | "complete";
 
 export function loadAllFlowProgress(storage: Storage): Record<string, FlowProgress> {
   return readAll(storage);
@@ -77,6 +98,6 @@ export function loadAllFlowProgress(storage: Storage): Record<string, FlowProgre
 export function motionStatus(entry: FlowProgress | undefined): MotionStatus {
   if (!entry) return "not-started";
   if (entry.forComplete && entry.againstComplete) return "complete";
-  if (entry.forComplete) return "for-done";
+  if (entry.forComplete || entry.againstComplete) return "one-side-done";
   return "in-progress";
 }

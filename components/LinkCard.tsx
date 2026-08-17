@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { gradeBridge, type BridgeGrade } from "@/lib/linkGrade";
 import { useLinkProgress } from "@/lib/state/useLinkProgress";
-import { speakCoach } from "@/lib/voice/playSpeech";
 import type { LinkScenario, LinkCandidate, CoachResponse } from "@/lib/schemas";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { Bridge } from "@/components/stages/Bridge";
@@ -19,8 +18,10 @@ export function LinkCard({
   const [progress, update] = useLinkProgress(scenario.id);
   const placed = progress.placedIds;
   const [grade, setGrade] = useState<BridgeGrade | null>(null);
+  const [attempts, setAttempts] = useState(0);
   const [reactions, setReactions] = useState<Record<string, string>>({});
   const [coachError, setCoachError] = useState<Record<string, boolean>>({});
+  const shuffleSeed = scenario.id.split("").reduce((n, ch) => n + ch.charCodeAt(0), 0);
 
   function toggle(id: string) {
     setGrade(null); // re-sorting invalidates the last test
@@ -31,7 +32,35 @@ export function LinkCard({
   function test() {
     const g = gradeBridge(scenario, placed);
     setGrade(g);
+    setAttempts((n) => (g.held ? 0 : n + 1));
     update({ held: g.held });
+  }
+
+  function summary(g: BridgeGrade): string {
+    if (g.held) return "✓ The bridge holds!";
+
+    const wrong = g.perPlank.filter((p) => p.status === "wrong");
+    const missing = g.perPlank.filter((p) => p.status === "missing");
+    const textFor = (id: string) => scenario.candidates.find((c) => c.id === id)?.text ?? "";
+    const shorten = (s: string) => (s.length > 48 ? `${s.slice(0, 48).trimEnd()}…` : s);
+
+    const problems: string[] = [];
+    if (!g.hasEvidence) problems.push("it has no evidence holding it up");
+    if (!g.hasReasoning) problems.push("nothing explains why the evidence matters — that's the reasoning");
+    for (const p of wrong) problems.push(`"${shorten(textFor(p.id))}" doesn't carry the weight`);
+    for (const p of missing) problems.push(`you left out "${shorten(textFor(p.id))}"`);
+
+    // `attempts` is already incremented (1-based) by the time this render sees
+    // it, since setAttempts and setGrade are batched from the same test() call.
+    // Index off attempts - 1 so the very first failure leads with the primary
+    // problem instead of skipping straight to the second one.
+    const round = attempts - 1;
+    const openers =
+      attempts >= 2
+        ? ["Still not holding —", "Close. The gap is that", "Nearly — but"]
+        : ["Not yet —", "That span won't hold —", "Almost —"];
+    const opener = openers[round % openers.length];
+    return `${opener} ${problems[round % Math.max(problems.length, 1)] ?? "check the flagged planks"}.`;
   }
 
   async function talkThrough(c: LinkCandidate) {
@@ -50,7 +79,6 @@ export function LinkCard({
       const data: CoachResponse = await res.json();
       if (data.kind === "link") {
         setReactions((r) => ({ ...r, [c.id]: data.reaction }));
-        void speakCoach(data.reaction);
       }
     } catch {
       setCoachError((e) => ({ ...e, [c.id]: true }));
@@ -76,23 +104,21 @@ export function LinkCard({
         coachError={coachError}
         onToggle={toggle}
         onTalkThrough={talkThrough}
+        shuffleSeed={shuffleSeed}
       />
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Button type="button" onClick={test}>
           Test the bridge
         </Button>
-        {grade &&
-          (grade.held ? (
-            <span className="font-semibold text-success">✓ The bridge holds!</span>
-          ) : (
-            <span className="text-reasoning">
-              Not yet
-              {!(grade.hasEvidence && grade.hasReasoning)
-                ? " — a strong bridge needs both evidence and reasoning."
-                : " — check the flagged planks."}
-            </span>
-          ))}
+        {grade && (
+          <span
+            data-testid="bridge-summary"
+            className={grade.held ? "font-semibold text-success" : "text-reasoning"}
+          >
+            {summary(grade)}
+          </span>
+        )}
       </div>
 
       {onComplete && grade?.held && (

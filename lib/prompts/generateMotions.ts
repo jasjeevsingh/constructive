@@ -6,7 +6,8 @@ Return ONLY a single JSON object, no prose, matching exactly one of these shapes
 - Refusal: {"refused": true, "reason": string}
 
 Rules:
-- Each "motion" is a debatable statement grounded in the universe's characters, factions, or conflicts (e.g. "This house believes the Hidden Villages do more harm than good"). It must have real arguments on both sides.
+- Each "motion" is a debatable statement grounded in the universe's characters, factions, or conflicts (e.g. "This House believes the Hidden Villages do more harm than good"). It must have real arguments on both sides.
+- Every motion must begin "This House believes ..." or "This House would ..." with "House" capitalized.
 - "keywords" are 2-4 important terms from the motion a student should define; "hint" is a short clue or null.
 - "hook" is one friendly sentence on why it is fun to argue.
 - Keep everything G/PG and school-safe: no graphic violence, romance, or mature themes; debate ideas, not fandom fights.

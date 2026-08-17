@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  STAGES, READ_SUBSTEPS, SIDES, nextStage, prevStage, stageIndex, isLastStage, againstUnlocked,
+  STAGES, READ_SUBSTEPS, SIDES, nextStage, prevStage, stageIndex, isLastStage, otherSideUnlocked,
 } from "@/lib/state/flowMachine";
 
 describe("flowMachine", () => {
@@ -22,8 +22,9 @@ describe("flowMachine", () => {
     expect(isLastStage("impact")).toBe(true);
     expect(isLastStage("read")).toBe(false);
   });
-  it("unlocks AGAINST only once FOR is complete", () => {
-    expect(againstUnlocked(false)).toBe(false);
-    expect(againstUnlocked(true)).toBe(true);
+  it("unlocks the other side once either side is complete", () => {
+    expect(otherSideUnlocked({ forComplete: false, againstComplete: false })).toBe(false);
+    expect(otherSideUnlocked({ forComplete: true, againstComplete: false })).toBe(true);
+    expect(otherSideUnlocked({ forComplete: false, againstComplete: true })).toBe(true);
   });
 });

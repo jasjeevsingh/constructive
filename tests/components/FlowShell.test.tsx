@@ -2,8 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FlowShell } from "@/components/FlowShell";
-import { FLOW_STORAGE_KEY } from "@/lib/state/flowProgress";
+import { FLOW_STORAGE_KEY, emptyFlowProgress } from "@/lib/state/flowProgress";
 import type { FlowMotion } from "@/lib/schemas";
+import type { FlowProgress } from "@/lib/state/flowProgress";
+import type { Side } from "@/lib/state/flowMachine";
 
 const motion: FlowMotion = {
   id: "m-kids-vote",
@@ -37,6 +39,12 @@ beforeEach(() => {
     new Response(JSON.stringify({ kind: "restate", reaction: "Good.", capturedCore: true }), { status: 200 })
   ));
 });
+
+function seedProgress(motionId: string, overrides: Partial<FlowProgress> & { side: Side }) {
+  localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+    [motionId]: { ...emptyFlowProgress(overrides.side), ...overrides },
+  }));
+}
 
 describe("FlowShell", () => {
   it("pins the motion, starts on Read/Restate, and locks AGAINST", () => {
@@ -91,5 +99,35 @@ describe("FlowShell", () => {
     expect(await screen.findByText(/argued both sides/i)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
     expect(onExit).toHaveBeenCalled();
+  });
+
+  it("labels the locked side Part 2, not soon", () => {
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    expect(screen.getByText(/Part 2/)).toBeInTheDocument();
+    expect(screen.queryByText(/soon/i)).toBeNull();
+  });
+
+  it("starts on AGAINST when asked and locks FOR as Part 2", () => {
+    render(<FlowShell motion={motion} startSide="against" onExit={() => {}} />);
+    expect(screen.getByText(/🔒 FOR · Part 2/)).toBeInTheDocument();
+  });
+
+  it("offers the other side after finishing AGAINST first", async () => {
+    seedProgress(motion.id, {
+      side: "against",
+      stage: "impact",
+      againstComplete: true,
+      forComplete: false,
+    });
+    render(<FlowShell motion={motion} startSide="against" onExit={() => {}} />);
+    expect(await screen.findByText(/AGAINST side complete/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /other side/i }));
+    expect(await screen.findByText(/strongest claim for/i)).toBeInTheDocument();
+  });
+
+  it("recovers to the claim stage when the mapped claim is missing", async () => {
+    seedProgress(motion.id, { side: "for", stage: "link", mappedClaimId: "gone" });
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    expect(await screen.findByText(/strongest claim/i)).toBeInTheDocument();
   });
 });

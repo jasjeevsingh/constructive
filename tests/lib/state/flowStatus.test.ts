@@ -13,8 +13,11 @@ describe("motionStatus", () => {
   it("is complete when both sides are done", () => {
     expect(motionStatus({ ...emptyFlowProgress(), forComplete: true, againstComplete: true })).toBe("complete");
   });
-  it("is for-done when only FOR is done", () => {
-    expect(motionStatus({ ...emptyFlowProgress(), forComplete: true })).toBe("for-done");
+  it("reports one-side-done regardless of which side was finished", () => {
+    expect(motionStatus({ ...emptyFlowProgress(), forComplete: true })).toBe("one-side-done");
+    expect(motionStatus({ ...emptyFlowProgress("against"), againstComplete: true })).toBe(
+      "one-side-done"
+    );
   });
   it("is in-progress for a started-but-unfinished entry", () => {
     expect(motionStatus({ ...emptyFlowProgress(), stage: "claim" })).toBe("in-progress");

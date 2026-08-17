@@ -21,4 +21,16 @@ describe("ImpactStage", () => {
     await userEvent.click(screen.getByRole("button", { name: /finish this side/i }));
     expect(onComplete).toHaveBeenCalledWith("kids get more sleep");
   });
+
+  it("shows the claim it is asking for an impact on", () => {
+    render(
+      <ImpactStage
+        motion="This House would ban homework."
+        claim="Homework crowds out family time."
+        authoredImpact="Families eat dinner together."
+        onComplete={() => {}}
+      />
+    );
+    expect(screen.getByText("Homework crowds out family time.")).toBeInTheDocument();
+  });
 });

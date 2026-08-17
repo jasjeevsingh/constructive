@@ -42,6 +42,12 @@ export function ImpactStage({
   return (
     <div>
       <StageHeader eyebrow="Stage 4 · Impact" prompt="So what? Why does this claim matter — what's the bigger consequence?" />
+      <div className="mb-4 rounded-lg border border-evidence bg-evidence/10 p-3">
+        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Your claim
+        </div>
+        <p className="mt-0.5 font-medium text-foreground">{claim}</p>
+      </div>
       <VoiceOrTextInput label="Say or type the impact" onSubmit={submit} />
       {reaction && <CoachBubble className="mt-3">{reaction}</CoachBubble>}
       {error && <p className="mt-3 text-muted-foreground">Coach unavailable — keep going.</p>}

@@ -16,6 +16,15 @@ export function motionCardId(universe: string, index: number): string {
   return `gen:${slug(universe)}:${index}`;
 }
 
+/**
+ * Motions must read "This House ..." — the generator sometimes lowercases it.
+ * Only the two words are rewritten; the following verb keeps its own case so
+ * the seeded convention ("This House would") is preserved. Idempotent.
+ */
+export function normalizeMotionText(motion: string): string {
+  return motion.replace(/\bthis\s+house\b/gi, "This House");
+}
+
 /** Solvable = ≥1 fitting evidence, ≥1 fitting reasoning, ≥1 non-fitting distractor. */
 export function claimIsSolvable(candidates: readonly { material: string; verdict: string }[]): boolean {
   const fitEvidence = candidates.some((c) => c.material === "evidence" && c.verdict === "fits");
@@ -61,7 +70,7 @@ export function assembleFlowMotion(
     });
   return {
     id: motionId,
-    motion,
+    motion: normalizeMotionText(motion),
     keywords,
     sides: { for: { claims: build(sides.for.claims) }, against: { claims: build(sides.against.claims) } },
   };

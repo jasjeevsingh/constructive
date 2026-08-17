@@ -18,6 +18,6 @@ export function prevStage(s: FlowStage): FlowStage {
 export function isLastStage(s: FlowStage): boolean {
   return stageIndex(s) === STAGES.length - 1;
 }
-export function againstUnlocked(forComplete: boolean): boolean {
-  return forComplete;
+export function otherSideUnlocked(p: { forComplete: boolean; againstComplete: boolean }): boolean {
+  return p.forComplete || p.againstComplete;
 }
