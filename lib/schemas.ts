@@ -19,10 +19,17 @@ export const MotionsFileSchema = z.array(MotionSchema);
 export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link", "claim", "impact"]);
 export type CoachStep = z.infer<typeof CoachStepSchema>;
 
+export const CoachTurnSchema = z.object({
+  role: z.enum(["student", "coach"]),
+  text: z.string().max(2000),
+});
+export type CoachTurn = z.infer<typeof CoachTurnSchema>;
+
 export const CoachRequestSchema = z.object({
   step: CoachStepSchema,
   motion: z.string().min(1),
   payload: z.record(z.string(), z.unknown()),
+  history: z.array(CoachTurnSchema).max(10).optional(),
 });
 export type CoachRequest = z.infer<typeof CoachRequestSchema>;
 
@@ -52,7 +59,9 @@ export const LinkResponseSchema = z.object({
 export const ClaimResponseSchema = z.object({
   kind: z.literal("claim"),
   reaction: z.string(),
-  mappedClaimId: z.string(),
+  verdict: z.enum(["keep-going", "good-enough"]),
+  question: z.string().nullable(),
+  mappedClaimId: z.string().nullable(),
 });
 export const ImpactResponseSchema = z.object({
   kind: z.literal("impact"),
@@ -150,3 +159,20 @@ export const GeneratedScaffoldResponseSchema = z.union([
   z.object({ sides: GeneratedSidesSchema }),
   GeneratedRefusalSchema,
 ]);
+
+export const ClaimCriterionSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  test: z.string().min(1),
+  bad: z.string().min(1),
+  good: z.string().min(1),
+});
+export const ClaimRubricSchema = z.object({
+  version: z.number(),
+  intro: z.string().min(1),
+  criteria: z.array(ClaimCriterionSchema).min(1),
+  /** Optional single claim that satisfies all criteria at once, for calibrating the combined bar. */
+  exemplar: z.string().min(1).optional(),
+});
+export type ClaimCriterion = z.infer<typeof ClaimCriterionSchema>;
+export type ClaimRubric = z.infer<typeof ClaimRubricSchema>;

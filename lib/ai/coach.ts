@@ -38,6 +38,8 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
         side: String(p.side ?? ""),
         studentClaim: String(p.studentClaim ?? ""),
         authoredClaims: (p.authoredClaims as { id: string; claim: string }[]) ?? [],
+        history: req.history ?? [],
+        attempt: (req.history ?? []).filter((t) => t.role === "student").length + 1,
       });
     case "impact":
       return impactPrompt({
@@ -51,7 +53,11 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
 
 export async function runCoach(req: CoachRequest, client: ChatClient): Promise<CoachResponse> {
   const { system, user } = buildPrompt(req);
-  const raw = await client.complete({ system, user });
+  const history = (req.history ?? []).map((t) => ({
+    role: t.role === "student" ? ("user" as const) : ("assistant" as const),
+    content: t.text,
+  }));
+  const raw = await client.complete({ system, user, history });
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -61,8 +67,13 @@ export async function runCoach(req: CoachRequest, client: ChatClient): Promise<C
   const result = CoachResponseSchema.parse(parsed);
   if (result.kind === "claim") {
     const ids = ((req.payload.authoredClaims as { id: string }[] | undefined) ?? []).map((c) => c.id);
-    if (!ids.includes(result.mappedClaimId)) {
+    // A hallucinated id must never reach the Link stage.
+    if (result.mappedClaimId !== null && !ids.includes(result.mappedClaimId)) {
       throw new Error("coach mapped claim to an id outside the authored set");
+    }
+    // "Good enough" is the signal to advance, so it must carry a claim to advance to.
+    if (result.verdict === "good-enough" && result.mappedClaimId === null) {
+      throw new Error("coach said good-enough without mapping a claim");
     }
   }
   return result;

@@ -1,8 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 
+export type ChatTurn = { role: "user" | "assistant"; content: string };
+
 export interface ChatClient {
-  complete(args: { system: string; user: string }): Promise<string>;
+  complete(args: { system: string; user: string; history?: ChatTurn[] }): Promise<string>;
 }
 
 const ANTHROPIC_MODEL = process.env.COACH_MODEL ?? "claude-sonnet-5";
@@ -18,12 +20,12 @@ export function createAnthropicClient(
   const model = opts?.model ?? ANTHROPIC_MODEL;
   const maxTokens = opts?.maxTokens ?? 1024;
   return {
-    async complete({ system, user }) {
+    async complete({ system, user, history }) {
       const msg = await anthropic.messages.create({
         model,
         max_tokens: maxTokens,
         system,
-        messages: [{ role: "user", content: user }],
+        messages: [...(history ?? []), { role: "user", content: user }],
       });
       return msg.content
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
@@ -41,12 +43,13 @@ export function createOpenAIClient(
   const model = opts?.model ?? OPENAI_MODEL;
   const maxTokens = opts?.maxTokens ?? 1024;
   return {
-    async complete({ system, user }) {
+    async complete({ system, user, history }) {
       const msg = await openai.chat.completions.create({
         model,
         max_tokens: maxTokens,
         messages: [
           { role: "system", content: system },
+          ...(history ?? []),
           { role: "user", content: user },
         ],
         response_format: { type: "json_object" },

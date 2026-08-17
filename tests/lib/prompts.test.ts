@@ -3,6 +3,7 @@ import { restatePrompt } from "@/lib/prompts/restate";
 import { keywordPrompt } from "@/lib/prompts/keyword";
 import { refinePrompt } from "@/lib/prompts/refine";
 import { generateMotionsPrompt } from "@/lib/prompts/generateMotions";
+import { generateScaffoldPrompt } from "@/lib/prompts/generateScaffold";
 
 describe("prompt builders", () => {
   it("restate prompt embeds motion + answer and asks for JSON", () => {
@@ -34,5 +35,12 @@ describe("prompt builders", () => {
     const p = generateMotionsPrompt("Naruto");
     expect(p.system).toContain("This House");
     expect(p.system).not.toContain("This house");
+  });
+
+  it("holds generated claims to the claim rubric", () => {
+    const p = generateScaffoldPrompt("Naruto", "This House would ban the Chunin Exams.");
+    for (const name of ["One idea", "Takes a side", "Concrete", "Contestable"]) {
+      expect(p.system).toContain(name);
+    }
   });
 });
