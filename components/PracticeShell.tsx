@@ -10,6 +10,11 @@ import { AppShell } from "@/components/ui/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  HelperContextProvider,
+  usePublishHelperContext,
+} from "@/components/helper/HelperContextProvider";
+import { HelperPanel } from "@/components/helper/HelperPanel";
 
 const TITLES: Record<PracticePart, string> = {
   claim: "Practice: Claims",
@@ -17,10 +22,25 @@ const TITLES: Record<PracticePart, string> = {
   impact: "Practice: Impacts",
 };
 
-export function PracticeShell({ part, onExit }: { part: PracticePart; onExit: () => void }) {
+export function PracticeShell(props: { part: PracticePart; onExit: () => void }) {
+  return (
+    <HelperContextProvider>
+      <PracticeShellInner {...props} />
+      <HelperPanel />
+    </HelperContextProvider>
+  );
+}
+
+function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () => void }) {
   const [item, setItem] = useState<PracticeItem>(() => drawItem(part, getFlowMotions()));
   const [done, setDone] = useState(false);
   const [count, setCount] = useState(0);
+
+  usePublishHelperContext({
+    activity: "practice",
+    stage: part,
+    motion: item.part === "link" ? "" : item.motion,
+  });
 
   useEffect(() => {
     setCount(loadPracticeCounts(window.localStorage)[part]);

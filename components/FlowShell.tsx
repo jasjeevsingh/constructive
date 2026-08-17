@@ -12,9 +12,23 @@ import { AppShell } from "@/components/ui/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  HelperContextProvider,
+  usePublishHelperContext,
+} from "@/components/helper/HelperContextProvider";
+import { HelperPanel } from "@/components/helper/HelperPanel";
 import type { FlowMotion } from "@/lib/schemas";
 
-export function FlowShell({
+export function FlowShell(props: { motion: FlowMotion; startSide?: Side; onExit: () => void }) {
+  return (
+    <HelperContextProvider>
+      <FlowShellInner {...props} />
+      <HelperPanel />
+    </HelperContextProvider>
+  );
+}
+
+function FlowShellInner({
   motion,
   startSide = "for",
   onExit,
@@ -24,6 +38,12 @@ export function FlowShell({
   onExit: () => void;
 }) {
   const [progress, update] = useFlowProgress(motion.id, startSide);
+  usePublishHelperContext({
+    activity: "journey",
+    motion: motion.motion,
+    side: progress.side,
+    stage: progress.stage,
+  });
   const sideClaims = motion.sides[progress.side].claims;
   const mappedClaim = sideClaims.find((c) => c.id === progress.mappedClaimId) ?? null;
 

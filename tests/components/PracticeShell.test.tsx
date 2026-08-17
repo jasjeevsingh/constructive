@@ -39,4 +39,9 @@ describe("PracticeShell", () => {
     await userEvent.click(screen.getByRole("button", { name: /next rep/i }));
     expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
   });
+
+  it("offers the voice helper inside a practice drill", () => {
+    render(<PracticeShell part="claim" onExit={() => {}} />);
+    expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
+  });
 });
