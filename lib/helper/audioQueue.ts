@@ -10,7 +10,10 @@ export function createAudioQueue(ctx: AudioContext, sampleRate = 24000) {
 
   function push(pcm: ArrayBuffer): void {
     if (pcm.byteLength < 2) return;
-    const ints = new Int16Array(pcm);
+    // PCM can arrive split at any byte boundary over the socket; Int16Array
+    // requires an even length, so drop a stray trailing byte rather than throw.
+    const evenLength = pcm.byteLength - (pcm.byteLength % 2);
+    const ints = new Int16Array(pcm.slice(0, evenLength));
     const buffer = ctx.createBuffer(1, ints.length, sampleRate);
     const channel = buffer.getChannelData(0);
     for (let i = 0; i < ints.length; i++) channel[i] = ints[i] / 32768;

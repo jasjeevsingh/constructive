@@ -63,4 +63,11 @@ describe("audioQueue", () => {
     q.push(new ArrayBuffer(0));
     expect(started).toHaveLength(0);
   });
+
+  it("tolerates an odd-length chunk instead of throwing", () => {
+    const { ctx, started } = fakeCtx();
+    const q = createAudioQueue(ctx);
+    expect(() => q.push(new ArrayBuffer(5))).not.toThrow();
+    expect(started).toHaveLength(1);
+  });
 });
