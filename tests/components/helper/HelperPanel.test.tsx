@@ -68,4 +68,25 @@ describe("HelperPanelView", () => {
     await userEvent.click(screen.getByRole("button", { name: /stop|close/i }));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it("shows a paused state with a resume control after the idle guard closes the session", () => {
+    render(<HelperPanelView state={{ ...base, phase: "idle" }} open onOpen={() => {}} onClose={() => {}} />);
+    expect(screen.getByText(/paused/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /resume/i })).toBeInTheDocument();
+  });
+
+  it("resumes on click", async () => {
+    const onOpen = vi.fn();
+    render(<HelperPanelView state={{ ...base, phase: "idle" }} open onOpen={onOpen} onClose={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /resume/i }));
+    expect(onOpen).toHaveBeenCalled();
+  });
+
+  it("does not show live phase text while paused", () => {
+    render(<HelperPanelView state={{ ...base, phase: "idle" }} open onOpen={() => {}} onClose={() => {}} />);
+    expect(screen.queryByText(/listening/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/connecting/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/thinking/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/speaking/i)).not.toBeInTheDocument();
+  });
 });

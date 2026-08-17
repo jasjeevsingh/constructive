@@ -209,6 +209,11 @@ export function HelperPanel() {
   };
 
   const handleOpen = () => {
+    // Defensive: by construction there's never a live session here (the
+    // initial open has none yet, and Resume only renders after the idle
+    // guard's teardownLive() already ran) — this is a no-op guard, not a
+    // behavior change.
+    teardownLive();
     setOpen(true);
     void connect();
   };
