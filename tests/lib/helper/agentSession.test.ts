@@ -74,6 +74,81 @@ describe("agentSession", () => {
     expect(h.queue.close).toHaveBeenCalled();
   });
 
+  it("tears down the previous socket and queue when start() is called again before stop()", async () => {
+    const sockets: ReturnType<typeof makeSocket>[] = [];
+    const queues: ReturnType<typeof makeQueue>[] = [];
+    function makeSocket() {
+      return {
+        on: vi.fn(),
+        configure: vi.fn(),
+        updatePrompt: vi.fn(),
+        send: vi.fn(),
+        keepAlive: vi.fn(),
+        requestClose: vi.fn(),
+      };
+    }
+    function makeQueue() {
+      return { push: vi.fn(), drop: vi.fn(), close: vi.fn() };
+    }
+    const createSocket = vi.fn(() => {
+      const s = makeSocket();
+      sockets.push(s);
+      return s;
+    });
+    const createQueue = vi.fn(() => {
+      const q = makeQueue();
+      queues.push(q);
+      return q;
+    });
+    const session = createAgentSession({
+      fetchToken: async () => "tok",
+      createSocket,
+      createQueue,
+      onState: () => {},
+    });
+
+    await session.start(emptyHelperContext());
+    await session.start({ ...emptyHelperContext(), stage: "impact" });
+
+    expect(createSocket).toHaveBeenCalledTimes(2);
+    expect(sockets[0].requestClose).toHaveBeenCalled();
+    expect(queues[0].close).toHaveBeenCalled();
+    expect(sockets[1].requestClose).not.toHaveBeenCalled();
+  });
+
+  it("ignores a superseded start() whose token fetch resolves after a newer start()", async () => {
+    let resolveStale: (token: string) => void = () => {};
+    const fetchToken = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<string>((resolve) => void (resolveStale = resolve)))
+      .mockImplementationOnce(async () => "tok-fresh");
+    const createSocket = vi.fn(() => ({
+      on: vi.fn(),
+      configure: vi.fn(),
+      updatePrompt: vi.fn(),
+      send: vi.fn(),
+      keepAlive: vi.fn(),
+      requestClose: vi.fn(),
+    }));
+    const createQueue = vi.fn(() => ({ push: vi.fn(), drop: vi.fn(), close: vi.fn() }));
+    const session = createAgentSession({
+      fetchToken,
+      createSocket,
+      createQueue,
+      onState: () => {},
+    });
+
+    const stale = session.start(emptyHelperContext());
+    const fresh = session.start({ ...emptyHelperContext(), stage: "impact" });
+    await fresh;
+    resolveStale("tok-stale");
+    await stale;
+
+    // Only the newer, non-superseded start() ever stands up a socket/queue.
+    expect(createSocket).toHaveBeenCalledTimes(1);
+    expect(createQueue).toHaveBeenCalledTimes(1);
+  });
+
   it("surfaces a token failure as an error state", async () => {
     const states: HelperState[] = [];
     const session = createAgentSession({

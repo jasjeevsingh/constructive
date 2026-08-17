@@ -46,6 +46,12 @@ export function createAgentSession(deps: SessionDeps) {
   let socket: AgentSocket | null = null;
   let queue: AgentQueue | null = null;
   let state = initialHelperState();
+  // Bumped on every start()/stop() call. A start() in flight (awaiting the
+  // token fetch, or awaiting nothing at all yet) captures the id it was
+  // issued with; if a later start()/stop() bumps the counter before that
+  // in-flight call resumes, it recognizes itself as superseded and backs
+  // out instead of standing up a second live socket/queue.
+  let sessionId = 0;
 
   function dispatch(event: HelperEvent) {
     const { state: next, effect } = reduceHelper(state, event);
@@ -54,46 +60,76 @@ export function createAgentSession(deps: SessionDeps) {
     deps.onState(state);
   }
 
+  function teardown(): void {
+    socket?.requestClose();
+    queue?.close();
+    socket = null;
+    queue = null;
+  }
+
   async function start(ctx: HelperContext): Promise<void> {
+    // Tear down any previous live session (or in-flight one, via the id
+    // bump below) so at most one socket and one queue are ever live.
+    teardown();
+    const mySession = ++sessionId;
+
     dispatch({ type: "connecting" });
     let token: string;
     try {
       token = await deps.fetchToken();
     } catch {
+      if (mySession !== sessionId) return; // superseded while awaiting the token
       dispatch({ type: "error", message: "Voice helper is unavailable right now." });
       return;
     }
+    if (mySession !== sessionId) return; // superseded while awaiting the token
+
+    let mySocket: AgentSocket;
+    let myQueue: AgentQueue;
     try {
-      queue = deps.createQueue();
-      socket = deps.createSocket(token);
+      myQueue = deps.createQueue();
+      mySocket = deps.createSocket(token);
     } catch {
+      if (mySession !== sessionId) return;
       dispatch({ type: "error", message: "Couldn't start the voice helper." });
       return;
     }
 
-    socket.on("Open", () => dispatch({ type: "open" }));
-    socket.on("Welcome", () => dispatch({ type: "ready" }));
-    socket.on("SettingsApplied", () => dispatch({ type: "ready" }));
-    socket.on("ConversationText", (p) => {
+    socket = mySocket;
+    queue = myQueue;
+
+    // Handlers close over mySession so a socket that has lost ownership
+    // (a newer start(), or stop(), ran after this one began) can no longer
+    // drive shared state even if events keep arriving before it fully closes.
+    const guardedDispatch = (event: HelperEvent) => {
+      if (mySession !== sessionId) return;
+      dispatch(event);
+    };
+
+    mySocket.on("Open", () => guardedDispatch({ type: "open" }));
+    mySocket.on("Welcome", () => guardedDispatch({ type: "ready" }));
+    mySocket.on("SettingsApplied", () => guardedDispatch({ type: "ready" }));
+    mySocket.on("ConversationText", (p) => {
       const t = p as { role?: string; content?: string };
-      dispatch({ type: "conversationText", role: t.role ?? "assistant", content: t.content ?? "" });
+      guardedDispatch({ type: "conversationText", role: t.role ?? "assistant", content: t.content ?? "" });
     });
-    socket.on("UserStartedSpeaking", () => dispatch({ type: "userStartedSpeaking" }));
-    socket.on("AgentThinking", () => dispatch({ type: "thinking" }));
-    socket.on("AgentAudioDone", () => dispatch({ type: "audioDone" }));
-    socket.on("Audio", (p) => {
+    mySocket.on("UserStartedSpeaking", () => guardedDispatch({ type: "userStartedSpeaking" }));
+    mySocket.on("AgentThinking", () => guardedDispatch({ type: "thinking" }));
+    mySocket.on("AgentAudioDone", () => guardedDispatch({ type: "audioDone" }));
+    mySocket.on("Audio", (p) => {
+      if (mySession !== sessionId) return;
       const buf = p as ArrayBuffer;
       queue?.push(buf);
       dispatch({ type: "audio" });
     });
-    socket.on("Close", () => dispatch({ type: "closed" }));
-    socket.on("Error", (p) => {
+    mySocket.on("Close", () => guardedDispatch({ type: "closed" }));
+    mySocket.on("Error", (p) => {
       const e = p as { message?: string };
-      dispatch({ type: "error", message: e?.message ?? "The voice helper hit a problem." });
+      guardedDispatch({ type: "error", message: e?.message ?? "The voice helper hit a problem." });
     });
 
     // configure() MUST precede any audio.
-    socket.configure(agentConfig(helperPrompt(ctx)));
+    mySocket.configure(agentConfig(helperPrompt(ctx)));
   }
 
   function updateContext(ctx: HelperContext): void {
@@ -101,10 +137,8 @@ export function createAgentSession(deps: SessionDeps) {
   }
 
   function stop(): void {
-    socket?.requestClose();
-    queue?.close();
-    socket = null;
-    queue = null;
+    teardown();
+    sessionId++; // invalidate any start() still awaiting its token fetch
     dispatch({ type: "closed" });
   }
 
