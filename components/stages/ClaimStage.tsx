@@ -4,7 +4,8 @@ import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { CoachBubble } from "@/components/CoachBubble";
-import type { CoachResponse } from "@/lib/schemas";
+import { CLAIM_TURN_CAP } from "@/lib/claimRubric";
+import type { CoachResponse, CoachTurn } from "@/lib/schemas";
 
 export function ClaimStage({
   motion,
@@ -17,12 +18,15 @@ export function ClaimStage({
   claims: { id: string; claim: string }[];
   onComplete: (mappedClaimId: string) => void;
 }) {
-  const [reaction, setReaction] = useState<string | null>(null);
+  const [turns, setTurns] = useState<CoachTurn[]>([]);
   const [mappedId, setMappedId] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
   const [fallback, setFallback] = useState(false);
 
+  const attempt = turns.filter((t) => t.role === "student").length;
+
   async function submit(text: string) {
-    if (!text.trim()) return;
+    if (!text.trim() || done) return;
     try {
       const res = await fetch("/api/coach", {
         method: "POST",
@@ -31,14 +35,24 @@ export function ClaimStage({
           step: "claim",
           motion,
           payload: { side, studentClaim: text, authoredClaims: claims },
+          history: turns,
         }),
       });
       if (!res.ok) throw new Error("coach failed");
       const data: CoachResponse = await res.json();
-      if (data.kind === "claim") {
-        setReaction(data.reaction);
-        setMappedId(data.mappedClaimId);
-      }
+      if (data.kind !== "claim") return;
+
+      const coachText = [data.reaction, data.question].filter(Boolean).join(" ");
+      const nextTurns: CoachTurn[] = [
+        ...turns,
+        { role: "student", text },
+        { role: "coach", text: coachText },
+      ];
+      setTurns(nextTurns);
+      setMappedId(data.mappedClaimId);
+
+      const studentTurns = nextTurns.filter((t) => t.role === "student").length;
+      setDone(data.verdict === "good-enough" || studentTurns >= CLAIM_TURN_CAP);
     } catch {
       setFallback(true);
     }
@@ -52,11 +66,30 @@ export function ClaimStage({
         eyebrow="Stage 2 · Claim"
         prompt={`What's your strongest claim ${side === "for" ? "for" : "against"} this motion?`}
       />
-      <VoiceOrTextInput label="Say or type your claim" onSubmit={submit} />
 
-      {reaction && mapped && (
+      {turns.length > 0 && (
+        <div className="mb-4 space-y-3">
+          {turns.map((t, i) =>
+            t.role === "student" ? (
+              <p key={i} className="text-sm text-muted-foreground">
+                You said: {t.text}
+              </p>
+            ) : (
+              <CoachBubble key={i}>{t.text}</CoachBubble>
+            )
+          )}
+        </div>
+      )}
+
+      {!done && (
+        <VoiceOrTextInput
+          label={attempt === 0 ? "Say or type your claim" : "Answer the coach, or sharpen your claim"}
+          onSubmit={submit}
+        />
+      )}
+
+      {done && mapped && (
         <div className="mt-3">
-          <CoachBubble>{reaction}</CoachBubble>
           <div className="mt-3 rounded-lg border border-evidence bg-evidence/10 p-3">
             <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               We&apos;ll carry this forward as
@@ -69,9 +102,9 @@ export function ClaimStage({
         </div>
       )}
 
-      {fallback && (
+      {((done && !mapped) || fallback) && (
         <div className="mt-3">
-          <p className="text-sm text-muted-foreground">Coach unavailable — pick the claim closest to yours:</p>
+          <p className="text-sm text-muted-foreground">Pick the claim closest to yours:</p>
           <div className="mt-2 flex flex-col gap-2">
             {claims.map((c) => (
               <Button

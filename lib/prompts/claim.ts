@@ -30,7 +30,7 @@ export function claimPrompt(input: {
     '- When the verdict is "good-enough", set "question" to null.',
     `- Set "mappedClaimId" to the authored claim closest to the student's claim when the verdict is "good-enough"${
       isFinal ? ", and ALSO on this final turn even if the claim is still rough" : ""
-    }. Otherwise set it to null.`,
+    }. Otherwise set it to null, except on the final turn as stated below.`,
     isFinal
       ? "- This is the final turn. Close warmly, do not ask another question, and you MUST set mappedClaimId so the student can move on."
       : "",
