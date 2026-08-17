@@ -1,6 +1,7 @@
 "use client";
 import { useFlowProgress } from "@/lib/state/useFlowProgress";
 import { flowMotionToMotion, claimToScenario } from "@/lib/flowMotions";
+import { otherSideUnlocked, type Side } from "@/lib/state/flowMachine";
 import { RestateStep } from "@/components/steps/RestateStep";
 import { KeywordStep } from "@/components/steps/KeywordStep";
 import { ClaimStage } from "@/components/stages/ClaimStage";
@@ -13,29 +14,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { FlowMotion } from "@/lib/schemas";
 
-export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () => void }) {
-  const [progress, update] = useFlowProgress(motion.id);
+export function FlowShell({
+  motion,
+  startSide = "for",
+  onExit,
+}: {
+  motion: FlowMotion;
+  startSide?: Side;
+  onExit: () => void;
+}) {
+  const [progress, update] = useFlowProgress(motion.id, startSide);
   const sideClaims = motion.sides[progress.side].claims;
   const mappedClaim = sideClaims.find((c) => c.id === progress.mappedClaimId) ?? null;
 
-  const forPill = progress.forComplete ? (
-    <Badge variant="success">✓ FOR</Badge>
-  ) : (
-    <Badge variant={progress.side === "for" ? "default" : "secondary"}>FOR</Badge>
-  );
+  const otherSide: Side = progress.side === "for" ? "against" : "for";
+  const isComplete = (s: Side) => (s === "for" ? progress.forComplete : progress.againstComplete);
+  const label = (s: Side) => (s === "for" ? "FOR" : "AGAINST");
 
-  const againstPill = progress.againstComplete ? (
-    <Badge variant="success">✓ AGAINST</Badge>
-  ) : progress.side === "against" ? (
-    <Badge variant="default">AGAINST</Badge>
-  ) : progress.forComplete ? (
-    <Badge variant="secondary">AGAINST</Badge>
-  ) : (
-    <Badge variant="outline">🔒 AGAINST · soon</Badge>
-  );
+  function pill(s: Side) {
+    if (isComplete(s)) return <Badge key={s} variant="success">✓ {label(s)}</Badge>;
+    if (progress.side === s) return <Badge key={s} variant="default">{label(s)}</Badge>;
+    if (otherSideUnlocked(progress)) return <Badge key={s} variant="secondary">{label(s)}</Badge>;
+    return <Badge key={s} variant="outline">🔒 {label(s)} · Part 2</Badge>;
+  }
 
   const bothComplete = progress.forComplete && progress.againstComplete;
-  const forDone = progress.side === "for" && progress.forComplete && !progress.againstComplete;
+  const currentSideDone = isComplete(progress.side) && !bothComplete;
 
   return (
     <AppShell>
@@ -50,8 +54,8 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
             </div>
           </div>
           <div className="flex shrink-0 gap-2">
-            {forPill}
-            {againstPill}
+            {pill("for")}
+            {pill("against")}
           </div>
         </div>
 
@@ -68,14 +72,21 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
                   ← back to motions
                 </Button>
               </div>
-            ) : forDone ? (
+            ) : currentSideDone ? (
               <div className="mx-auto max-w-md py-8 text-center">
-                <div className="text-xs font-semibold uppercase tracking-wide text-primary">FOR side complete</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  {label(progress.side)} side complete
+                </div>
                 <p className="mt-2 text-lg text-foreground">
-                  Nice — you built the FOR case: claim, link, and impact. Now flip it and argue the other side.
+                  Nice — you built the {label(progress.side)} case: claim, link, and impact. Now flip
+                  it and argue the other side.
                 </p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
-                  <Button onClick={() => update({ side: "against", stage: "claim", mappedClaimId: null, impact: "" })}>
+                  <Button
+                    onClick={() =>
+                      update({ side: otherSide, stage: "claim", mappedClaimId: null, impact: "" })
+                    }
+                  >
                     Now argue the other side →
                   </Button>
                   <Button variant="ghost" onClick={onExit}>
@@ -96,6 +107,14 @@ export function FlowShell({ motion, onExit }: { motion: FlowMotion; onExit: () =
                   <KeywordStep motion={flowMotionToMotion(motion)} onNext={() => update({ stage: "claim" })} />
                 )}
                 {progress.stage === "claim" && (
+                  <ClaimStage
+                    motion={motion.motion}
+                    side={progress.side}
+                    claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
+                    onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
+                  />
+                )}
+                {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && (
                   <ClaimStage
                     motion={motion.motion}
                     side={progress.side}
