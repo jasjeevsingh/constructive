@@ -38,6 +38,8 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
         side: String(p.side ?? ""),
         studentClaim: String(p.studentClaim ?? ""),
         authoredClaims: (p.authoredClaims as { id: string; claim: string }[]) ?? [],
+        history: req.history ?? [],
+        attempt: (req.history ?? []).filter((t) => t.role === "student").length + 1,
       });
     case "impact":
       return impactPrompt({
