@@ -25,7 +25,7 @@ const STATUS_META: Record<
 > = {
   "not-started": { label: "Not started", badge: "New", variant: "secondary", cta: "Start" },
   "in-progress": { label: "In progress", badge: "In progress", variant: "default", cta: "Resume" },
-  "for-done": { label: "FOR side done", badge: "FOR done", variant: "default", cta: "Resume" },
+  "one-side-done": { label: "One side done", badge: "1 side done", variant: "default", cta: "Resume" },
   complete: { label: "Both sides done", badge: "✓ Both sides", variant: "success", cta: "Review" },
 };
 

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
-  emptyFlowProgress, loadFlowProgress, saveFlowProgress, FLOW_STORAGE_KEY,
+  emptyFlowProgress, loadFlowProgress, saveFlowProgress, loadAllFlowProgress,
+  hasFlowProgress, clearFlowProgressForPrefix, FLOW_STORAGE_KEY,
 } from "@/lib/state/flowProgress";
 
 describe("flowProgress store", () => {
@@ -33,5 +34,26 @@ describe("flowProgress store", () => {
   it("drops a malformed entry (missing fields) and returns empty for it", () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({ m1: { stage: "claim" } }));
     expect(loadFlowProgress(localStorage, "m1")).toEqual(emptyFlowProgress());
+  });
+  it("starts on the requested side", () => {
+    expect(emptyFlowProgress("against").side).toBe("against");
+    expect(emptyFlowProgress().side).toBe("for");
+  });
+  it("reports whether a motion has saved progress", () => {
+    expect(hasFlowProgress(localStorage, "m1")).toBe(false);
+    saveFlowProgress(localStorage, "m1", emptyFlowProgress("against"));
+    expect(hasFlowProgress(localStorage, "m1")).toBe(true);
+  });
+  it("loads a fresh entry on the requested side", () => {
+    expect(loadFlowProgress(localStorage, "m1", "against").side).toBe("against");
+  });
+  it("clears only the entries matching a prefix", () => {
+    saveFlowProgress(localStorage, "gen:naruto:0", emptyFlowProgress());
+    saveFlowProgress(localStorage, "gen:naruto:1", emptyFlowProgress());
+    saveFlowProgress(localStorage, "gen:potter:0", emptyFlowProgress());
+    saveFlowProgress(localStorage, "m1", emptyFlowProgress());
+    clearFlowProgressForPrefix(localStorage, "gen:naruto:");
+    const all = loadAllFlowProgress(localStorage);
+    expect(Object.keys(all).sort()).toEqual(["gen:potter:0", "m1"]);
   });
 });

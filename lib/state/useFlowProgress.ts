@@ -3,15 +3,17 @@ import { useCallback, useEffect, useState } from "react";
 import {
   emptyFlowProgress, loadFlowProgress, saveFlowProgress, type FlowProgress,
 } from "@/lib/state/flowProgress";
+import type { Side } from "@/lib/state/flowMachine";
 
 export function useFlowProgress(
-  motionId: string
+  motionId: string,
+  startSide: Side = "for"
 ): [FlowProgress, (patch: Partial<FlowProgress>) => void] {
-  const [progress, setProgress] = useState<FlowProgress>(emptyFlowProgress());
+  const [progress, setProgress] = useState<FlowProgress>(() => emptyFlowProgress(startSide));
 
   useEffect(() => {
-    setProgress(loadFlowProgress(window.localStorage, motionId));
-  }, [motionId]);
+    setProgress(loadFlowProgress(window.localStorage, motionId, startSide));
+  }, [motionId, startSide]);
 
   const update = useCallback(
     (patch: Partial<FlowProgress>) => {
