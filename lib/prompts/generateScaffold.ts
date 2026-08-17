@@ -1,3 +1,5 @@
+import { renderRubric } from "@/lib/claimRubric";
+
 export function generateScaffoldPrompt(universe: string, motion: string): { system: string; user: string } {
   const system = `You are a debate coach building the full scaffold for one debate motion for students in grades 5-12, grounded in a fictional universe.
 
@@ -10,6 +12,9 @@ Each CANDIDATE is: {"text": string, "material":"evidence"|"reasoning", "verdict"
 
 Rules:
 - Give 1-2 claims per side. Each claim needs an "impact": why it matters, the bigger consequence.
+- EVERY claim you write must itself meet this standard:
+${renderRubric()}
+  In particular: one claim = ONE idea. Never bundle several complaints into a single claim.
 - Each claim's "candidates" are planks for a bridge from the claim to its impact. EVERY claim MUST include:
   - at least one candidate with material "evidence" and verdict "fits",
   - at least one candidate with material "reasoning" and verdict "fits",
