@@ -5,6 +5,7 @@ import {
   claimIsSolvable,
   enforceSolvableSides,
   assembleFlowMotion,
+  normalizeMotionText,
   ScaffoldError,
 } from "@/lib/generatedNormalize";
 import type { GeneratedSides } from "@/lib/schemas";
@@ -78,5 +79,36 @@ describe("assembleFlowMotion", () => {
     expect(motion.sides.for.claims[0].id).toBe("c1");
     const cand = motion.sides.for.claims[0].candidates;
     expect(cand.map((c) => c.id)).toEqual(["e1", "r1", "e2"]);
+  });
+});
+
+describe("normalizeMotionText", () => {
+  it("capitalizes a lowercase 'this house'", () => {
+    expect(normalizeMotionText("this house would ban homework.")).toBe(
+      "This House would ban homework."
+    );
+  });
+
+  it("preserves the verb's existing case", () => {
+    expect(normalizeMotionText("This house believes the Hidden Villages harm.")).toBe(
+      "This House believes the Hidden Villages harm."
+    );
+  });
+
+  it("leaves already-correct text untouched", () => {
+    expect(normalizeMotionText("This House would ban homework.")).toBe(
+      "This House would ban homework."
+    );
+  });
+
+  it("is idempotent", () => {
+    const once = normalizeMotionText("THIS HOUSE would act.");
+    expect(normalizeMotionText(once)).toBe(once);
+  });
+
+  it("does not touch unrelated words containing 'house'", () => {
+    expect(normalizeMotionText("This House would fund household repairs.")).toBe(
+      "This House would fund household repairs."
+    );
   });
 });

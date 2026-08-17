@@ -11,7 +11,7 @@ import {
   type GeneratedStore,
   type StoredMotionCard,
 } from "@/lib/state/generatedUniverses";
-import { assembleFlowMotion, motionCardId } from "@/lib/generatedNormalize";
+import { assembleFlowMotion, motionCardId, normalizeMotionText } from "@/lib/generatedNormalize";
 import type { FlowMotion, GeneratedSides } from "@/lib/schemas";
 
 export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => void }) {
@@ -50,7 +50,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion) => 
       const key = universeKey(universe);
       const motions: StoredMotionCard[] = data.motions.map((m: { motion: string; keywords: unknown; hook: string }, i: number) => ({
         id: motionCardId(universe, i),
-        motion: m.motion,
+        motion: normalizeMotionText(m.motion),
         keywords: m.keywords as StoredMotionCard["keywords"],
         hook: m.hook,
         sides: null,
