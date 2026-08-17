@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { gradeBridge, type BridgeGrade } from "@/lib/linkGrade";
 import { useLinkProgress } from "@/lib/state/useLinkProgress";
-import { speakCoach } from "@/lib/voice/playSpeech";
 import type { LinkScenario, LinkCandidate, CoachResponse } from "@/lib/schemas";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { Bridge } from "@/components/stages/Bridge";
@@ -50,7 +49,6 @@ export function LinkCard({
       const data: CoachResponse = await res.json();
       if (data.kind === "link") {
         setReactions((r) => ({ ...r, [c.id]: data.reaction }));
-        void speakCoach(data.reaction);
       }
     } catch {
       setCoachError((e) => ({ ...e, [c.id]: true }));

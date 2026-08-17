@@ -12,12 +12,9 @@ type VoiceStatus = "idle" | "listening" | "transcribing";
 export function VoiceOrTextInput({
   label,
   onSubmit,
-  autoSubmit = true,
 }: {
   label: string;
   onSubmit: (text: string) => void;
-  /** After a successful voice transcript, submit immediately (seamless coach loop). */
-  autoSubmit?: boolean;
 }) {
   const [text, setText] = useState("");
   const [status, setStatus] = useState<VoiceStatus>("idle");
@@ -220,7 +217,6 @@ export function VoiceOrTextInput({
     if (finalText) {
       setText(finalText);
       setStatus("idle");
-      if (autoSubmit) onSubmit(finalText);
       return;
     }
 
