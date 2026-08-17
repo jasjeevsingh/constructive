@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MotionSchema, MotionsFileSchema, CoachResponseSchema } from "@/lib/schemas";
+import { MotionSchema, MotionsFileSchema, CoachResponseSchema, CoachRequestSchema } from "@/lib/schemas";
 
 describe("MotionSchema", () => {
   it("accepts a well-formed motion", () => {
@@ -34,5 +34,32 @@ describe("CoachResponseSchema", () => {
 
   it("rejects an unknown kind", () => {
     expect(() => CoachResponseSchema.parse({ kind: "nope" })).toThrow();
+  });
+
+  it("accepts a mid-loop claim response with a null mapped id", () => {
+    const parsed = CoachResponseSchema.parse({
+      kind: "claim",
+      reaction: "Nice start.",
+      verdict: "keep-going",
+      question: "Which one of those is the real problem?",
+      mappedClaimId: null,
+    });
+    expect(parsed.kind).toBe("claim");
+  });
+
+  it("rejects a claim response missing the verdict", () => {
+    expect(() =>
+      CoachResponseSchema.parse({ kind: "claim", reaction: "x", question: null, mappedClaimId: null })
+    ).toThrow();
+  });
+
+  it("accepts a request carrying prior turns", () => {
+    const parsed = CoachRequestSchema.parse({
+      step: "claim",
+      motion: "m",
+      payload: {},
+      history: [{ role: "student", text: "hi" }],
+    });
+    expect(parsed.history?.[0].role).toBe("student");
   });
 });
