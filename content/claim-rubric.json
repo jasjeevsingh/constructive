@@ -5,7 +5,7 @@
     {
       "id": "one-idea",
       "name": "One idea",
-      "test": "Makes a single point, not a bundle of points.",
+      "test": "Makes a single arguable point. Giving a reason for that point is fine; adding a second, unrelated complaint is not.",
       "bad": "Phones cause cheating, distraction, and texting in class.",
       "good": "Phones let students cheat on tests."
     },
@@ -30,5 +30,6 @@
       "bad": "Cheating is bad.",
       "good": "Banning phones cuts cheating enough to be worth the hassle of enforcing it."
     }
-  ]
+  ],
+  "exemplar": "Schools should ban phones during exams because students use them to look up answers mid-test."
 }

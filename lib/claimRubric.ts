@@ -16,5 +16,9 @@ export function renderRubric(): string {
   const lines = rubric.criteria.map(
     (c) => `- ${c.name}: ${c.test}\n  Weak: "${c.bad}"\n  Strong: "${c.good}"`
   );
-  return [rubric.intro, "", ...lines].join("\n");
+  const parts = [rubric.intro, "", ...lines];
+  if (rubric.exemplar) {
+    parts.push("", `A claim that meets the whole standard: "${rubric.exemplar}"`);
+  }
+  return parts.join("\n");
 }

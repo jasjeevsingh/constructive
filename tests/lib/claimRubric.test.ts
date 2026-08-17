@@ -46,4 +46,15 @@ describe("claim rubric", () => {
       })
     ).toThrow();
   });
+
+  it("includes the exemplar claim in the rendered prompt block", () => {
+    const rubric = getClaimRubric();
+    expect(rubric.exemplar).toBeTruthy();
+    expect(renderRubric()).toContain(rubric.exemplar as string);
+  });
+
+  it("still parses a rubric that omits the optional exemplar", () => {
+    const criteria = [{ id: "one-idea", name: "One idea", test: "t", bad: "b", good: "g" }];
+    expect(() => ClaimRubricSchema.parse({ version: 1, intro: "x", criteria })).not.toThrow();
+  });
 });

@@ -162,6 +162,8 @@ export const ClaimRubricSchema = z.object({
   version: z.number(),
   intro: z.string().min(1),
   criteria: z.array(ClaimCriterionSchema).min(1),
+  /** Optional single claim that satisfies all criteria at once, for calibrating the combined bar. */
+  exemplar: z.string().min(1).optional(),
 });
 export type ClaimCriterion = z.infer<typeof ClaimCriterionSchema>;
 export type ClaimRubric = z.infer<typeof ClaimRubricSchema>;
