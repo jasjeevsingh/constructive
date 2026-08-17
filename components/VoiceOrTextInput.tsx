@@ -47,13 +47,15 @@ export function VoiceOrTextInput({
     return () => {
       const warm = warmSessionRef.current;
       warmSessionRef.current = null;
-      void warm?.then((id) => {
-        if (!id || sessionIdRef.current === id) return;
-        void fetch(
-          `/api/transcribe/live?action=stop&sessionId=${encodeURIComponent(id)}`,
-          { method: "POST" }
-        );
-      });
+      void warm
+        ?.then((id) => {
+          if (!id || sessionIdRef.current === id) return;
+          void fetch(
+            `/api/transcribe/live?action=stop&sessionId=${encodeURIComponent(id)}`,
+            { method: "POST" }
+          ).catch(() => {});
+        })
+        .catch(() => {});
     };
   }, []);
 

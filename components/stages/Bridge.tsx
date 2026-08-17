@@ -7,6 +7,18 @@ import { CoachBubble } from "@/components/CoachBubble";
 import { cn } from "@/lib/utils";
 import { BridgeScene } from "@/components/stages/BridgeScene";
 
+/**
+ * Every authored claim in the bank lists its candidates in the same order
+ * (fitting reasoning, fitting evidence, then distractors), so an unshuffled
+ * tray makes "build the first two" the universal answer. A seeded rotation
+ * keeps it deterministic for tests.
+ */
+function orderBySeed<T>(items: T[], seed?: number): T[] {
+  if (seed === undefined || items.length < 2) return items;
+  const offset = Math.abs(Math.floor(seed)) % items.length;
+  return [...items.slice(offset), ...items.slice(0, offset)];
+}
+
 export function Bridge({
   claim,
   impact,
@@ -17,6 +29,7 @@ export function Bridge({
   coachError,
   onToggle,
   onTalkThrough,
+  shuffleSeed,
 }: {
   claim: string;
   impact: string;
@@ -27,10 +40,14 @@ export function Bridge({
   coachError: Record<string, boolean>;
   onToggle: (id: string) => void;
   onTalkThrough: (c: LinkCandidate) => void;
+  shuffleSeed?: number;
 }) {
   const placedSet = new Set(placedIds);
   const placed = candidates.filter((c) => placedSet.has(c.id));
-  const unplaced = candidates.filter((c) => !placedSet.has(c.id));
+  const unplaced = orderBySeed(
+    candidates.filter((c) => !placedSet.has(c.id)),
+    shuffleSeed
+  );
   const statusOf = (id: string): PlankStatus | undefined =>
     grade?.perPlank.find((p) => p.id === id)?.status;
   const held = grade?.held ?? false;
@@ -68,7 +85,7 @@ export function Bridge({
     const stateRing =
       status === "wrong" ? "ring-1 ring-destructive" : status === "correct" ? "ring-1 ring-success" : "";
     return (
-      <div key={c.id} className={cn("rounded-lg border border-border bg-card p-3", stateRing)}>
+      <div key={c.id} data-plank-id={c.id} className={cn("rounded-lg border border-border bg-card p-3", stateRing)}>
         <div className="flex items-start gap-3">
           <Badge variant={c.material === "evidence" ? "evidence" : "reasoning"} className="mt-0.5 shrink-0 capitalize">
             {c.material}

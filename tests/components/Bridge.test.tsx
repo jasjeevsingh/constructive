@@ -6,22 +6,23 @@ import type { LinkCandidate } from "@/lib/schemas";
 const candidates: LinkCandidate[] = [
   { id: "e1", text: "Studies tie homework to stress.", material: "evidence", verdict: "fits", explanation: "x" },
   { id: "r1", text: "Frees evenings for family.", material: "reasoning", verdict: "fits", explanation: "y" },
+  { id: "gbw", text: "A Harvard study raised test scores.", material: "evidence", verdict: "great-but-wrong", explanation: "z" },
 ];
 
+const baseProps = {
+  claim: "Ban homework.",
+  impact: "More family time.",
+  candidates,
+  placedIds: [] as string[],
+  grade: null,
+  reactions: {},
+  coachError: {},
+  onToggle: () => {},
+  onTalkThrough: () => {},
+};
+
 function renderBridge(placedIds: string[]) {
-  render(
-    <Bridge
-      claim="Ban homework."
-      impact="More family time."
-      candidates={candidates}
-      placedIds={placedIds}
-      grade={null}
-      reactions={{}}
-      coachError={{}}
-      onToggle={() => {}}
-      onTalkThrough={() => {}}
-    />
-  );
+  render(<Bridge {...baseProps} placedIds={placedIds} />);
 }
 
 describe("Bridge", () => {
@@ -43,5 +44,13 @@ describe("Bridge", () => {
   it("shows a placed plank in the span with a Set aside control", () => {
     renderBridge(["e1"]);
     expect(screen.getByRole("button", { name: /set aside .*stress/i })).toBeInTheDocument();
+  });
+
+  it("orders the materials tray by the shuffle seed", () => {
+    const { container: a } = render(<Bridge {...baseProps} shuffleSeed={1} />);
+    const { container: b } = render(<Bridge {...baseProps} shuffleSeed={2} />);
+    const text = (c: HTMLElement) =>
+      Array.from(c.querySelectorAll("[data-plank-id]")).map((n) => n.getAttribute("data-plank-id")).join(",");
+    expect(text(a)).not.toBe(text(b));
   });
 });

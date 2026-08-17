@@ -43,12 +43,22 @@ describe("LinkCard", () => {
     expect(await screen.findByText(/argues the other way/i)).toBeInTheDocument();
   });
 
-  it("does not hold with evidence only (needs both materials)", async () => {
+  it("names the missing material when only evidence is built", async () => {
     render(<LinkCard scenario={scenario} onExit={() => {}} />);
     await userEvent.click(screen.getByRole("button", { name: /build .*stress/i }));
     await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
     expect(screen.queryByText(/bridge holds/i)).toBeNull();
-    expect(await screen.findByText(/both/i)).toBeInTheDocument();
+    const summary = await screen.findByTestId("bridge-summary");
+    expect(summary.textContent).toMatch(/reasoning/i);
+  });
+
+  it("changes its wording on a repeated failed attempt", async () => {
+    render(<LinkCard scenario={scenario} onExit={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /build .*stress/i }));
+    await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
+    const first = screen.getByTestId("bridge-summary").textContent;
+    await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
+    expect(screen.getByTestId("bridge-summary").textContent).not.toBe(first);
   });
 
   it("surfaces a coach reaction from 'talk this through' after testing", async () => {
