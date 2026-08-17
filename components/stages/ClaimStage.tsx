@@ -40,7 +40,10 @@ export function ClaimStage({
       });
       if (!res.ok) throw new Error("coach failed");
       const data: CoachResponse = await res.json();
-      if (data.kind !== "claim") return;
+      if (data.kind !== "claim") {
+        setFallback(true);
+        return;
+      }
 
       const coachText = [data.reaction, data.question].filter(Boolean).join(" ");
       const nextTurns: CoachTurn[] = [
@@ -102,9 +105,30 @@ export function ClaimStage({
         </div>
       )}
 
-      {((done && !mapped) || fallback) && (
+      {done && !mapped && !fallback && (
         <div className="mt-3">
-          <p className="text-sm text-muted-foreground">Pick the claim closest to yours:</p>
+          <p className="text-sm text-muted-foreground">
+            Good work — pick the claim closest to yours to carry forward:
+          </p>
+          <div className="mt-2 flex flex-col gap-2">
+            {claims.map((c) => (
+              <Button
+                key={c.id}
+                type="button"
+                variant="outline"
+                className="h-auto w-full justify-start whitespace-normal py-2 text-left"
+                onClick={() => onComplete(c.id)}
+              >
+                {c.claim}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {fallback && (
+        <div className="mt-3">
+          <p className="text-sm text-muted-foreground">Coach unavailable — pick the claim closest to yours:</p>
           <div className="mt-2 flex flex-col gap-2">
             {claims.map((c) => (
               <Button

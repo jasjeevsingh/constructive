@@ -101,8 +101,50 @@ describe("ClaimStage", () => {
     render(<ClaimStage motion="THW let kids vote." side="for" claims={claims} onComplete={onComplete} />);
     await userEvent.type(screen.getByRole("textbox"), "something");
     await userEvent.click(screen.getByRole("button", { name: /submit/i }));
-    // On failure, the authored claims are offered as pick buttons.
-    await userEvent.click(await screen.findByRole("button", { name: /kids deserve a say/i }));
+    // On a hard failure the copy says the coach is unavailable, not that things are going well.
+    expect(await screen.findByText(/coach unavailable/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /kids deserve a say/i }));
+    expect(onComplete).toHaveBeenCalledWith("c-stake");
+  });
+
+  it("falls back to manual pick, with the failure copy, when the coach returns an unexpected kind", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ kind: "keyword", reaction: "huh" }), { status: 200 }))
+    );
+    const onComplete = vi.fn();
+    render(<ClaimStage motion="m" side="for" claims={claims} onComplete={onComplete} />);
+    await userEvent.type(screen.getByRole("textbox"), "something");
+    await userEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(await screen.findByText(/coach unavailable/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /kids deserve a say/i }));
+    expect(onComplete).toHaveBeenCalledWith("c-stake");
+  });
+
+  it("shows warm, non-alarming copy when the turn cap is hit without a mapped claim", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        coachReply({
+          reaction: "Getting closer.",
+          verdict: "keep-going",
+          question: "What changes if that is true?",
+          mappedClaimId: null,
+        })
+      )
+    );
+    const onComplete = vi.fn();
+    render(<ClaimStage motion="m" side="for" claims={claims} onComplete={onComplete} />);
+    for (let i = 0; i < 3; i++) {
+      await userEvent.type(screen.getByRole("textbox"), `try ${i}`);
+      await userEvent.click(screen.getByRole("button", { name: /submit/i }));
+      await waitFor(() => expect(screen.getAllByText(/getting closer/i)).toHaveLength(i + 1));
+    }
+
+    expect(await screen.findByText(/good work/i)).toBeInTheDocument();
+    expect(screen.queryByText(/coach unavailable/i)).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /kids deserve a say/i }));
     expect(onComplete).toHaveBeenCalledWith("c-stake");
   });
 });
