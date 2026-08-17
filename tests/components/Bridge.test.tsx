@@ -31,6 +31,7 @@ describe("Bridge", () => {
     expect(screen.getByText("More family time.")).toBeInTheDocument();
     expect(screen.getByText("Claim")).toBeInTheDocument();
     expect(screen.getByText("Impact")).toBeInTheDocument();
+    expect(screen.getByTestId("bridge-scene")).toBeInTheDocument();
   });
 
   it("puts unplaced planks in the materials tray with a Build control", () => {
