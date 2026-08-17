@@ -43,11 +43,12 @@ export function Bridge({
   shuffleSeed?: number;
 }) {
   const placedSet = new Set(placedIds);
-  const placed = candidates.filter((c) => placedSet.has(c.id));
-  const unplaced = orderBySeed(
-    candidates.filter((c) => !placedSet.has(c.id)),
-    shuffleSeed
-  );
+  // Shuffle the FULL candidate list once, then derive placed/unplaced from that ordering —
+  // rotating an already-filtered list would re-derive a new offset (against a shrinking
+  // length) every time a plank is placed, visibly reshuffling the remaining planks.
+  const ordered = orderBySeed(candidates, shuffleSeed);
+  const placed = ordered.filter((c) => placedSet.has(c.id));
+  const unplaced = ordered.filter((c) => !placedSet.has(c.id));
   const statusOf = (id: string): PlankStatus | undefined =>
     grade?.perPlank.find((p) => p.id === id)?.status;
   const held = grade?.held ?? false;
@@ -141,7 +142,7 @@ export function Bridge({
 
       {/* Materials tray */}
       {unplaced.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-4" data-testid="materials-tray">
           <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Materials</div>
           <div className="space-y-2">{unplaced.map((c) => plankRow(c, false))}</div>
         </div>

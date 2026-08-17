@@ -68,4 +68,33 @@ describe("FlowDeck", () => {
     await userEvent.click(screen.getAllByRole("button", { name: new RegExp(motions[0].motion.slice(0, 20)) })[0]);
     expect(screen.queryByText(/which side/i)).toBeNull();
   });
+
+  it("refreshes the deck badge after returning from a motion completed during the journey", async () => {
+    const motions = getFlowMotions();
+    const motionId = motions[0].id;
+    // Start out "in progress" so the deck shows a distinct initial badge.
+    localStorage.setItem(
+      FLOW_STORAGE_KEY,
+      JSON.stringify({ [motionId]: { ...emptyFlowProgress("against"), stage: "claim" } })
+    );
+    render(<FlowDeck />);
+    expect(await screen.findByText("In progress")).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getAllByRole("button", { name: new RegExp(motions[0].motion.slice(0, 20)) })[0]
+    );
+    // Now inside the journey (FlowShell). Simulate the journey completing the AGAINST side —
+    // this is what useFlowProgress/saveFlowProgress would write as the student finishes.
+    localStorage.setItem(
+      FLOW_STORAGE_KEY,
+      JSON.stringify({
+        [motionId]: { ...emptyFlowProgress("against"), stage: "claim", againstComplete: true },
+      })
+    );
+    // Exit back to the deck without a remount.
+    await userEvent.click(screen.getByRole("button", { name: /Motions/ }));
+
+    expect(await screen.findByText("1 side done")).toBeInTheDocument();
+    expect(screen.queryByText("In progress")).toBeNull();
+  });
 });

@@ -56,7 +56,16 @@ export function FlowDeck() {
 
   if (active) {
     return (
-      <FlowShell motion={active.motion} startSide={active.side} onExit={() => setActive(null)} />
+      <FlowShell
+        motion={active.motion}
+        startSide={active.side}
+        onExit={() => {
+          // Progress was written to localStorage during the journey (e.g. a side just got
+          // completed) — re-read it so the deck's badges aren't stale on return.
+          setProgress(loadAllFlowProgress(window.localStorage));
+          setActive(null);
+        }}
+      />
     );
   }
   if (practicePart) return <PracticeShell part={practicePart} onExit={() => setPracticePart(null)} />;
