@@ -17,6 +17,12 @@ describe("PracticeShell", () => {
     expect(screen.getByText(/strongest claim/i)).toBeInTheDocument();
   });
 
+  it("shows the drawn motion in the header for a claim drill", () => {
+    render(<PracticeShell part="claim" onExit={() => {}} />);
+    // Every seeded motion begins with "This House" — the header must name one.
+    expect(screen.getByText(/^This House/)).toBeInTheDocument();
+  });
+
   it("renders the link bridge for the link part", () => {
     render(<PracticeShell part="link" onExit={() => {}} />);
     expect(screen.getByRole("button", { name: /test the bridge/i })).toBeInTheDocument();

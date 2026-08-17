@@ -36,6 +36,8 @@ export function PracticeShell({ part, onExit }: { part: PracticePart; onExit: ()
     setDone(false);
   }
 
+  const drilledMotion = item.part === "link" ? null : item.motion;
+
   return (
     <AppShell>
       <Card className="flex min-h-[70vh] flex-col overflow-hidden p-0">
@@ -47,6 +49,9 @@ export function PracticeShell({ part, onExit }: { part: PracticePart; onExit: ()
             <div className="font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
               {TITLES[part]}
             </div>
+            {drilledMotion && (
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{drilledMotion}</p>
+            )}
           </div>
           <Badge variant="secondary" className="shrink-0">{count} done</Badge>
         </div>
