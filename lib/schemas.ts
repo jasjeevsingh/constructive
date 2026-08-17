@@ -21,7 +21,7 @@ export type CoachStep = z.infer<typeof CoachStepSchema>;
 
 export const CoachTurnSchema = z.object({
   role: z.enum(["student", "coach"]),
-  text: z.string(),
+  text: z.string().max(2000),
 });
 export type CoachTurn = z.infer<typeof CoachTurnSchema>;
 
@@ -29,7 +29,7 @@ export const CoachRequestSchema = z.object({
   step: CoachStepSchema,
   motion: z.string().min(1),
   payload: z.record(z.string(), z.unknown()),
-  history: z.array(CoachTurnSchema).optional(),
+  history: z.array(CoachTurnSchema).max(10).optional(),
 });
 export type CoachRequest = z.infer<typeof CoachRequestSchema>;
 

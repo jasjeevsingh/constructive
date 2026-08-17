@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
 import { StageHeader } from "@/components/stages/StageHeader";
@@ -22,11 +22,17 @@ export function ClaimStage({
   const [mappedId, setMappedId] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [fallback, setFallback] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [lastStudentClaim, setLastStudentClaim] = useState<string | null>(null);
+  const sendingRef = useRef(false);
 
   const attempt = turns.filter((t) => t.role === "student").length;
 
   async function submit(text: string) {
-    if (!text.trim() || done) return;
+    if (!text.trim() || done || sendingRef.current) return;
+    sendingRef.current = true;
+    setSending(true);
+    setFallback(false);
     try {
       const res = await fetch("/api/coach", {
         method: "POST",
@@ -53,11 +59,15 @@ export function ClaimStage({
       ];
       setTurns(nextTurns);
       setMappedId(data.mappedClaimId);
+      setLastStudentClaim(text);
 
       const studentTurns = nextTurns.filter((t) => t.role === "student").length;
       setDone(data.verdict === "good-enough" || studentTurns >= CLAIM_TURN_CAP);
     } catch {
       setFallback(true);
+    } finally {
+      sendingRef.current = false;
+      setSending(false);
     }
   }
 
@@ -86,16 +96,27 @@ export function ClaimStage({
 
       {!done && (
         <VoiceOrTextInput
+          key={attempt}
           label={attempt === 0 ? "Say or type your claim" : "Answer the coach, or sharpen your claim"}
           onSubmit={submit}
         />
       )}
 
+      {!done && sending && <p className="mt-2 text-sm text-muted-foreground">Thinking…</p>}
+
       {done && mapped && (
         <div className="mt-3">
+          {lastStudentClaim && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Your claim
+              </div>
+              <p className="mt-0.5 font-medium text-foreground">{lastStudentClaim}</p>
+            </div>
+          )}
           <div className="mt-3 rounded-lg border border-evidence bg-evidence/10 p-3">
             <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              We&apos;ll carry this forward as
+              Closest authored claim we&apos;ll build the bridge from
             </div>
             <p className="mt-0.5 font-medium text-foreground">{mapped.claim}</p>
           </div>

@@ -62,4 +62,20 @@ describe("CoachResponseSchema", () => {
     });
     expect(parsed.history?.[0].role).toBe("student");
   });
+
+  it("rejects a request whose history is over the length cap", () => {
+    const history = Array.from({ length: 11 }, () => ({ role: "student" as const, text: "hi" }));
+    expect(() =>
+      CoachRequestSchema.parse({ step: "claim", motion: "m", payload: {}, history })
+    ).toThrow();
+  });
+
+  it("rejects a turn whose text is over the character cap", () => {
+    expect(() => CoachRequestSchema.parse({
+      step: "claim",
+      motion: "m",
+      payload: {},
+      history: [{ role: "student", text: "x".repeat(2001) }],
+    })).toThrow();
+  });
 });

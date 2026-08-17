@@ -5,7 +5,7 @@
     {
       "id": "one-idea",
       "name": "One idea",
-      "test": "Makes a single arguable point. Giving a reason for that point is fine; adding a second, unrelated complaint is not.",
+      "test": "Makes a single arguable point. Giving a reason for that point is fine; adding a second, separate complaint is not.",
       "bad": "Phones cause cheating, distraction, and texting in class.",
       "good": "Phones let students cheat on tests."
     },
@@ -19,16 +19,16 @@
     {
       "id": "concrete",
       "name": "Concrete",
-      "test": "Names a real situation, person, or mechanism instead of staying abstract.",
+      "test": "Names a specific situation, person, or mechanism instead of staying abstract.",
       "bad": "Phones affect learning.",
       "good": "Students look up answers on their phones in the middle of a test."
     },
     {
       "id": "contestable",
       "name": "Contestable",
-      "test": "A reasonable person could disagree. Not a truism, and not the motion restated in different words.",
+      "test": "A reasonable person could disagree. Not a truism, and not just the motion repeated with no reason attached.",
       "bad": "Cheating is bad.",
-      "good": "Banning phones cuts cheating enough to be worth the hassle of enforcing it."
+      "good": "Phones cause enough cheating that banning them is worth the hassle."
     }
   ],
   "exemplar": "Schools should ban phones during exams because students use them to look up answers mid-test."
