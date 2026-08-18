@@ -1342,8 +1342,14 @@ Expected: empty.
 
 - [ ] **Step 6: Commit any fixes**
 
+**Do NOT use `git add -A`.** The working tree contains stray untracked duplicate files
+(`content/claim-rubric 2.json`, `lib/claimRubric 2.ts`, `tests/lib/claimRubric.test 2.ts`,
+`tests/lib/ai/claude.history.test 2.ts`, and two in `docs/superpowers/`) left by an editor or sync
+tool during an earlier branch. They are NOT collected by vitest (the ` 2.ts` suffix falls outside its
+include pattern) and must not be committed. Stage only the files you actually changed, by path.
+
 ```bash
-git add -A
+git add <the specific files you changed>
 git commit -m "fix: verification pass for the voice helper branch"
 ```
 
