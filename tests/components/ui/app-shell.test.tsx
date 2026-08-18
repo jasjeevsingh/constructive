@@ -13,17 +13,15 @@ describe("AppShell", () => {
     expect(screen.getByText("page body")).toBeInTheDocument();
   });
 
-  it("renders the feedback link when the url is configured", () => {
-    vi.stubEnv("NEXT_PUBLIC_FEEDBACK_URL", "https://example.com/feedback");
+  it("offers the feedback panel when enabled", () => {
+    vi.stubEnv("NEXT_PUBLIC_FEEDBACK_ENABLED", "1");
     render(<AppShell><p>page body</p></AppShell>);
-    const link = screen.getByRole("link", { name: /user feedback/i });
-    expect(link).toHaveAttribute("href", "https://example.com/feedback");
-    expect(link).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("button", { name: /user feedback/i })).toBeInTheDocument();
   });
 
-  it("renders no feedback link when the url is unset", () => {
-    vi.stubEnv("NEXT_PUBLIC_FEEDBACK_URL", "");
+  it("renders no feedback affordance when the flag is unset", () => {
+    vi.stubEnv("NEXT_PUBLIC_FEEDBACK_ENABLED", "");
     render(<AppShell><p>page body</p></AppShell>);
-    expect(screen.queryByRole("link", { name: /user feedback/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /user feedback/i })).toBeNull();
   });
 });
