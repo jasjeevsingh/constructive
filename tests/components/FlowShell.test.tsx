@@ -131,6 +131,17 @@ describe("FlowShell", () => {
     expect(await screen.findByText(/strongest claim/i)).toBeInTheDocument();
   });
 
+  it("cross-fades from the Read stage into the Claim stage", async () => {
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    await userEvent.type(screen.getByRole("textbox"), "kids should get a say");
+    await userEvent.click(screen.getByRole("button", { name: /submit/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /next: keywords/i }));
+    await screen.findByText("kids");
+    await userEvent.click(screen.getByRole("button", { name: /next: claim/i }));
+    // Claim stage content appears after the stage cross-fade settles.
+    expect(await screen.findByText(/strongest claim for/i)).toBeInTheDocument();
+  });
+
   it("offers the voice helper inside the journey", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();

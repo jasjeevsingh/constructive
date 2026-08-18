@@ -1,4 +1,6 @@
 "use client";
+import { AnimatePresence, motion as m } from "motion/react";
+import { transitions } from "@/lib/motion";
 import { useFlowProgress } from "@/lib/state/useFlowProgress";
 import { flowMotionToMotion, claimToScenario } from "@/lib/flowMotions";
 import { otherSideUnlocked, type Side } from "@/lib/state/flowMachine";
@@ -82,88 +84,98 @@ function FlowShellInner({
         <div className="flex flex-1 flex-col md:flex-row">
           <FlowRail stage={progress.stage} />
           <div className="flex-1 p-5 sm:p-6">
-            {bothComplete ? (
-              <div className="mx-auto max-w-md py-8 text-center">
-                <div className="text-xs font-semibold uppercase tracking-wide text-primary">Complete</div>
-                <p className="mt-2 font-display text-xl font-semibold text-foreground">
-                  You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
-                </p>
-                <Button variant="secondary" className="mt-4" onClick={onExit}>
-                  ← back to motions
-                </Button>
-              </div>
-            ) : currentSideDone ? (
-              <div className="mx-auto max-w-md py-8 text-center">
-                <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-                  {label(progress.side)} side complete
-                </div>
-                <p className="mt-2 text-lg text-foreground">
-                  Nice — you built the {label(progress.side)} case: claim, link, and impact. Now flip
-                  it and argue the other side.
-                </p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
-                  <Button
-                    onClick={() =>
-                      update({ side: otherSide, stage: "claim", mappedClaimId: null, impact: "" })
-                    }
-                  >
-                    Now argue the other side →
-                  </Button>
-                  <Button variant="ghost" onClick={onExit}>
-                    ← back to motions
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                {progress.stage === "read" && progress.readSubstep === "restate" && (
-                  <RestateStep
-                    motion={motion.motion}
-                    initial={progress.restate}
-                    onNext={(restate) => update({ restate, readSubstep: "keyword" })}
-                  />
+            <AnimatePresence mode="wait">
+              <m.div
+                key={`${progress.stage}-${progress.readSubstep}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={transitions.snappy}
+              >
+                {bothComplete ? (
+                  <div className="mx-auto max-w-md py-8 text-center">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-primary">Complete</div>
+                    <p className="mt-2 font-display text-xl font-semibold text-foreground">
+                      You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
+                    </p>
+                    <Button variant="secondary" className="mt-4" onClick={onExit}>
+                      ← back to motions
+                    </Button>
+                  </div>
+                ) : currentSideDone ? (
+                  <div className="mx-auto max-w-md py-8 text-center">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-primary">
+                      {label(progress.side)} side complete
+                    </div>
+                    <p className="mt-2 text-lg text-foreground">
+                      Nice — you built the {label(progress.side)} case: claim, link, and impact. Now flip
+                      it and argue the other side.
+                    </p>
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                      <Button
+                        onClick={() =>
+                          update({ side: otherSide, stage: "claim", mappedClaimId: null, impact: "" })
+                        }
+                      >
+                        Now argue the other side →
+                      </Button>
+                      <Button variant="ghost" onClick={onExit}>
+                        ← back to motions
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {progress.stage === "read" && progress.readSubstep === "restate" && (
+                      <RestateStep
+                        motion={motion.motion}
+                        initial={progress.restate}
+                        onNext={(restate) => update({ restate, readSubstep: "keyword" })}
+                      />
+                    )}
+                    {progress.stage === "read" && progress.readSubstep === "keyword" && (
+                      <KeywordStep motion={flowMotionToMotion(motion)} onNext={() => update({ stage: "claim" })} />
+                    )}
+                    {progress.stage === "claim" && (
+                      <ClaimStage
+                        motion={motion.motion}
+                        side={progress.side}
+                        claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
+                        onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
+                      />
+                    )}
+                    {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && (
+                      <ClaimStage
+                        motion={motion.motion}
+                        side={progress.side}
+                        claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
+                        onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
+                      />
+                    )}
+                    {progress.stage === "link" && mappedClaim && (
+                      <LinkCard
+                        scenario={claimToScenario(motion.id, mappedClaim)}
+                        onComplete={() => update({ stage: "impact" })}
+                      />
+                    )}
+                    {progress.stage === "impact" && mappedClaim && (
+                      <ImpactStage
+                        motion={motion.motion}
+                        claim={mappedClaim.claim}
+                        authoredImpact={mappedClaim.impact}
+                        onComplete={(impact) =>
+                          update({
+                            impact,
+                            forComplete: progress.side === "for" ? true : progress.forComplete,
+                            againstComplete: progress.side === "against" ? true : progress.againstComplete,
+                          })
+                        }
+                      />
+                    )}
+                  </>
                 )}
-                {progress.stage === "read" && progress.readSubstep === "keyword" && (
-                  <KeywordStep motion={flowMotionToMotion(motion)} onNext={() => update({ stage: "claim" })} />
-                )}
-                {progress.stage === "claim" && (
-                  <ClaimStage
-                    motion={motion.motion}
-                    side={progress.side}
-                    claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
-                    onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
-                  />
-                )}
-                {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && (
-                  <ClaimStage
-                    motion={motion.motion}
-                    side={progress.side}
-                    claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
-                    onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
-                  />
-                )}
-                {progress.stage === "link" && mappedClaim && (
-                  <LinkCard
-                    scenario={claimToScenario(motion.id, mappedClaim)}
-                    onComplete={() => update({ stage: "impact" })}
-                  />
-                )}
-                {progress.stage === "impact" && mappedClaim && (
-                  <ImpactStage
-                    motion={motion.motion}
-                    claim={mappedClaim.claim}
-                    authoredImpact={mappedClaim.impact}
-                    onComplete={(impact) =>
-                      update({
-                        impact,
-                        forComplete: progress.side === "for" ? true : progress.forComplete,
-                        againstComplete: progress.side === "against" ? true : progress.againstComplete,
-                      })
-                    }
-                  />
-                )}
-              </>
-            )}
+              </m.div>
+            </AnimatePresence>
           </div>
         </div>
       </Card>

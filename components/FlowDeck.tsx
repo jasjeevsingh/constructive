@@ -115,7 +115,7 @@ export function FlowDeck() {
                 onClick={() => open(m)}
                 aria-label={`${m.motion} — ${meta.label}`}
                 className={cn(
-                  "group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-all hover:border-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   status === "complete" && "ring-1 ring-success"
                 )}
               >

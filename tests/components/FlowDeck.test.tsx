@@ -69,6 +69,13 @@ describe("FlowDeck", () => {
     expect(screen.queryByText(/which side/i)).toBeNull();
   });
 
+  it("gives motion cards a hover border and shadow lift", () => {
+    render(<FlowDeck />);
+    const card = screen.getByRole("button", { name: /let kids vote/i });
+    expect(card.className).toContain("hover:border-primary");
+    expect(card.className).toContain("hover:shadow-md");
+  });
+
   it("refreshes the deck badge after returning from a motion completed during the journey", async () => {
     const motions = getFlowMotions();
     const motionId = motions[0].id;
