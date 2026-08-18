@@ -5,9 +5,15 @@ vi.mock("@deepgram/sdk", () => ({
   createClient: () => ({ auth: { grantToken } }),
 }));
 
-const { GET, POST } = await import("@/app/api/deepgram/token/route");
+// Re-imported per test: the route caches a successful capability probe in
+// module scope, and a cache leaking across tests would let one test pass on a
+// previous test's side effect rather than on its own setup.
+let GET: () => Promise<Response>;
+let POST: () => Promise<Response>;
 
-beforeEach(() => {
+beforeEach(async () => {
+  vi.resetModules();
+  ({ GET, POST } = await import("@/app/api/deepgram/token/route"));
   grantToken.mockReset();
   vi.spyOn(console, "error").mockImplementation(() => {});
   process.env.DEEPGRAM_API_KEY = "secret-key";

@@ -529,12 +529,14 @@ export function HelperPanel() {
     sessionRef.current?.updateContext(ctx);
   }, [ctx]);
 
-  // One-time availability probe so a key-less deploy disables just "Start
-  // voice call" with an explanation up front, instead of an enabled button
-  // that fails on click. GET is a plain env-var check — no token is minted,
-  // so this costs nothing even on a deploy where the key IS set. Text chat
-  // needs neither Deepgram nor a microphone, so this must never touch the
-  // trigger, `open`, or `callState` — only the voice-specific affordance.
+  // One-time availability probe so an unusable key disables just "Start voice
+  // call" with an explanation up front, instead of an enabled button that
+  // fails on click. GET attempts a real grant server-side and caches success
+  // briefly, because a key can be present and still be refused when minting a
+  // browser token — an env-presence check reported exactly that key as
+  // available. Text chat needs neither Deepgram nor a microphone, so this must
+  // never touch the trigger, `open`, or `callState` — only the voice-specific
+  // affordance.
   useEffect(() => {
     let cancelled = false;
     fetch("/api/deepgram/token", { method: "GET" })
