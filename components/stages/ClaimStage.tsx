@@ -4,6 +4,7 @@ import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { CoachBubble } from "@/components/CoachBubble";
+import { usePublishHelperContext } from "@/components/helper/HelperContextProvider";
 import { CLAIM_TURN_CAP } from "@/lib/claimRubric";
 import type { CoachResponse, CoachTurn } from "@/lib/schemas";
 
@@ -27,6 +28,8 @@ export function ClaimStage({
   const sendingRef = useRef(false);
 
   const attempt = turns.filter((t) => t.role === "student").length;
+
+  usePublishHelperContext({ claimDraft: lastStudentClaim || null, transcript: turns });
 
   async function submit(text: string) {
     if (!text.trim() || done || sendingRef.current) return;

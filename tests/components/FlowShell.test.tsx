@@ -130,4 +130,9 @@ describe("FlowShell", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(await screen.findByText(/strongest claim/i)).toBeInTheDocument();
   });
+
+  it("offers the voice helper inside the journey", () => {
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
+  });
 });

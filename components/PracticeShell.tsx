@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getFlowMotions } from "@/lib/flowMotions";
 import { drawItem, type PracticePart, type PracticeItem } from "@/lib/practice";
+import type { Side } from "@/lib/state/flowMachine";
 import { loadPracticeCounts, incrementPracticeCount } from "@/lib/state/practiceProgress";
 import { ClaimStage } from "@/components/stages/ClaimStage";
 import { ImpactStage } from "@/components/stages/ImpactStage";
@@ -10,6 +11,11 @@ import { AppShell } from "@/components/ui/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  HelperContextProvider,
+  usePublishHelperContext,
+} from "@/components/helper/HelperContextProvider";
+import { HelperPanel } from "@/components/helper/HelperPanel";
 
 const TITLES: Record<PracticePart, string> = {
   claim: "Practice: Claims",
@@ -17,10 +23,32 @@ const TITLES: Record<PracticePart, string> = {
   impact: "Practice: Impacts",
 };
 
-export function PracticeShell({ part, onExit }: { part: PracticePart; onExit: () => void }) {
+export function PracticeShell(props: { part: PracticePart; onExit: () => void }) {
+  return (
+    <HelperContextProvider>
+      <PracticeShellInner {...props} />
+      <HelperPanel />
+    </HelperContextProvider>
+  );
+}
+
+/** Only the claim variant of a PracticeItem carries a side — the link variant
+ *  drills the bridge between a claim and its impact and has none. */
+export function sideForPracticeItem(item: PracticeItem): Side | null {
+  return item.part === "claim" ? item.side : null;
+}
+
+function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () => void }) {
   const [item, setItem] = useState<PracticeItem>(() => drawItem(part, getFlowMotions()));
   const [done, setDone] = useState(false);
   const [count, setCount] = useState(0);
+
+  usePublishHelperContext({
+    activity: "practice",
+    stage: part,
+    motion: item.part === "link" ? "" : item.motion,
+    side: sideForPracticeItem(item),
+  });
 
   useEffect(() => {
     setCount(loadPracticeCounts(window.localStorage)[part]);
