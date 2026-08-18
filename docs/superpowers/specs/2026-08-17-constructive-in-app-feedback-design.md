@@ -98,7 +98,9 @@ key-less environment degrades instead of 500-ing).
 Reads the two progress keys defensively — corrupt or absent JSON yields a context with those fields
 omitted rather than throwing, mirroring `lib/state/flowProgress.ts`'s corruption tolerance. Returns
 the current pathname, the per-motion flow entries (motion id, side, stage, mappedClaimId,
-completion flags), and the practice rep counts. Pure and fully unit-testable.
+completion flags — each entry is projected down to exactly these fields, so the student's own
+writing, `restate`/`keywordAnswers`/`impact`, never leaves the device, for the current motion or any
+other one they've touched), and the practice rep counts. Pure and fully unit-testable.
 
 ### 3. UI — `components/feedback/FeedbackPanel.tsx`
 

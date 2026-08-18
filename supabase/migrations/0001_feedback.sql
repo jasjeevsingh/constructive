@@ -12,7 +12,9 @@ create table if not exists public.feedback (
   -- What the tester typed.
   message     text        not null,
   -- Where they were and what state they were in, read from localStorage at
-  -- submit time: motion id, side, stage, mapped claim, practice counts.
+  -- submit time: per motion, only its id, side, stage, mapped claim, and
+  -- completion flags (never the student's own writing), plus practice
+  -- counts.
   context     jsonb,
   -- Coarse environment, for reproducing a bug.
   path        text,

@@ -53,6 +53,22 @@ describe("POST /api/feedback", () => {
     expect(insert).not.toHaveBeenCalled();
   });
 
+  it("rejects an oversized context payload", async () => {
+    const res = await POST(
+      req({ message: "hi", context: { blob: "x".repeat(20 * 1024) } })
+    );
+    expect(res.status).toBe(400);
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("accepts a normal-sized context payload", async () => {
+    const res = await POST(
+      req({ message: "hi", context: { pathname: "/", flow: { "m-1": { side: "for" } } } })
+    );
+    expect(res.status).toBe(204);
+    expect(insert).toHaveBeenCalledTimes(1);
+  });
+
   it("503s when supabase is not configured", async () => {
     delete process.env.SUPABASE_SERVICE_ROLE_KEY;
     const res = await POST(req({ message: "hi" }));
@@ -64,6 +80,24 @@ describe("POST /api/feedback", () => {
     insert.mockResolvedValue({ error: new Error("db down") });
     const res = await POST(req({ message: "hi" }));
     expect(res.status).toBe(503);
+  });
+
+  it("logs only the insert error's message, never the whole error object", async () => {
+    const dbError = Object.assign(new Error("db down"), {
+      connectionString: "postgres://service_role:supersecret@example/db",
+    });
+    insert.mockResolvedValue({ error: dbError });
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await POST(req({ message: "hi" }));
+    expect(spy).toHaveBeenCalledTimes(1);
+    const loggedArgs = spy.mock.calls[0];
+    const loggedText = loggedArgs.map((a) => String(a)).join(" ");
+    expect(loggedText).toContain("db down");
+    expect(loggedText).not.toContain("supersecret");
+    for (const arg of loggedArgs) {
+      expect(arg).not.toBe(dbError);
+    }
+    spy.mockRestore();
   });
 
   it("never leaks the service role key", async () => {

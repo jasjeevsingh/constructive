@@ -1,8 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { MAX_FEEDBACK_CONTEXT_BYTES } from "@/lib/feedback/limits";
 
 const FeedbackBodySchema = z.object({
   message: z.string().trim().min(1).max(4000),
+  // Size-capped below (see MAX_FEEDBACK_CONTEXT_BYTES) rather than in the
+  // schema, since the cap is on the whole serialized object, not any one field.
   context: z.record(z.string(), z.unknown()).optional(),
   path: z.string().max(500).optional(),
 });
@@ -28,6 +31,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid feedback" }, { status: 400 });
   }
 
+  if (
+    parsed.data.context &&
+    Buffer.byteLength(JSON.stringify(parsed.data.context), "utf8") > MAX_FEEDBACK_CONTEXT_BYTES
+  ) {
+    return Response.json({ error: "invalid feedback" }, { status: 400 });
+  }
+
   const supabase = createClient(url, serviceRoleKey, { auth: { persistSession: false } });
   const { error } = await supabase.from("feedback").insert({
     message: parsed.data.message,
@@ -38,6 +48,10 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    // Message only — never the whole error object (may carry connection
+    // details) or anything env/client-related. Server log only, never the
+    // response body.
+    console.error("feedback insert failed:", error.message);
     return Response.json({ error: "could not save feedback" }, { status: 503 });
   }
   return new Response(null, { status: 204 });

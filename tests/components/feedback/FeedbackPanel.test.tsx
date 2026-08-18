@@ -25,6 +25,18 @@ describe("FeedbackPanelView", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("disables Send while the textarea is empty or whitespace-only", async () => {
+    render(<FeedbackPanelView open status="idle" onOpen={noop} onClose={noop} onSubmit={noop} />);
+    const sendButton = screen.getByRole("button", { name: /send/i });
+    expect(sendButton).toBeDisabled();
+
+    await userEvent.type(screen.getByRole("textbox"), "   ");
+    expect(sendButton).toBeDisabled();
+
+    await userEvent.type(screen.getByRole("textbox"), "now real text");
+    expect(sendButton).not.toBeDisabled();
+  });
+
   it("submits what was typed", async () => {
     const onSubmit = vi.fn();
     render(<FeedbackPanelView open status="idle" onOpen={noop} onClose={noop} onSubmit={onSubmit} />);

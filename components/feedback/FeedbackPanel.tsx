@@ -45,6 +45,8 @@ export function FeedbackPanelView({
     );
   }
 
+  const isEmpty = text.trim().length === 0;
+
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -52,7 +54,12 @@ export function FeedbackPanelView({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:left-4 sm:w-96">
+    // Offset from the very bottom on mobile (top-4, not bottom-0) so this
+    // sheet doesn't sit on top of the voice helper's own full-width sheet
+    // (components/helper/HelperPanel.tsx) when both are open on a phone.
+    // From `sm` up they already sit side by side (left vs right), so this
+    // reverts to the original bottom-anchored placement.
+    <div className="fixed inset-x-0 top-4 z-40 sm:inset-x-auto sm:top-auto sm:bottom-4 sm:left-4 sm:w-96">
       <Card className="border-border">
         <CardContent className="flex flex-col gap-3 p-4">
           <p className="text-xs text-muted-foreground">
@@ -75,7 +82,7 @@ export function FeedbackPanelView({
               <Button variant="outline" size="sm" onClick={onClose}>
                 Close
               </Button>
-              <Button size="sm" onClick={handleSend} disabled={status === "sending"}>
+              <Button size="sm" onClick={handleSend} disabled={isEmpty || status === "sending"}>
                 Send
               </Button>
             </div>
