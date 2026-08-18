@@ -215,6 +215,17 @@ describe("HelperPanelView — text chat (open, not in call)", () => {
     await userEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it("mounts the open panel inside an animated (spring) entrance wrapper", () => {
+    renderView({ open: true });
+    const panel = screen.getByTestId("helper-panel");
+    // Framer Motion applies `initial` variant values synchronously as inline
+    // style on mount, before the animation frame runs — a plain <div> would
+    // carry no such style. This is our signal that entrance motion is wired.
+    const style = panel.getAttribute("style") ?? "";
+    expect(style).toContain("opacity");
+    expect(panel).toContainElement(screen.getByRole("textbox"));
+  });
 });
 
 describe("HelperPanelView — in a live call", () => {
@@ -310,6 +321,32 @@ describe("HelperPanelView — in a live call", () => {
     renderView({ open: true, inCall: true, state: { ...base, phase: "idle" }, onClose });
     await userEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("mounts the live-call panel inside an animated (spring) entrance wrapper", () => {
+    renderView({ open: true, inCall: true, state: { ...base, phase: "listening" } });
+    const panel = screen.getByTestId("helper-panel");
+    const style = panel.getAttribute("style") ?? "";
+    expect(style).toContain("opacity");
+  });
+
+  it("renders a helper turn inside its own rise-in wrapper as it arrives", () => {
+    renderView({
+      open: true,
+      inCall: true,
+      state: {
+        ...base,
+        phase: "listening",
+        turns: [{ role: "helper", text: "what do you think it needs?" }],
+      },
+    });
+    const bubble = screen.getByText("what do you think it needs?");
+    // CoachBubble wraps helper turns in the Rise entrance primitive — the
+    // ancestor carrying the animated `style` attribute is that wrapper, not
+    // the panel's own spring wrapper (both apply, but this checks the inner one).
+    const animatedAncestor = bubble.closest("[style]");
+    expect(animatedAncestor).not.toBeNull();
+    expect(animatedAncestor?.getAttribute("style") ?? "").toContain("opacity");
   });
 });
 

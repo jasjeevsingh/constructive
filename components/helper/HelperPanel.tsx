@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { createClient } from "@deepgram/sdk";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/helper/agentMachine";
 import { createAgentSession, type AgentSocket } from "@/lib/helper/agentSession";
 import { createAudioQueue } from "@/lib/helper/audioQueue";
+import { riseIn, transitions } from "@/lib/motion";
 
 const PHASE_LABEL: Partial<Record<HelperPhase, string>> = {
   connecting: "Connecting…",
@@ -98,7 +100,14 @@ export function HelperPanelView({
   // `inCall` true, so a one-tap "Resume" (via onStartCall) can reconnect.
   if (inCall && state.phase === "idle") {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96">
+      <motion.div
+        data-testid="helper-panel"
+        className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+        variants={riseIn}
+        initial="hidden"
+        animate="show"
+        transition={transitions.spring}
+      >
         <Card className="border-border">
           <CardContent className="flex flex-col items-start gap-2 p-4">
             <p className="text-xs text-muted-foreground">Paused to save time on the call.</p>
@@ -112,13 +121,20 @@ export function HelperPanelView({
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
   if (inCall) {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96">
+      <motion.div
+        data-testid="helper-panel"
+        className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+        variants={riseIn}
+        initial="hidden"
+        animate="show"
+        transition={transitions.spring}
+      >
         <Card className="border-border">
           <CardContent className="flex max-h-[70vh] flex-col gap-3 p-4">
             <div className="flex items-center justify-between">
@@ -148,7 +164,7 @@ export function HelperPanelView({
             {state.error && <p className="text-xs text-muted-foreground">{state.error}</p>}
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
@@ -162,7 +178,14 @@ export function HelperPanelView({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96">
+    <motion.div
+      data-testid="helper-panel"
+      className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+      variants={riseIn}
+      initial="hidden"
+      animate="show"
+      transition={transitions.spring}
+    >
       <Card className="border-border">
         <CardContent className="flex max-h-[70vh] flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
@@ -208,7 +231,7 @@ export function HelperPanelView({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

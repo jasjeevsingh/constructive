@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { collectFeedbackContext } from "@/lib/feedback/context";
+import { riseIn, transitions } from "@/lib/motion";
 
 export type FeedbackStatus = "idle" | "sending" | "sent" | "error";
 
@@ -59,7 +61,14 @@ export function FeedbackPanelView({
     // (components/helper/HelperPanel.tsx) when both are open on a phone.
     // From `sm` up they already sit side by side (left vs right), so this
     // reverts to the original bottom-anchored placement.
-    <div className="fixed inset-x-0 top-4 z-40 sm:inset-x-auto sm:top-auto sm:bottom-4 sm:left-4 sm:w-96">
+    <motion.div
+      data-testid="feedback-panel"
+      className="fixed inset-x-0 top-4 z-40 sm:inset-x-auto sm:top-auto sm:bottom-4 sm:left-4 sm:w-96"
+      variants={riseIn}
+      initial="hidden"
+      animate="show"
+      transition={transitions.spring}
+    >
       <Card className="border-border">
         <CardContent className="flex flex-col gap-3 p-4">
           <p className="text-xs text-muted-foreground">
@@ -89,7 +98,7 @@ export function FeedbackPanelView({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

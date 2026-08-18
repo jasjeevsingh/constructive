@@ -69,4 +69,21 @@ describe("FeedbackPanelView", () => {
     await userEvent.type(screen.getByRole("textbox"), "still here");
     expect(screen.getByRole("textbox")).toHaveValue("still here");
   });
+
+  it("mounts the open panel inside an animated (spring) entrance wrapper", () => {
+    render(<FeedbackPanelView open status="idle" onOpen={noop} onClose={noop} onSubmit={noop} />);
+    const panel = screen.getByTestId("feedback-panel");
+    // Framer Motion applies `initial` variant values synchronously as inline
+    // style on mount, before the animation frame runs — a plain <div> would
+    // carry no such style. This is our signal that entrance motion is wired.
+    const style = panel.getAttribute("style") ?? "";
+    expect(style).toContain("opacity");
+  });
+
+  it("keeps the mobile top offset that stops it covering the helper sheet", () => {
+    render(<FeedbackPanelView open status="idle" onOpen={noop} onClose={noop} onSubmit={noop} />);
+    const panel = screen.getByTestId("feedback-panel");
+    expect(panel.className).toContain("top-4");
+    expect(panel.className).toContain("sm:top-auto");
+  });
 });
