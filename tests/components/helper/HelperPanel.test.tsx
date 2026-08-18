@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { HelperPanelView } from "@/components/helper/HelperPanel";
+import { HelperPanel, HelperPanelView } from "@/components/helper/HelperPanel";
 import { initialHelperState } from "@/lib/helper/agentMachine";
 
 const base = initialHelperState();
@@ -310,5 +310,114 @@ describe("HelperPanelView — in a live call", () => {
     renderView({ open: true, inCall: true, state: { ...base, phase: "idle" }, onClose });
     await userEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+// The two tests below drive the real wired `HelperPanel`, not the pure
+// view — they exist to guard the exact guarantees the view can't see: that
+// opening never touches the mic/socket, and that a send racing a call start
+// can't lose a message.
+describe("HelperPanel — wiring", () => {
+  let getUserMediaMock: ReturnType<typeof vi.fn>;
+  let audioContextMock: ReturnType<typeof vi.fn>;
+  let originalMediaDevices: PropertyDescriptor | undefined;
+  let originalAudioContext: unknown;
+
+  beforeEach(() => {
+    originalMediaDevices = Object.getOwnPropertyDescriptor(window.navigator, "mediaDevices");
+    originalAudioContext = (window as unknown as { AudioContext?: unknown }).AudioContext;
+
+    getUserMediaMock = vi.fn().mockResolvedValue({ getTracks: () => [] } as unknown as MediaStream);
+    Object.defineProperty(window.navigator, "mediaDevices", {
+      value: { getUserMedia: getUserMediaMock },
+      configurable: true,
+    });
+
+    // A minimal stand-in — just enough that connect() (if it runs) doesn't
+    // throw. Real Web Audio isn't available in jsdom.
+    audioContextMock = vi.fn(() => ({
+      createMediaStreamSource: () => ({ connect: () => {} }),
+      createScriptProcessor: () => ({ connect: () => {}, disconnect: () => {}, onaudioprocess: null }),
+      close: () => Promise.resolve(),
+    }));
+    (window as unknown as { AudioContext: unknown }).AudioContext = audioContextMock;
+  });
+
+  afterEach(() => {
+    if (originalMediaDevices) {
+      Object.defineProperty(window.navigator, "mediaDevices", originalMediaDevices);
+    } else {
+      delete (window.navigator as unknown as { mediaDevices?: unknown }).mediaDevices;
+    }
+    (window as unknown as { AudioContext: unknown }).AudioContext = originalAudioContext;
+    vi.unstubAllGlobals();
+  });
+
+  it("never touches the mic, a socket, or fetch just by opening", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/deepgram/token") return { ok: true, json: async () => ({}) } as Response;
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<HelperPanel />);
+    // Let the mount-time availability probe (a plain GET, no token minted)
+    // settle before measuring what opening itself does.
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    fetchMock.mockClear();
+
+    await userEvent.click(screen.getByRole("button", { name: /talk it through/i }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(getUserMediaMock).not.toHaveBeenCalled();
+    expect(audioContextMock).not.toHaveBeenCalled();
+  });
+
+  it("does not lose a message whose reply resolves while a call is starting", async () => {
+    let resolveHelperFetch: (value: unknown) => void = () => {};
+    const helperFetchPromise = new Promise((resolve) => {
+      resolveHelperFetch = resolve;
+    });
+
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/deepgram/token") {
+        if (init?.method === "POST") {
+          // No token minted — a real connect attempt fails fast and
+          // harmlessly, without needing a fake socket.
+          return { ok: false, json: async () => ({}) } as Response;
+        }
+        return { ok: true, json: async () => ({}) } as Response;
+      }
+      if (url === "/api/helper") return helperFetchPromise as Promise<Response>;
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<HelperPanel />);
+    await userEvent.click(screen.getByRole("button", { name: /talk it through/i }));
+    await userEvent.type(screen.getByRole("textbox"), "what makes a claim good");
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+
+    // The send is now in flight (sending === true). Attempt to escalate
+    // before it resolves — this is the race: Start voice call must be
+    // inert right now, not snapshot a stale `turns`.
+    await userEvent.click(screen.getByRole("button", { name: /start voice call/i }));
+
+    resolveHelperFetch({ ok: true, json: async () => ({ reply: "what do you think it needs?" }) });
+
+    // If the race had been lost, a call would now be live on a stale
+    // snapshot and this reply — appended to `turns`, not the session's
+    // state — would never reach the screen.
+    await waitFor(() => expect(screen.getByText("what do you think it needs?")).toBeInTheDocument());
+    expect(screen.getByText("what makes a claim good")).toBeInTheDocument();
+
+    // Now actually start a call (no send in flight) and end it, to prove
+    // the end-of-call merge itself doesn't drop turns that are legitimately
+    // part of the up-to-date snapshot.
+    await userEvent.click(screen.getByRole("button", { name: /start voice call/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /end call/i }));
+
+    expect(screen.getByText("what makes a claim good")).toBeInTheDocument();
+    expect(screen.getByText("what do you think it needs?")).toBeInTheDocument();
   });
 });

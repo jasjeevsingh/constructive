@@ -192,7 +192,14 @@ export function HelperPanelView({
             className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           <div className="flex items-center justify-end gap-2 border-t border-border pt-3">
-            <Button variant="outline" size="sm" onClick={onStartCall}>
+            {/* Disabled while a send is in flight: starting a call snapshots
+                `turns` into the session's initialTurns, and ending the call
+                later overwrites `turns` wholesale with the session's final
+                turns — a send that resolves mid-call would be silently
+                discarded by that overwrite. Blocking the escalation until
+                the send settles keeps the snapshot (and therefore the
+                merge) complete. */}
+            <Button variant="outline" size="sm" onClick={onStartCall} disabled={sending}>
               Start voice call
             </Button>
             <Button size="sm" onClick={handleSend} disabled={sendDisabled}>
@@ -389,8 +396,14 @@ export function HelperPanel() {
   };
 
   // Escalate the text chat to a live voice call, carrying the typed
-  // conversation across as initialTurns.
+  // conversation across as initialTurns. Guarded against a send still in
+  // flight (the view also disables the button for this, but this defends
+  // any other caller): starting now would snapshot `turns` before that
+  // send's reply lands, and ending the call later overwrites `turns`
+  // wholesale with the session's turns — silently discarding the pending
+  // exchange once it resolves.
   const handleStartCall = () => {
+    if (sending) return;
     teardownLive(); // defensive: no live session should exist yet, invalidates any stale connect()
     setInCall(true);
     setCallState(initialHelperState(turnsRef.current));
