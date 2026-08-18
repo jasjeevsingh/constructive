@@ -101,6 +101,37 @@ describe("FlowShell", () => {
     expect(onExit).toHaveBeenCalled();
   });
 
+  it("carries a celebration in the both-sides-complete panel", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+    }));
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    expect(await screen.findByTestId("both-sides-celebration")).toBeInTheDocument();
+  });
+
+  it("does not show the both-sides celebration when only one side is complete", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+    }));
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    await screen.findByText(/built the for case/i);
+    expect(screen.queryByTestId("both-sides-celebration")).toBeNull();
+  });
+
+  it("keeps back-to-motions usable immediately alongside the both-sides celebration", async () => {
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
+      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
+        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+    }));
+    const onExit = vi.fn();
+    render(<FlowShell motion={motion} onExit={onExit} />);
+    await screen.findByTestId("both-sides-celebration");
+    await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
+    expect(onExit).toHaveBeenCalled();
+  });
+
   it("labels the locked side Part 2, not soon", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(screen.getByText(/Part 2/)).toBeInTheDocument();

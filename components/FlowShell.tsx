@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion as m } from "motion/react";
 import { transitions } from "@/lib/motion";
 import { useFlowProgress } from "@/lib/state/useFlowProgress";
@@ -63,6 +64,17 @@ function FlowShellInner({
   const bothComplete = progress.forComplete && progress.againstComplete;
   const currentSideDone = isComplete(progress.side) && !bothComplete;
 
+  // Fire the both-sides celebration once per transition into "bothComplete",
+  // not on every re-render while it stays complete.
+  const [celebrationId, setCelebrationId] = useState(0);
+  const wasBothCompleteRef = useRef(false);
+  useEffect(() => {
+    if (bothComplete && !wasBothCompleteRef.current) {
+      setCelebrationId((n) => n + 1);
+    }
+    wasBothCompleteRef.current = bothComplete;
+  }, [bothComplete]);
+
   return (
     <AppShell>
       <Card className="flex min-h-[70vh] flex-col overflow-hidden p-0">
@@ -94,7 +106,20 @@ function FlowShellInner({
               >
                 {bothComplete ? (
                   <div className="mx-auto max-w-md py-8 text-center">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-primary">Complete</div>
+                    <m.div
+                      key={celebrationId}
+                      data-testid="both-sides-celebration"
+                      aria-hidden="true"
+                      className="text-4xl leading-none"
+                      initial={{ opacity: 0, scale: 0.4, rotate: -10 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={transitions.spring}
+                    >
+                      🏆
+                    </m.div>
+                    <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-primary">
+                      Complete
+                    </div>
                     <p className="mt-2 font-display text-xl font-semibold text-foreground">
                       You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
                     </p>

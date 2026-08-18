@@ -75,4 +75,38 @@ describe("LinkCard", () => {
     // e1 was placed → its toggle should now read "Set aside", found via aria-label.
     expect(await screen.findByRole("button", { name: /set aside .*stress/i })).toBeInTheDocument();
   });
+
+  it("has no celebration before the bridge holds", () => {
+    render(<LinkCard scenario={scenario} onExit={() => {}} />);
+    expect(screen.queryByTestId("bridge-celebration")).toBeNull();
+  });
+
+  it("shows a celebration once the bridge holds, and not on a failed test", async () => {
+    render(<LinkCard scenario={scenario} onExit={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /build .*harvard/i }));
+    await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
+    expect(await screen.findByText(/argues the other way/i)).toBeInTheDocument();
+    expect(screen.queryByTestId("bridge-celebration")).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: /set aside .*harvard/i }));
+    await userEvent.click(screen.getByRole("button", { name: /build .*stress/i }));
+    await userEvent.click(screen.getByRole("button", { name: /build .*frees evenings/i }));
+    await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
+    expect(await screen.findByTestId("bridge-celebration")).toBeInTheDocument();
+  });
+
+  it("does not remount the celebration when an unrelated re-render happens after the bridge holds", async () => {
+    render(<LinkCard scenario={scenario} onExit={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /build .*stress/i }));
+    await userEvent.click(screen.getByRole("button", { name: /build .*frees evenings/i }));
+    await userEvent.click(screen.getByRole("button", { name: /test the bridge/i }));
+    const first = await screen.findByTestId("bridge-celebration");
+
+    // Talking through a plank triggers an unrelated re-render (coach reaction arrives).
+    await userEvent.click(screen.getAllByRole("button", { name: /talk this through/i })[0]);
+    await screen.findByText(/tempting, but it argues the other way/i);
+
+    const second = screen.getByTestId("bridge-celebration");
+    expect(second).toBe(first);
+  });
 });

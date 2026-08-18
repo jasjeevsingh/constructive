@@ -1,6 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { gradeBridge, type BridgeGrade } from "@/lib/linkGrade";
+import { transitions } from "@/lib/motion";
 import { useLinkProgress } from "@/lib/state/useLinkProgress";
 import type { LinkScenario, LinkCandidate, CoachResponse } from "@/lib/schemas";
 import { StageHeader } from "@/components/stages/StageHeader";
@@ -22,6 +24,19 @@ export function LinkCard({
   const [reactions, setReactions] = useState<Record<string, string>>({});
   const [coachError, setCoachError] = useState<Record<string, boolean>>({});
   const shuffleSeed = scenario.id.split("").reduce((n, ch) => n + ch.charCodeAt(0), 0);
+
+  // Fire the celebration once per transition into "held", not on every re-render
+  // while it stays held (planks re-toggling or a coach reaction arriving both
+  // re-render this component without changing whether the bridge holds).
+  const [celebrationId, setCelebrationId] = useState(0);
+  const wasHeldRef = useRef(false);
+  useEffect(() => {
+    const held = !!grade?.held;
+    if (held && !wasHeldRef.current) {
+      setCelebrationId((n) => n + 1);
+    }
+    wasHeldRef.current = held;
+  }, [grade?.held]);
 
   function toggle(id: string) {
     setGrade(null); // re-sorting invalidates the last test
@@ -118,6 +133,19 @@ export function LinkCard({
           >
             {summary(grade)}
           </span>
+        )}
+        {grade?.held && (
+          <motion.span
+            key={celebrationId}
+            data-testid="bridge-celebration"
+            aria-hidden="true"
+            className="inline-block text-lg leading-none"
+            initial={{ opacity: 0, scale: 0.3, rotate: -12 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={transitions.spring}
+          >
+            🎉
+          </motion.span>
         )}
       </div>
 
