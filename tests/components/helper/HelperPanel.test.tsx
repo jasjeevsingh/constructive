@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HelperPanel, HelperPanelView } from "@/components/helper/HelperPanel";
 import { initialHelperState } from "@/lib/helper/agentMachine";
@@ -7,6 +7,38 @@ import { initialHelperState } from "@/lib/helper/agentMachine";
 const base = initialHelperState();
 
 const noop = () => {};
+
+// A minimal fake Deepgram agent socket for the F2 wiring test below — just
+// enough to capture event handlers and let the test fire them, mirroring the
+// harness in tests/lib/helper/agentSession.test.ts. Defined via vi.hoisted so
+// the (hoisted) vi.mock factory below can close over it and reference `vi`.
+const { fakeSockets, makeFakeSocket } = vi.hoisted(() => {
+  const fakeSockets: ReturnType<typeof makeFakeSocket>[] = [];
+  function makeFakeSocket() {
+    const handlers = new Map<string, (p: unknown) => void>();
+    return {
+      handlers,
+      on: (e: string, h: (p: unknown) => void) => void handlers.set(e, h),
+      configure: () => {},
+      updatePrompt: () => {},
+      send: () => {},
+      keepAlive: () => {},
+      requestClose: () => {},
+      fire: (event: string, payload?: unknown) => handlers.get(event)?.(payload),
+    };
+  }
+  return { fakeSockets, makeFakeSocket };
+});
+
+vi.mock("@deepgram/sdk", () => ({
+  createClient: () => ({
+    agent: () => {
+      const socket = makeFakeSocket();
+      fakeSockets.push(socket);
+      return socket;
+    },
+  }),
+}));
 
 function renderView(overrides: Partial<React.ComponentProps<typeof HelperPanelView>> = {}) {
   return render(
@@ -27,7 +59,7 @@ function renderView(overrides: Partial<React.ComponentProps<typeof HelperPanelVi
 describe("HelperPanelView — collapsed", () => {
   it("shows a collapsed affordance reading 'Talk it through' when closed", () => {
     renderView();
-    expect(screen.getByText("💬 Talk it through")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
   });
 
   it("opens on click", async () => {
@@ -37,15 +69,22 @@ describe("HelperPanelView — collapsed", () => {
     expect(onOpen).toHaveBeenCalled();
   });
 
-  it("renders a disabled affordance with an explanation when closed and unavailable", () => {
-    renderView({ state: { ...base, phase: "error", error: "Voice helper is unavailable right now." } });
-    const button = screen.getByRole("button", { name: /talk it through/i });
-    expect(button).toBeDisabled();
-    expect(screen.getByText(/unavailable/i)).toBeInTheDocument();
-  });
-
   it("still shows the enabled affordance when closed with no error", () => {
     renderView();
+    expect(screen.getByRole("button", { name: /talk it through/i })).toBeEnabled();
+  });
+
+  // F1: text chat needs neither Deepgram nor a microphone, so a voice
+  // availability probe must never gate the trigger — only "Start voice
+  // call" (tested below) may ever be disabled by it.
+  it("stays enabled when voice is unavailable — the trigger is never gated by voice", () => {
+    renderView({ voiceUnavailable: "Voice helper is unavailable right now." });
+    const button = screen.getByRole("button", { name: /talk it through/i });
+    expect(button).toBeEnabled();
+  });
+
+  it("stays enabled even if state itself reports an error", () => {
+    renderView({ state: { ...base, phase: "error", error: "Voice helper is unavailable right now." } });
     expect(screen.getByRole("button", { name: /talk it through/i })).toBeEnabled();
   });
 });
@@ -98,6 +137,29 @@ describe("HelperPanelView — text chat (open, not in call)", () => {
     renderView({ open: true, onStartCall });
     await userEvent.click(screen.getByRole("button", { name: /start voice call/i }));
     expect(onStartCall).toHaveBeenCalled();
+  });
+
+  // F1: voice availability may only ever disable "Start voice call" — never
+  // the trigger (covered above) and never the composer (covered by the
+  // surrounding tests in this block, all of which render with no
+  // voiceUnavailable prop and still pass).
+  it("disables only Start voice call when voice is unavailable, leaving the composer usable", async () => {
+    const onSend = vi.fn();
+    renderView({ open: true, onSend, voiceUnavailable: "Voice helper is unavailable right now." });
+    const startCall = screen.getByRole("button", { name: /start voice call/i });
+    expect(startCall).toBeDisabled();
+    expect(screen.getByText(/voice helper is unavailable right now/i)).toBeInTheDocument();
+
+    expect(screen.getByRole("textbox")).toBeEnabled();
+    await userEvent.type(screen.getByRole("textbox"), "what makes a claim good");
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+    expect(onSend).toHaveBeenCalledWith("what makes a claim good");
+  });
+
+  it("does not show a voice-unavailable explanation when voice is available", () => {
+    renderView({ open: true });
+    expect(screen.getByRole("button", { name: /start voice call/i })).toBeEnabled();
+    expect(screen.queryByText(/unavailable/i)).not.toBeInTheDocument();
   });
 
   it("renders a thread with student and helper turns", () => {
@@ -207,6 +269,48 @@ describe("HelperPanelView — text chat (open, not in call)", () => {
     );
 
     expect(screen.getByRole("textbox")).toHaveValue("");
+  });
+
+  // F4: a screen-reader user needs an accessible name for the composer, not
+  // just a placeholder (placeholders aren't reliably exposed as a label).
+  it("gives the composer an accessible label", () => {
+    renderView({ open: true });
+    expect(screen.getByRole("textbox", { name: /message the helper/i })).toBeInTheDocument();
+  });
+
+  // F4: the thread and the "Sending…" indicator must be announced to a
+  // screen-reader user as replies arrive, the same way FeedbackPanel's
+  // status line is (components/feedback/FeedbackPanel.tsx).
+  it("announces the thread and the sending indicator via an aria-live region", () => {
+    renderView({ open: true, sending: true });
+    const live = screen.getByText(/sending/i).closest('[aria-live="polite"]');
+    expect(live).not.toBeNull();
+  });
+
+  it("sends on Enter", async () => {
+    const onSend = vi.fn();
+    renderView({ open: true, onSend });
+    const textbox = screen.getByRole("textbox");
+    await userEvent.type(textbox, "hello{Enter}");
+    expect(onSend).toHaveBeenCalledWith("hello");
+  });
+
+  it("inserts a newline on Shift+Enter instead of sending", async () => {
+    const onSend = vi.fn();
+    renderView({ open: true, onSend });
+    const textbox = screen.getByRole("textbox");
+    await userEvent.type(textbox, "line one{Shift>}{Enter}{/Shift}line two");
+    expect(onSend).not.toHaveBeenCalled();
+    expect(textbox).toHaveValue("line one\nline two");
+  });
+
+  it("does not send on Enter while empty", async () => {
+    const onSend = vi.fn();
+    renderView({ open: true, onSend });
+    const textbox = screen.getByRole("textbox");
+    textbox.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(onSend).not.toHaveBeenCalled();
   });
 
   it("offers a way to close the chat", async () => {
@@ -350,6 +454,67 @@ describe("HelperPanelView — in a live call", () => {
   });
 });
 
+// F4: keyboard focus must move into the composer on open, and back to the
+// trigger that opened it on close — otherwise both actions strand focus on
+// <body>.
+describe("HelperPanelView — focus management", () => {
+  it("focuses the composer when the panel opens", () => {
+    const { rerender } = render(
+      <HelperPanelView
+        state={base}
+        open={false}
+        onOpen={noop}
+        onClose={noop}
+        inCall={false}
+        sending={false}
+        onSend={noop}
+        onStartCall={noop}
+      />
+    );
+    rerender(
+      <HelperPanelView
+        state={base}
+        open
+        onOpen={noop}
+        onClose={noop}
+        inCall={false}
+        sending={false}
+        onSend={noop}
+        onStartCall={noop}
+      />
+    );
+    expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  });
+
+  it("returns focus to the trigger when the panel closes", () => {
+    const { rerender } = render(
+      <HelperPanelView
+        state={base}
+        open
+        onOpen={noop}
+        onClose={noop}
+        inCall={false}
+        sending={false}
+        onSend={noop}
+        onStartCall={noop}
+      />
+    );
+    rerender(
+      <HelperPanelView
+        state={base}
+        open={false}
+        onOpen={noop}
+        onClose={noop}
+        inCall={false}
+        sending={false}
+        onSend={noop}
+        onStartCall={noop}
+      />
+    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: /talk it through/i }));
+  });
+});
+
 // The two tests below drive the real wired `HelperPanel`, not the pure
 // view — they exist to guard the exact guarantees the view can't see: that
 // opening never touches the mic/socket, and that a send racing a call start
@@ -456,5 +621,164 @@ describe("HelperPanel — wiring", () => {
 
     expect(screen.getByText("what makes a claim good")).toBeInTheDocument();
     expect(screen.getByText("what do you think it needs?")).toBeInTheDocument();
+  });
+
+  // F1: a deploy with ANTHROPIC_API_KEY but no DEEPGRAM_API_KEY must still
+  // let a student open and use text chat — only "Start voice call" may be
+  // affected by the voice availability probe.
+  it("keeps the trigger, the panel, and the composer working when the voice probe 503s — only Start voice call is disabled", async () => {
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/deepgram/token") {
+        if (init?.method === "GET") return { ok: false, json: async () => ({}) } as Response;
+        return { ok: false, json: async () => ({}) } as Response;
+      }
+      if (url === "/api/helper") {
+        return { ok: true, json: async () => ({ reply: "what do you think it needs?" }) } as Response;
+      }
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<HelperPanel />);
+
+    // The trigger opens the chat regardless of the probe's outcome or timing.
+    const trigger = screen.getByRole("button", { name: /talk it through/i });
+    expect(trigger).toBeEnabled();
+    await userEvent.click(trigger);
+    expect(await screen.findByRole("textbox")).toBeInTheDocument();
+
+    // Once the 503 probe settles, only Start voice call is affected.
+    await waitFor(() => expect(screen.getByRole("button", { name: /start voice call/i })).toBeDisabled());
+    expect(screen.getByText(/voice helper is unavailable right now/i)).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+    expect(screen.getByRole("button", { name: /^send$/i })).toBeInTheDocument();
+
+    // And the composer actually works — text chat needs neither Deepgram
+    // nor a microphone.
+    await userEvent.type(screen.getByRole("textbox"), "what makes a claim good");
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+    await waitFor(() => expect(screen.getByText("what do you think it needs?")).toBeInTheDocument());
+  });
+});
+
+// F2: turns spoken before an idle pause must survive Resume, and survive
+// End call afterward. This drives the real wired HelperPanel through a full
+// text-then-voice-then-pause-then-resume sequence, with a fake Deepgram
+// agent socket standing in for the real one.
+describe("HelperPanel — wiring (resume after an idle pause)", () => {
+  let getUserMediaMock: ReturnType<typeof vi.fn>;
+  let originalMediaDevices: PropertyDescriptor | undefined;
+  let originalAudioContext: unknown;
+
+  beforeEach(() => {
+    fakeSockets.length = 0;
+    originalMediaDevices = Object.getOwnPropertyDescriptor(window.navigator, "mediaDevices");
+    originalAudioContext = (window as unknown as { AudioContext?: unknown }).AudioContext;
+
+    getUserMediaMock = vi.fn().mockResolvedValue({ getTracks: () => [] } as unknown as MediaStream);
+    Object.defineProperty(window.navigator, "mediaDevices", {
+      value: { getUserMedia: getUserMediaMock },
+      configurable: true,
+    });
+    (window as unknown as { AudioContext: unknown }).AudioContext = vi.fn(() => ({
+      createMediaStreamSource: () => ({ connect: () => {} }),
+      createScriptProcessor: () => ({ connect: () => {}, disconnect: () => {}, onaudioprocess: null }),
+      close: () => Promise.resolve(),
+    }));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    if (originalMediaDevices) {
+      Object.defineProperty(window.navigator, "mediaDevices", originalMediaDevices);
+    } else {
+      delete (window.navigator as unknown as { mediaDevices?: unknown }).mediaDevices;
+    }
+    (window as unknown as { AudioContext: unknown }).AudioContext = originalAudioContext;
+    vi.unstubAllGlobals();
+  });
+
+  it("keeps turns spoken before a 90s idle pause through Resume, and through End call", async () => {
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url === "/api/deepgram/token") {
+        if (init?.method === "GET") return { ok: true, json: async () => ({}) } as Response;
+        return { ok: true, json: async () => ({ access_token: "tok" }) } as Response;
+      }
+      if (url === "/api/helper") {
+        const body = JSON.parse(String(init?.body)) as { messages: { text: string }[] };
+        const last = body.messages[body.messages.length - 1].text;
+        return { ok: true, json: async () => ({ reply: `re: ${last}` }) } as Response;
+      }
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const flush = async (ms = 0) => {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(ms);
+      });
+    };
+
+    render(<HelperPanel />);
+    await flush(); // let the mount-time voice probe settle
+
+    // Type two messages before ever touching voice.
+    await user.click(screen.getByRole("button", { name: /talk it through/i }));
+    await user.type(screen.getByRole("textbox"), "typed message one");
+    await user.click(screen.getByRole("button", { name: /^send$/i }));
+    await flush();
+    expect(screen.getByText("re: typed message one")).toBeInTheDocument();
+    await user.type(screen.getByRole("textbox"), "typed message two");
+    await user.click(screen.getByRole("button", { name: /^send$/i }));
+    await flush();
+    expect(screen.getByText("re: typed message two")).toBeInTheDocument();
+
+    // Start a call — this carries the typed thread across as initialTurns.
+    await user.click(screen.getByRole("button", { name: /start voice call/i }));
+    await flush();
+    expect(fakeSockets).toHaveLength(1);
+    const firstSocket = fakeSockets[0];
+
+    // Speak four turns.
+    await act(async () => {
+      firstSocket.fire("ConversationText", { role: "user", content: "spoken turn one" });
+      firstSocket.fire("ConversationText", { role: "assistant", content: "spoken reply one" });
+      firstSocket.fire("ConversationText", { role: "user", content: "spoken turn two" });
+      firstSocket.fire("ConversationText", { role: "assistant", content: "spoken reply two" });
+    });
+    expect(screen.getByText("spoken turn one")).toBeInTheDocument();
+    expect(screen.getByText("spoken reply two")).toBeInTheDocument();
+
+    // Pause: 90s of silence trips the idle guard, closing the session but
+    // leaving the panel open on a "Resume" affordance.
+    await flush(90_000);
+    expect(screen.getByText(/paused/i)).toBeInTheDocument();
+    const resumeButton = screen.getByRole("button", { name: /resume/i });
+
+    // Resume — this is the bug: a reseed from the stale typed-turns ref
+    // would wipe out everything spoken above.
+    await user.click(resumeButton);
+    await flush();
+
+    expect(screen.getByText("typed message one")).toBeInTheDocument();
+    expect(screen.getByText("typed message two")).toBeInTheDocument();
+    expect(screen.getByText("spoken turn one")).toBeInTheDocument();
+    expect(screen.getByText("spoken reply one")).toBeInTheDocument();
+    expect(screen.getByText("spoken turn two")).toBeInTheDocument();
+    expect(screen.getByText("spoken reply two")).toBeInTheDocument();
+
+    // End the call — the merge back into the text thread must not drop them
+    // either.
+    await user.click(screen.getByRole("button", { name: /end call/i }));
+    await flush();
+
+    expect(screen.getByText("typed message one")).toBeInTheDocument();
+    expect(screen.getByText("typed message two")).toBeInTheDocument();
+    expect(screen.getByText("spoken turn one")).toBeInTheDocument();
+    expect(screen.getByText("spoken reply one")).toBeInTheDocument();
+    expect(screen.getByText("spoken turn two")).toBeInTheDocument();
+    expect(screen.getByText("spoken reply two")).toBeInTheDocument();
   });
 });

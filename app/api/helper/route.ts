@@ -38,7 +38,11 @@ export async function POST(request: Request) {
   }));
 
   try {
-    const reply = await getChatClient().complete({ system, user: latest.text, history });
+    // Prose, not JSON: the helper's prompt is conversational and never
+    // mentions "json", so OpenAI's json_object mode (the fallback client's
+    // default) rejects it outright — opt out so an Anthropic outage doesn't
+    // take the whole chat down, and so a student never sees a raw JSON blob.
+    const reply = await getChatClient({ json: false }).complete({ system, user: latest.text, history });
     return Response.json({ reply: reply.trim() });
   } catch {
     // Static string: an upstream error can carry key material.

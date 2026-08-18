@@ -37,11 +37,16 @@ export function createAnthropicClient(
 
 export function createOpenAIClient(
   apiKey: string,
-  opts?: { model?: string; maxTokens?: number }
+  // `json` defaults to true: /api/coach and the generate routes all expect
+  // (and prompt for) a JSON object back. The helper chat's prompt is prose
+  // and contains no "json", so OpenAI's API rejects a json_object request
+  // outright — callers whose prompt is prose (the helper) must opt out.
+  opts?: { model?: string; maxTokens?: number; json?: boolean }
 ): ChatClient {
   const openai = new OpenAI({ apiKey });
   const model = opts?.model ?? OPENAI_MODEL;
   const maxTokens = opts?.maxTokens ?? 1024;
+  const json = opts?.json ?? true;
   return {
     async complete({ system, user, history }) {
       const msg = await openai.chat.completions.create({
@@ -52,7 +57,7 @@ export function createOpenAIClient(
           ...(history ?? []),
           { role: "user", content: user },
         ],
-        response_format: { type: "json_object" },
+        ...(json ? { response_format: { type: "json_object" as const } } : {}),
       });
       const text = msg.choices[0]?.message?.content;
       if (!text) throw new Error("OpenAI returned empty content");
@@ -83,12 +88,12 @@ export function createFallbackClient(
   };
 }
 
-export function getChatClient(): ChatClient {
+export function getChatClient(opts?: { json?: boolean }): ChatClient {
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
   return createFallbackClient(
     anthropicKey ? createAnthropicClient(anthropicKey) : null,
-    openaiKey ? createOpenAIClient(openaiKey) : null
+    openaiKey ? createOpenAIClient(openaiKey, { json: opts?.json }) : null
   );
 }
 

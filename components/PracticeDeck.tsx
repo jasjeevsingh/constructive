@@ -30,7 +30,7 @@ export function PracticeDeck({ onPick }: { onPick: (part: PracticePart) => void 
             type="button"
             onClick={() => onPick(c.part)}
             aria-label={`${c.title} — ${counts[c.part]} done`}
-            className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-[border-color,box-shadow] hover:border-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Badge variant="secondary" className="self-start">{counts[c.part]} done</Badge>
             <div className="mt-3 font-display text-lg font-semibold leading-snug text-foreground">{c.title}</div>

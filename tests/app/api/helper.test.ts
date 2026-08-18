@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const complete = vi.fn();
-vi.mock("@/lib/ai/claude", () => ({ getChatClient: () => ({ complete }) }));
+const getChatClient = vi.fn(() => ({ complete }));
+vi.mock("@/lib/ai/claude", () => ({ getChatClient }));
 
 const { POST } = await import("@/app/api/helper/route");
 
@@ -16,6 +17,7 @@ const ctx = { activity: "journey", motion: "This House would ban homework.", sid
 
 beforeEach(() => {
   complete.mockReset();
+  getChatClient.mockClear();
   complete.mockResolvedValue("What happens because of that?");
   process.env.ANTHROPIC_API_KEY = "k";
 });
@@ -71,5 +73,14 @@ describe("POST /api/helper", () => {
     complete.mockRejectedValue(new Error("ANTHROPIC_API_KEY=sk-secret"));
     const res = await POST(req({ messages: [{ role: "student", text: "hi" }], context: ctx }));
     expect(await res.text()).not.toContain("sk-secret");
+  });
+
+  // F3: the helper's prompt is prose, not JSON — the shared OpenAI fallback
+  // client's json_object mode (used by /api/coach) would reject it outright,
+  // so this route must opt out. If it doesn't, an Anthropic outage would
+  // take the whole chat down even with OPENAI_API_KEY configured.
+  it("requests prose, not json_object, from the shared chat client", async () => {
+    await POST(req({ messages: [{ role: "student", text: "hi" }], context: ctx }));
+    expect(getChatClient).toHaveBeenCalledWith({ json: false });
   });
 });

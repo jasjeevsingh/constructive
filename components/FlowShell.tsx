@@ -121,7 +121,8 @@ function FlowShellInner({
                       Complete
                     </div>
                     <p className="mt-2 font-display text-xl font-semibold text-foreground">
-                      You&apos;ve argued both sides of this motion — FOR and AGAINST. 🎉
+                      You&apos;ve argued both sides of this motion — FOR and AGAINST.{" "}
+                      <span aria-hidden>🎉</span>
                     </p>
                     <Button variant="secondary" className="mt-4" onClick={onExit}>
                       ← back to motions
