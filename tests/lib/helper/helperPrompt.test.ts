@@ -40,4 +40,11 @@ describe("helperPrompt", () => {
     const p = helperPrompt(ctx).toLowerCase();
     expect(p).toContain("trusted adult");
   });
+
+  it("tells the helper never to solicit personal or identifying information", () => {
+    const p = helperPrompt(ctx).toLowerCase();
+    expect(p).toContain("personal");
+    expect(p).toContain("name");
+    expect(p).toContain("do not record");
+  });
 });

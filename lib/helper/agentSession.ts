@@ -46,6 +46,12 @@ export function createAgentSession(deps: SessionDeps) {
   let socket: AgentSocket | null = null;
   let queue: AgentQueue | null = null;
   let state = initialHelperState();
+  // WebSocket ordering plus Deepgram's own server-side stop make a trailing
+  // Audio frame after barge-in rare, but not impossible. Suppress playback of
+  // any Audio frame that arrives after the student starts talking, until the
+  // next turn (a fresh ConversationText or AgentThinking) confirms the agent
+  // has moved on and later Audio frames belong to its new reply.
+  let suppressUntilNextTurn = false;
   // Bumped on every start()/stop() call. A start() in flight (awaiting the
   // token fetch, or awaiting nothing at all yet) captures the id it was
   // issued with; if a later start()/stop() bumps the counter before that
@@ -72,6 +78,7 @@ export function createAgentSession(deps: SessionDeps) {
     // bump below) so at most one socket and one queue are ever live.
     teardown();
     const mySession = ++sessionId;
+    suppressUntilNextTurn = false;
 
     dispatch({ type: "connecting" });
     let token: string;
@@ -110,14 +117,24 @@ export function createAgentSession(deps: SessionDeps) {
     mySocket.on("Welcome", () => guardedDispatch({ type: "ready" }));
     mySocket.on("SettingsApplied", () => guardedDispatch({ type: "ready" }));
     mySocket.on("ConversationText", (p) => {
+      suppressUntilNextTurn = false;
       const t = p as { role?: string; content?: string };
       guardedDispatch({ type: "conversationText", role: t.role ?? "assistant", content: t.content ?? "" });
     });
-    mySocket.on("UserStartedSpeaking", () => guardedDispatch({ type: "userStartedSpeaking" }));
-    mySocket.on("AgentThinking", () => guardedDispatch({ type: "thinking" }));
+    mySocket.on("UserStartedSpeaking", () => {
+      suppressUntilNextTurn = true;
+      guardedDispatch({ type: "userStartedSpeaking" });
+    });
+    mySocket.on("AgentThinking", () => {
+      suppressUntilNextTurn = false;
+      guardedDispatch({ type: "thinking" });
+    });
     mySocket.on("AgentAudioDone", () => guardedDispatch({ type: "audioDone" }));
     mySocket.on("Audio", (p) => {
       if (mySession !== sessionId) return;
+      // Trailing audio from before the barge-in — drop it rather than play
+      // (or even queue) it; the student has already moved on.
+      if (suppressUntilNextTurn) return;
       const buf = p as ArrayBuffer;
       queue?.push(buf);
       dispatch({ type: "audio" });

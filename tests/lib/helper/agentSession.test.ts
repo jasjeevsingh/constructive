@@ -149,6 +149,29 @@ describe("agentSession", () => {
     expect(createQueue).toHaveBeenCalledTimes(1);
   });
 
+  it("drops a trailing Audio frame that arrives after barge-in, until the next turn", async () => {
+    const h = harness();
+    await h.session.start(emptyHelperContext());
+
+    h.fire("UserStartedSpeaking");
+    h.fire("Audio", new Int16Array([1, 2]).buffer);
+    expect(h.queue.push).not.toHaveBeenCalled();
+
+    h.fire("ConversationText", { role: "assistant", content: "okay, let's try that again" });
+    h.fire("Audio", new Int16Array([3, 4]).buffer);
+    expect(h.queue.push).toHaveBeenCalledTimes(1);
+  });
+
+  it("resumes pushing Audio once AgentThinking marks a new turn", async () => {
+    const h = harness();
+    await h.session.start(emptyHelperContext());
+
+    h.fire("UserStartedSpeaking");
+    h.fire("AgentThinking");
+    h.fire("Audio", new Int16Array([1, 2]).buffer);
+    expect(h.queue.push).toHaveBeenCalledTimes(1);
+  });
+
   it("surfaces a token failure as an error state", async () => {
     const states: HelperState[] = [];
     const session = createAgentSession({

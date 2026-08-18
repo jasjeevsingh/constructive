@@ -1,5 +1,13 @@
 import { createClient } from "@deepgram/sdk";
 
+/** Cheap availability check: an env-var presence check only, no Deepgram call
+ *  and no token minted. Lets the client show a disabled affordance up front
+ *  on a key-less deploy instead of failing a real connect attempt. */
+export async function GET() {
+  const available = Boolean(process.env.DEEPGRAM_API_KEY);
+  return Response.json({ available }, { status: available ? 200 : 503 });
+}
+
 /** Mints a ~30s Deepgram token so the browser can open an agent socket directly.
  *  The API key itself never leaves the server. */
 export async function POST() {

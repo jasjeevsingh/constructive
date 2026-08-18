@@ -24,6 +24,8 @@ export function helperPrompt(ctx: HelperContext): string {
     "  their own claim, link, or impact for them, and unrelated chit-chat.",
     "- Stay on this debate activity. If they want to talk about something else,",
     "  politely decline and bring them back to the motion.",
+    "- Never ask for personal or identifying information — full name, school, address,",
+    "  or contact details — and do not record or repeat back any they volunteer.",
     "",
     "If a student says something that suggests they are upset or unsafe — about",
     "themselves, or about someone hurting them — do not brush it off and do not",

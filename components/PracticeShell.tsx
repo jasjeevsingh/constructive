@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getFlowMotions } from "@/lib/flowMotions";
 import { drawItem, type PracticePart, type PracticeItem } from "@/lib/practice";
+import type { Side } from "@/lib/state/flowMachine";
 import { loadPracticeCounts, incrementPracticeCount } from "@/lib/state/practiceProgress";
 import { ClaimStage } from "@/components/stages/ClaimStage";
 import { ImpactStage } from "@/components/stages/ImpactStage";
@@ -31,6 +32,12 @@ export function PracticeShell(props: { part: PracticePart; onExit: () => void })
   );
 }
 
+/** Only the claim variant of a PracticeItem carries a side — the link variant
+ *  drills the bridge between a claim and its impact and has none. */
+export function sideForPracticeItem(item: PracticeItem): Side | null {
+  return item.part === "claim" ? item.side : null;
+}
+
 function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () => void }) {
   const [item, setItem] = useState<PracticeItem>(() => drawItem(part, getFlowMotions()));
   const [done, setDone] = useState(false);
@@ -40,6 +47,7 @@ function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () =
     activity: "practice",
     stage: part,
     motion: item.part === "link" ? "" : item.motion,
+    side: sideForPracticeItem(item),
   });
 
   useEffect(() => {

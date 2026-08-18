@@ -5,7 +5,7 @@ vi.mock("@deepgram/sdk", () => ({
   createClient: () => ({ auth: { grantToken } }),
 }));
 
-const { POST } = await import("@/app/api/deepgram/token/route");
+const { GET, POST } = await import("@/app/api/deepgram/token/route");
 
 beforeEach(() => {
   grantToken.mockReset();
@@ -39,5 +39,21 @@ describe("POST /api/deepgram/token", () => {
     grantToken.mockResolvedValue({ result: null, error: new Error("nope") });
     const res = await POST();
     expect(res.status).toBe(503);
+  });
+});
+
+describe("GET /api/deepgram/token", () => {
+  it("reports available, without minting a token, when the key is set", async () => {
+    const res = await GET();
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ available: true });
+    expect(grantToken).not.toHaveBeenCalled();
+  });
+
+  it("503s and reports unavailable when the key is unset", async () => {
+    delete process.env.DEEPGRAM_API_KEY;
+    const res = await GET();
+    expect(res.status).toBe(503);
+    await expect(res.json()).resolves.toEqual({ available: false });
   });
 });

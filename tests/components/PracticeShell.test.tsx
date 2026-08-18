@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PracticeShell } from "@/components/PracticeShell";
+import { PracticeShell, sideForPracticeItem } from "@/components/PracticeShell";
 
 beforeEach(() => {
   localStorage.clear();
@@ -43,5 +43,22 @@ describe("PracticeShell", () => {
   it("offers the voice helper inside a practice drill", () => {
     render(<PracticeShell part="claim" onExit={() => {}} />);
     expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
+  });
+});
+
+describe("sideForPracticeItem", () => {
+  it("publishes the side for a claim drill so the helper knows which side the student argues", () => {
+    expect(
+      sideForPracticeItem({ part: "claim", motion: "This House would ban homework.", side: "for", claims: [] })
+    ).toBe("for");
+  });
+
+  it("has no side for a link drill", () => {
+    expect(
+      sideForPracticeItem({
+        part: "link",
+        scenario: { id: "s1", claim: "c", impact: "i", candidates: [] },
+      })
+    ).toBeNull();
   });
 });

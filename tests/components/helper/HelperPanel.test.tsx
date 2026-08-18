@@ -89,4 +89,42 @@ describe("HelperPanelView", () => {
     expect(screen.queryByText(/thinking/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/speaking/i)).not.toBeInTheDocument();
   });
+
+  it("renders a disabled affordance with an explanation when closed and unavailable", () => {
+    render(
+      <HelperPanelView
+        state={{ ...base, phase: "error", error: "Voice helper is unavailable right now." }}
+        open={false}
+        onOpen={() => {}}
+        onClose={() => {}}
+      />
+    );
+    const button = screen.getByRole("button", { name: /talk it through/i });
+    expect(button).toBeDisabled();
+    expect(screen.getByText(/unavailable/i)).toBeInTheDocument();
+  });
+
+  it("still shows the enabled affordance when closed with no error", () => {
+    render(<HelperPanelView state={base} open={false} onOpen={() => {}} onClose={() => {}} />);
+    expect(screen.getByRole("button", { name: /talk it through/i })).toBeEnabled();
+  });
+
+  it("offers a retry control in the error phase while open", async () => {
+    const onOpen = vi.fn();
+    render(
+      <HelperPanelView
+        state={{ ...base, phase: "error", error: "The voice helper hit a problem." }}
+        open
+        onOpen={onOpen}
+        onClose={() => {}}
+      />
+    );
+    await userEvent.click(screen.getByRole("button", { name: /retry/i }));
+    expect(onOpen).toHaveBeenCalled();
+  });
+
+  it("does not offer a retry control outside the error phase", () => {
+    render(<HelperPanelView state={{ ...base, phase: "listening" }} open onOpen={() => {}} onClose={() => {}} />);
+    expect(screen.queryByRole("button", { name: /retry/i })).not.toBeInTheDocument();
+  });
 });
