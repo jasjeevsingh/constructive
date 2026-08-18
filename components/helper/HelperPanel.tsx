@@ -1,14 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { createClient } from "@deepgram/sdk";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CoachBubble } from "@/components/CoachBubble";
 import { useHelperContext } from "@/components/helper/HelperContextProvider";
-import { initialHelperState, type HelperPhase, type HelperState } from "@/lib/helper/agentMachine";
+import {
+  initialHelperState,
+  type HelperPhase,
+  type HelperReplyTurn,
+  type HelperState,
+} from "@/lib/helper/agentMachine";
 import { createAgentSession, type AgentSocket } from "@/lib/helper/agentSession";
 import { createAudioQueue } from "@/lib/helper/audioQueue";
+import { riseIn, transitions } from "@/lib/motion";
 
 const PHASE_LABEL: Partial<Record<HelperPhase, string>> = {
   connecting: "Connecting…",
@@ -31,52 +38,92 @@ const SESSION_CAP_MS = 10 * 60_000;
 const HELPER_UNAVAILABLE_MESSAGE = "Voice helper is unavailable right now.";
 const MIC_UNAVAILABLE_MESSAGE =
   "I couldn't hear your microphone — check that it's connected and that this page has permission to use it.";
+const SEND_FAILED_MESSAGE = "Couldn't reach the helper. Try again.";
 
 /** Pure presentation — no sockets, no AudioContext, no fetch. This is what
- *  tests drive directly. */
+ *  tests drive directly. Text chat is the default surface; a live call is an
+ *  escalation the student explicitly starts. */
 export function HelperPanelView({
   state,
   open,
   onOpen,
   onClose,
+  inCall,
+  sending,
+  onSend,
+  onStartCall,
+  voiceUnavailable = null,
 }: {
   state: HelperState;
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
+  inCall: boolean;
+  sending: boolean;
+  onSend: (text: string) => void;
+  onStartCall: () => void;
+  // A reason voice is unavailable (e.g. no Deepgram key configured), if any.
+  // This only ever disables "Start voice call" — text chat needs neither a
+  // key nor a microphone, so the trigger and the composer must both keep
+  // working regardless of this.
+  voiceUnavailable?: string | null;
 }) {
-  if (!open) {
-    // A prior availability probe (or a failed connect attempt before the
-    // student ever closed the panel) found the voice helper unavailable —
-    // render a disabled affordance with a plain explanation instead of an
-    // enabled button that would just fail on click.
-    if (state.phase === "error" && state.error) {
-      return (
-        <div className="fixed bottom-4 right-4 z-40 max-w-[16rem] text-right">
-          <Button disabled title={state.error}>
-            🎙 Talk it through
-          </Button>
-          <p className="mt-1 text-xs text-muted-foreground">{state.error}</p>
-        </div>
-      );
+  const [draft, setDraft] = useState("");
+  // Mirrors the feedback panel: clear the draft once a send actually goes
+  // through (sending flips back off with no error). A failed send must
+  // never land here — losing what someone typed is the worst outcome.
+  const prevSendingRef = useRef(sending);
+  useEffect(() => {
+    if (prevSendingRef.current && !sending && !state.error) {
+      setDraft("");
     }
+    prevSendingRef.current = sending;
+  }, [sending, state.error]);
+
+  // Focus management: opening the panel drops a keyboard user straight into
+  // the composer, and closing it returns focus to the trigger that opened
+  // it — otherwise both leave focus stranded on <body>.
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const wasOpenRef = useRef(open);
+  useEffect(() => {
+    if (open && !wasOpenRef.current) {
+      textareaRef.current?.focus();
+    } else if (!open && wasOpenRef.current) {
+      triggerRef.current?.focus();
+    }
+    wasOpenRef.current = open;
+  }, [open]);
+
+  if (!open) {
+    // The trigger always opens the chat — text needs neither a microphone
+    // nor Deepgram, so no availability probe may ever gate it.
     return (
       <div className="fixed bottom-4 right-4 z-40">
-        <Button onClick={onOpen}>🎙 Talk it through</Button>
+        <Button ref={triggerRef} onClick={onOpen}>
+          <span aria-hidden>💬</span> Talk it through
+        </Button>
       </div>
     );
   }
 
-  // The idle guard closes the session but leaves the panel open so a
-  // one-tap "Resume" (reusing the same onOpen wiring) can reconnect.
-  if (state.phase === "idle") {
+  // The idle guard closes the live session but leaves the panel open and
+  // `inCall` true, so a one-tap "Resume" (via onStartCall) can reconnect.
+  if (inCall && state.phase === "idle") {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96">
+      <motion.div
+        data-testid="helper-panel"
+        className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+        variants={riseIn}
+        initial="hidden"
+        animate="show"
+        transition={transitions.spring}
+      >
         <Card className="border-border">
           <CardContent className="flex flex-col items-start gap-2 p-4">
             <p className="text-xs text-muted-foreground">Paused to save time on the call.</p>
             <div className="flex gap-2">
-              <Button size="sm" onClick={onOpen}>
+              <Button size="sm" onClick={onStartCall}>
                 Resume
               </Button>
               <Button variant="outline" size="sm" onClick={onClose}>
@@ -85,28 +132,88 @@ export function HelperPanelView({
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
+  if (inCall) {
+    return (
+      <motion.div
+        data-testid="helper-panel"
+        className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+        variants={riseIn}
+        initial="hidden"
+        animate="show"
+        transition={transitions.spring}
+      >
+        <Card className="border-border">
+          <CardContent className="flex max-h-[70vh] flex-col gap-3 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">{PHASE_LABEL[state.phase] ?? ""}</span>
+              <div className="flex gap-2">
+                {state.phase === "error" && (
+                  <Button size="sm" onClick={onStartCall}>
+                    Retry
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" onClick={onClose}>
+                  End call
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 space-y-2 overflow-y-auto">
+              {state.turns.map((t, i) =>
+                t.role === "helper" ? (
+                  <CoachBubble key={i}>{t.text}</CoachBubble>
+                ) : (
+                  <p key={i} className="text-sm text-muted-foreground">
+                    {t.text}
+                  </p>
+                )
+              )}
+            </div>
+            {state.error && <p className="text-xs text-muted-foreground">{state.error}</p>}
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  // Text chat — the default surface. Two simultaneous input channels into
+  // one agent would be confusing, so this only ever renders while !inCall.
+  const trimmed = draft.trim();
+  const sendDisabled = trimmed.length === 0 || sending;
+  const handleSend = () => {
+    if (sendDisabled) return;
+    onSend(trimmed);
+  };
+  // Enter sends (matching what students expect from every chat app);
+  // Shift+Enter keeps its default behavior of inserting a newline.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96">
+    <motion.div
+      data-testid="helper-panel"
+      className="fixed inset-x-0 bottom-0 z-40 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-96"
+      variants={riseIn}
+      initial="hidden"
+      animate="show"
+      transition={transitions.spring}
+    >
       <Card className="border-border">
         <CardContent className="flex max-h-[70vh] flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">{PHASE_LABEL[state.phase] ?? ""}</span>
-            <div className="flex gap-2">
-              {state.phase === "error" && (
-                <Button size="sm" onClick={onOpen}>
-                  Retry
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={onClose}>
-                Stop
-              </Button>
-            </div>
+            <span className="text-xs text-muted-foreground">Talk it through</span>
+            <Button variant="outline" size="sm" onClick={onClose}>
+              Close
+            </Button>
           </div>
-          <div className="flex-1 space-y-2 overflow-y-auto">
+          <div className="flex-1 space-y-2 overflow-y-auto" aria-live="polite">
             {state.turns.map((t, i) =>
               t.role === "helper" ? (
                 <CoachBubble key={i}>{t.text}</CoachBubble>
@@ -116,11 +223,47 @@ export function HelperPanelView({
                 </p>
               )
             )}
+            {sending && <p className="text-xs text-muted-foreground">Sending…</p>}
           </div>
           {state.error && <p className="text-xs text-muted-foreground">{state.error}</p>}
+          <textarea
+            ref={textareaRef}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={handleKeyDown}
+            aria-label="Message the helper"
+            placeholder="Ask about your claim, or talk through your argument…"
+            rows={3}
+            className="w-full resize-none rounded-lg border border-input bg-background p-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          <div className="flex flex-col items-end gap-1 border-t border-border pt-3">
+            {voiceUnavailable && <p className="text-xs text-muted-foreground">{voiceUnavailable}</p>}
+            <div className="flex items-center justify-end gap-2">
+              {/* Disabled while a send is in flight: starting a call snapshots
+                  `turns` into the session's initialTurns, and ending the call
+                  later overwrites `turns` wholesale with the session's final
+                  turns — a send that resolves mid-call would be silently
+                  discarded by that overwrite. Blocking the escalation until
+                  the send settles keeps the snapshot (and therefore the
+                  merge) complete. Also disabled when voice itself is
+                  unavailable — text chat never is. */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onStartCall}
+                disabled={sending || Boolean(voiceUnavailable)}
+                title={voiceUnavailable ?? undefined}
+              >
+                Start voice call
+              </Button>
+              <Button size="sm" onClick={handleSend} disabled={sendDisabled}>
+                Send
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 
@@ -130,17 +273,34 @@ type Mic = {
   processor: ScriptProcessorNode;
 };
 
-/** Live wiring: the untestable seam. Real WebSocket, real AudioContext, real
- *  microphone capture. Not covered by unit tests — see task report. */
+/** Live wiring: the untestable seam. Real fetch, real WebSocket, real
+ *  AudioContext, real microphone capture. Not covered by unit tests — see
+ *  task report. `turns` is the single source of truth for the conversation;
+ *  opening the panel touches none of the above — only pressing "Start voice
+ *  call" does. */
 export function HelperPanel() {
   const ctx = useHelperContext();
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
 
   const [open, setOpen] = useState(false);
-  const [state, setState] = useState<HelperState>(initialHelperState());
-  const openRef = useRef(open);
-  openRef.current = open;
+  const [inCall, setInCall] = useState(false);
+  const [turns, setTurns] = useState<HelperReplyTurn[]>([]);
+  const [sending, setSending] = useState(false);
+  // The live voice session's own state machine — only meaningful while a
+  // call is being started or is live.
+  const [callState, setCallState] = useState<HelperState>(initialHelperState());
+  // A reason voice is unavailable (mount-time probe came back non-ok), if
+  // any. Deliberately separate from `callState.error` — that field also
+  // carries mid-call errors and send failures, which must never disable
+  // "Start voice call" the way an availability probe should.
+  const [voiceUnavailable, setVoiceUnavailable] = useState<string | null>(null);
+  const turnsRef = useRef(turns);
+  turnsRef.current = turns;
+  const callStateRef = useRef(callState);
+  callStateRef.current = callState;
+  const inCallRef = useRef(inCall);
+  inCallRef.current = inCall;
 
   const sessionRef = useRef<ReturnType<typeof createAgentSession> | null>(null);
   const keepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -175,10 +335,11 @@ export function HelperPanel() {
     micRef.current = null;
   };
 
-  /** Tears down the socket, mic, and timers, but leaves `open` alone. Used
-   *  both by the idle guard (panel stays open, showing Resume) and as the
-   *  first half of a full close. Also invalidates any connect() still
-   *  awaiting a token or the mic permission prompt (see connectEpochRef). */
+  /** Tears down the socket, mic, and timers, but leaves `open`/`inCall`
+   *  alone. Used both by the idle guard (call stays "paused", showing
+   *  Resume) and as the first half of ending a call. Also invalidates any
+   *  connect() still awaiting a token or the mic permission prompt (see
+   *  connectEpochRef). */
   const teardownLive = () => {
     connectEpochRef.current++;
     if (keepAliveRef.current) {
@@ -203,7 +364,7 @@ export function HelperPanel() {
     turnCountRef.current = 0;
   };
 
-  const connect = async () => {
+  const connect = async (initialTurns: HelperReplyTurn[]) => {
     const epoch = ++connectEpochRef.current;
     const isCurrent = () => connectEpochRef.current === epoch;
 
@@ -219,7 +380,7 @@ export function HelperPanel() {
       createSocket: (token) => createClient(token).agent() as unknown as AgentSocket,
       createQueue: () => createAudioQueue(outputAudioContext),
       onState: (next) => {
-        setState(next);
+        setCallState(next);
         if (next.turns.length > turnCountRef.current) {
           turnCountRef.current = next.turns.length;
           // Only a STUDENT turn counts as activity — the helper's own reply
@@ -227,6 +388,11 @@ export function HelperPanel() {
           if (next.turns[next.turns.length - 1]?.role === "student") resetIdleTimer();
         }
       },
+      // Continue the conversation this call should carry forward: the typed
+      // thread on a fresh start, or the call's own turns-so-far on a resume
+      // (see handleStartCall) — never the stale text ref on a resume, or
+      // every spoken turn since the last pause/cap/retry would be lost.
+      initialTurns,
     });
     sessionRef.current = session;
     await session.start(ctxRef.current);
@@ -257,7 +423,7 @@ export function HelperPanel() {
       // is being heard — don't leave a "Listening…" panel that never
       // responds. Tear the whole session down and say why.
       teardownLive();
-      setState((prev) => ({ ...prev, phase: "error", error: MIC_UNAVAILABLE_MESSAGE }));
+      setCallState((prev) => ({ ...prev, phase: "error", error: MIC_UNAVAILABLE_MESSAGE }));
       return;
     }
 
@@ -286,37 +452,95 @@ export function HelperPanel() {
     micRef.current = { stream, audioContext, processor };
   };
 
+  // Opening the panel is inert: no fetch, no mic, no socket. Only pressing
+  // "Start voice call" (handleStartCall) touches any of that.
   const handleOpen = () => {
-    // Defensive: by construction there's never a live session here (the
-    // initial open has none yet, and Resume/Retry only render after
-    // teardownLive() already ran) — this is a no-op guard, not a behavior
-    // change. It also invalidates (via connectEpochRef) any earlier connect()
-    // still awaiting a token or the mic prompt.
-    teardownLive();
     setOpen(true);
-    void connect();
   };
 
+  // Escalate the text chat to a live voice call, carrying the typed
+  // conversation across as initialTurns. Guarded against a send still in
+  // flight (the view also disables the button for this, but this defends
+  // any other caller): starting now would snapshot `turns` before that
+  // send's reply lands, and ending the call later overwrites `turns`
+  // wholesale with the session's turns — silently discarding the pending
+  // exchange once it resolves.
+  const handleStartCall = () => {
+    if (sending || voiceUnavailable) return;
+    // A call is already "in call" (live, paused after the idle guard or the
+    // session cap, or sitting in the error phase from Retry) exactly when
+    // this is a resume, not a fresh start — in every one of those cases the
+    // turns spoken so far live in callState, not in the text ref. Seeding
+    // from turnsRef there would silently drop every spoken turn (see F2).
+    // A fresh start from text chat has no live call yet, so it seeds from
+    // the typed conversation instead.
+    const seedTurns = inCallRef.current ? callStateRef.current.turns : turnsRef.current;
+    teardownLive(); // defensive: no live session should exist yet, invalidates any stale connect()
+    setInCall(true);
+    setCallState(initialHelperState(seedTurns));
+    void connect(seedTurns);
+  };
+
+  // Reused for every "leave this screen" control. While a call is live (or
+  // paused/erroring), this ends the call and returns to text chat with the
+  // conversation so far preserved. Otherwise it closes the whole panel.
   const handleClose = () => {
     teardownLive();
-    setOpen(false);
-    setState(initialHelperState());
+    if (inCallRef.current) {
+      setTurns(callStateRef.current.turns);
+      setInCall(false);
+      setCallState(initialHelperState());
+    } else {
+      setOpen(false);
+      setCallState(initialHelperState());
+      // `turns` is deliberately left alone — a plain close only hides the
+      // panel for this session; only a reload clears the thread.
+    }
+  };
+
+  const handleSend = async (text: string) => {
+    if (sending) return;
+    setSending(true);
+    setCallState((prev) => ({ ...prev, error: null }));
+    try {
+      const res = await fetch("/api/helper", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          messages: [...turnsRef.current, { role: "student", text }],
+          context: ctxRef.current,
+        }),
+      });
+      if (!res.ok) {
+        setCallState((prev) => ({ ...prev, error: SEND_FAILED_MESSAGE }));
+        return;
+      }
+      const data = (await res.json()) as { reply: string };
+      setTurns([...turnsRef.current, { role: "student", text }, { role: "helper", text: data.reply }]);
+      setCallState((prev) => ({ ...prev, error: null }));
+    } catch {
+      setCallState((prev) => ({ ...prev, error: SEND_FAILED_MESSAGE }));
+    } finally {
+      setSending(false);
+    }
   };
 
   useEffect(() => {
     sessionRef.current?.updateContext(ctx);
   }, [ctx]);
 
-  // One-time availability probe so a key-less deploy shows a disabled
-  // affordance with an explanation up front, instead of an enabled button
+  // One-time availability probe so a key-less deploy disables just "Start
+  // voice call" with an explanation up front, instead of an enabled button
   // that fails on click. GET is a plain env-var check — no token is minted,
-  // so this costs nothing even on a deploy where the key IS set.
+  // so this costs nothing even on a deploy where the key IS set. Text chat
+  // needs neither Deepgram nor a microphone, so this must never touch the
+  // trigger, `open`, or `callState` — only the voice-specific affordance.
   useEffect(() => {
     let cancelled = false;
     fetch("/api/deepgram/token", { method: "GET" })
       .then((res) => {
-        if (cancelled || openRef.current || res.ok) return;
-        setState((prev) => ({ ...prev, phase: "error", error: HELPER_UNAVAILABLE_MESSAGE }));
+        if (cancelled || res.ok) return;
+        setVoiceUnavailable(HELPER_UNAVAILABLE_MESSAGE);
       })
       .catch(() => {
         // Couldn't check — leave the affordance enabled and let a real
@@ -330,5 +554,23 @@ export function HelperPanel() {
   // Full teardown on unmount, regardless of open/closed state.
   useEffect(() => teardownLive, []);
 
-  return <HelperPanelView state={state} open={open} onOpen={handleOpen} onClose={handleClose} />;
+  // The view only ever needs one HelperState: while a call is live (or
+  // paused/erroring), that's the session's own state; otherwise it's the
+  // text thread plus any send error, synthesized here so the view stays
+  // agnostic to where the turns came from.
+  const viewState: HelperState = open && !inCall ? { phase: "idle", turns, error: callState.error } : callState;
+
+  return (
+    <HelperPanelView
+      state={viewState}
+      open={open}
+      onOpen={handleOpen}
+      onClose={handleClose}
+      inCall={inCall}
+      sending={sending}
+      onSend={(text) => void handleSend(text)}
+      onStartCall={handleStartCall}
+      voiceUnavailable={voiceUnavailable}
+    />
+  );
 }

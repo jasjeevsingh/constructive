@@ -55,4 +55,20 @@ describe("reduceHelper", () => {
     expect(s.phase).toBe("error");
     expect(s.error).toBe("socket died");
   });
+
+  it("can start from an existing transcript", () => {
+    const seeded = initialHelperState([{ role: "student", text: "typed earlier" }]);
+    expect(seeded.turns).toEqual([{ role: "student", text: "typed earlier" }]);
+    expect(seeded.phase).toBe("idle");
+  });
+
+  it("appends spoken turns after the seeded ones", () => {
+    let s = initialHelperState([{ role: "student", text: "typed earlier" }]);
+    s = reduceHelper(s, { type: "conversationText", role: "assistant", content: "spoken reply" }).state;
+    expect(s.turns.map((t) => t.text)).toEqual(["typed earlier", "spoken reply"]);
+  });
+
+  it("defaults to an empty transcript", () => {
+    expect(initialHelperState().turns).toEqual([]);
+  });
 });

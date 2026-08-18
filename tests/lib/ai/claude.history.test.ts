@@ -18,11 +18,13 @@ vi.mock("openai", () => ({
   },
 }));
 
-const { createAnthropicClient, createOpenAIClient } = await import("@/lib/ai/claude");
+const { createAnthropicClient, createOpenAIClient, getChatClient } = await import("@/lib/ai/claude");
 
 beforeEach(() => {
   anthropicCreate.mockClear();
   openaiCreate.mockClear();
+  delete process.env.ANTHROPIC_API_KEY;
+  delete process.env.OPENAI_API_KEY;
 });
 
 describe("ChatClient history", () => {
@@ -58,5 +60,39 @@ describe("ChatClient history", () => {
       { role: "user", content: "u1" },
       { role: "user", content: "u2" },
     ]);
+  });
+});
+
+// F3: response_format must be opt-in, defaulting to the current JSON
+// behaviour so /api/coach and the generate routes (which always ask
+// createOpenAIClient for its default) are unaffected.
+describe("createOpenAIClient — response_format opt-in (F3)", () => {
+  it("defaults to json_object, unchanged from before", async () => {
+    await createOpenAIClient("k").complete({ system: "s", user: "u" });
+    expect(openaiCreate.mock.calls[0][0].response_format).toEqual({ type: "json_object" });
+  });
+
+  it("still defaults to json_object when json is explicitly true", async () => {
+    await createOpenAIClient("k", { json: true }).complete({ system: "s", user: "u" });
+    expect(openaiCreate.mock.calls[0][0].response_format).toEqual({ type: "json_object" });
+  });
+
+  it("omits response_format when json is false, for a prose prompt like the helper's", async () => {
+    await createOpenAIClient("k", { json: false }).complete({ system: "s", user: "u" });
+    expect(openaiCreate.mock.calls[0][0].response_format).toBeUndefined();
+  });
+});
+
+describe("getChatClient — passes json through to the OpenAI fallback (F3)", () => {
+  it("requests json_object by default (the /api/coach and generate routes' path)", async () => {
+    process.env.OPENAI_API_KEY = "k";
+    await getChatClient().complete({ system: "s", user: "u" });
+    expect(openaiCreate.mock.calls[0][0].response_format).toEqual({ type: "json_object" });
+  });
+
+  it("requests prose when told json: false (the helper route's path)", async () => {
+    process.env.OPENAI_API_KEY = "k";
+    await getChatClient({ json: false }).complete({ system: "s", user: "u" });
+    expect(openaiCreate.mock.calls[0][0].response_format).toBeUndefined();
   });
 });

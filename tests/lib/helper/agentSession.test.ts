@@ -3,7 +3,7 @@ import { createAgentSession } from "@/lib/helper/agentSession";
 import { emptyHelperContext } from "@/lib/helper/context";
 import type { HelperState } from "@/lib/helper/agentMachine";
 
-function harness() {
+function harness(overrides: Record<string, unknown> = {}) {
   const handlers = new Map<string, (p: unknown) => void>();
   const socket = {
     on: (e: string, h: (p: unknown) => void) => void handlers.set(e, h),
@@ -20,6 +20,7 @@ function harness() {
     createSocket: () => socket,
     createQueue: () => queue,
     onState: (s) => states.push(s),
+    ...overrides,
   });
   return { session, socket, queue, states, fire: (e: string, p?: unknown) => handlers.get(e)?.(p) };
 }
@@ -186,5 +187,13 @@ describe("agentSession", () => {
     });
     await session.start(emptyHelperContext());
     expect(states[states.length - 1].phase).toBe("error");
+  });
+
+  it("starts a call from the text transcript and tells the agent about it", async () => {
+    const h = harness({ initialTurns: [{ role: "student", text: "phones are bad" }] });
+    await h.session.start(emptyHelperContext());
+    const cfg = JSON.stringify(h.socket.configure.mock.calls[0][0]);
+    expect(cfg).toContain("phones are bad");
+    expect(h.states[h.states.length - 1].turns[0]).toEqual({ role: "student", text: "phones are bad" });
   });
 });

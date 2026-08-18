@@ -17,4 +17,13 @@ describe("Button", () => {
     );
     expect(screen.getByRole("link", { name: "Go" })).toHaveAttribute("href", "/x");
   });
+
+  it("gives every button a hover lift that respects reduced motion", () => {
+    render(<Button>Go</Button>);
+    const cls = screen.getByRole("button").className;
+    // jsdom can't evaluate :hover; assert the primitive carries the classes.
+    expect(cls).toContain("hover:-translate-y-px");
+    expect(cls).toContain("active:translate-y-0");
+    expect(cls).toContain("motion-reduce:transform-none");
+  });
 });

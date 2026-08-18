@@ -1,5 +1,11 @@
 import { helperPrompt } from "@/lib/helper/helperPrompt";
-import { initialHelperState, reduceHelper, type HelperEvent, type HelperState } from "@/lib/helper/agentMachine";
+import {
+  initialHelperState,
+  reduceHelper,
+  type HelperEvent,
+  type HelperReplyTurn,
+  type HelperState,
+} from "@/lib/helper/agentMachine";
 import type { HelperContext } from "@/lib/helper/context";
 
 export type AgentSocket = {
@@ -18,6 +24,9 @@ export type SessionDeps = {
   createSocket: (token: string) => AgentSocket;
   createQueue: () => AgentQueue;
   onState: (s: HelperState) => void;
+  // The typed transcript this call is continuing, if any — so a voice call
+  // started from the text chat carries that history into the agent's prompt.
+  initialTurns?: HelperReplyTurn[];
 };
 
 // Hardcoded, not env-driven: agentConfig runs in the browser, where server-only
@@ -45,7 +54,8 @@ export function agentConfig(prompt: string) {
 export function createAgentSession(deps: SessionDeps) {
   let socket: AgentSocket | null = null;
   let queue: AgentQueue | null = null;
-  let state = initialHelperState();
+  const initialTurns = deps.initialTurns ?? [];
+  let state = initialHelperState(initialTurns);
   // WebSocket ordering plus Deepgram's own server-side stop make a trailing
   // Audio frame after barge-in rare, but not impossible. Suppress playback of
   // any Audio frame that arrives after the student starts talking, until the
@@ -146,11 +156,13 @@ export function createAgentSession(deps: SessionDeps) {
     });
 
     // configure() MUST precede any audio.
-    mySocket.configure(agentConfig(helperPrompt(ctx)));
+    mySocket.configure(agentConfig(helperPrompt(ctx, "voice", initialTurns)));
   }
 
   function updateContext(ctx: HelperContext): void {
-    socket?.updatePrompt(helperPrompt(ctx));
+    // Keep passing the same prior turns — a context change mid-call must not
+    // erase the agent's memory of the text thread it's continuing.
+    socket?.updatePrompt(helperPrompt(ctx, "voice", initialTurns));
   }
 
   function stop(): void {

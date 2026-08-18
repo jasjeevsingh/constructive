@@ -1,8 +1,10 @@
 export type HelperPhase = "idle" | "connecting" | "listening" | "thinking" | "speaking" | "error";
 
+export type HelperReplyTurn = { role: "student" | "helper"; text: string };
+
 export type HelperState = {
   phase: HelperPhase;
-  turns: { role: "student" | "helper"; text: string }[];
+  turns: HelperReplyTurn[];
   error: string | null;
 };
 
@@ -22,8 +24,8 @@ export type HelperEvent =
  *  effect keeps it testable without a socket or an AudioContext. */
 export type HelperEffect = "dropAudio" | null;
 
-export function initialHelperState(): HelperState {
-  return { phase: "idle", turns: [], error: null };
+export function initialHelperState(turns: HelperReplyTurn[] = []): HelperState {
+  return { phase: "idle", turns, error: null };
 }
 
 export function reduceHelper(
