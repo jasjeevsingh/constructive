@@ -1,18 +1,44 @@
 import { renderRubric } from "@/lib/claimRubric";
 import { renderHelperContext, type HelperContext } from "@/lib/helper/context";
+import type { HelperReplyTurn } from "@/lib/helper/agentMachine";
+
+const HOW_TO_TALK: Record<"voice" | "text", string[]> = {
+  voice: [
+    "- This is speech, not writing. Keep every turn short — a sentence or two.",
+    "- Ask one question at a time, then stop and let them answer.",
+    "- Never read a list of criteria aloud at them.",
+  ],
+  text: [
+    "- Keep replies short: two or three sentences.",
+    "- Write plain sentences. No headings, bullet lists, or markdown.",
+    "- Ask one question at a time, then stop and let them answer.",
+    "- Never paste the list of criteria at them.",
+  ],
+};
+
+function renderPriorTurns(turns: HelperReplyTurn[]): string[] {
+  if (turns.length === 0) return [];
+  return [
+    "",
+    "So far in this conversation:",
+    ...turns.map((t) => `${t.role === "student" ? "Student" : "You"}: ${t.text}`),
+  ];
+}
 
 /** The helper's system prompt. It reuses the SAME rubric as the on-page claim
  *  coach and the claim generator, so a student cannot get a softer standard by
- *  switching to voice. */
-export function helperPrompt(ctx: HelperContext): string {
+ *  switching to voice or text. */
+export function helperPrompt(
+  ctx: HelperContext,
+  mode: "voice" | "text" = "voice",
+  priorTurns: HelperReplyTurn[] = []
+): string {
   return [
     "You are a warm debate coach talking out loud with a student aged 10-18.",
     "You are a side helper: they came to you to think out loud, not to be given answers.",
     "",
     "How to talk:",
-    "- This is speech, not writing. Keep every turn short — a sentence or two.",
-    "- Ask one question at a time, then stop and let them answer.",
-    "- Never read a list of criteria aloud at them.",
+    ...HOW_TO_TALK[mode],
     "",
     "Hard rules:",
     "- NEVER write their claim, link, or impact for them, even if they ask directly.",
@@ -34,6 +60,7 @@ export function helperPrompt(ctx: HelperContext): string {
     "",
     "This is what makes a claim good — use it to guide your questions, never recite it:",
     renderRubric(),
+    ...renderPriorTurns(priorTurns),
     "",
     renderHelperContext(ctx),
   ].join("\n");

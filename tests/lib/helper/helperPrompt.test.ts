@@ -47,4 +47,39 @@ describe("helperPrompt", () => {
     expect(p).toContain("name");
     expect(p).toContain("do not record");
   });
+
+  it("keeps the speech instruction in voice mode", () => {
+    expect(helperPrompt(ctx, "voice").toLowerCase()).toContain("speech");
+  });
+
+  it("drops the speech instruction in text mode and forbids markdown", () => {
+    const p = helperPrompt(ctx, "text").toLowerCase();
+    expect(p).not.toContain("this is speech");
+    expect(p).toContain("plain sentences");
+  });
+
+  it("still carries every hard rule in text mode", () => {
+    const p = helperPrompt(ctx, "text");
+    for (const name of ["One idea", "Takes a side", "Concrete", "Contestable"]) expect(p).toContain(name);
+    expect(p.toLowerCase()).toContain("never write");
+    expect(p.toLowerCase()).toContain("politely decline");
+    expect(p.toLowerCase()).toContain("trusted adult");
+  });
+
+  it("renders prior turns so a voice call continues the text thread", () => {
+    const p = helperPrompt(ctx, "voice", [
+      { role: "student", text: "i think phones are bad" },
+      { role: "helper", text: "what happens because of that?" },
+    ]);
+    expect(p).toContain("i think phones are bad");
+    expect(p).toContain("what happens because of that?");
+  });
+
+  it("omits the transcript section when there are no prior turns", () => {
+    expect(helperPrompt(ctx, "text")).not.toMatch(/so far in this conversation/i);
+  });
+
+  it("defaults to voice mode with no prior turns", () => {
+    expect(helperPrompt(ctx)).toBe(helperPrompt(ctx, "voice", []));
+  });
 });

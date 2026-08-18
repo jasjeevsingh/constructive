@@ -1,8 +1,10 @@
 export type HelperPhase = "idle" | "connecting" | "listening" | "thinking" | "speaking" | "error";
 
+export type HelperReplyTurn = { role: "student" | "helper"; text: string };
+
 export type HelperState = {
   phase: HelperPhase;
-  turns: { role: "student" | "helper"; text: string }[];
+  turns: HelperReplyTurn[];
   error: string | null;
 };
 
