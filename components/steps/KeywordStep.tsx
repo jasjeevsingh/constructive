@@ -46,7 +46,7 @@ export function KeywordStep({
 
   return (
     <div>
-      <StageHeader eyebrow="Stage 1 · Read" prompt="Tap a highlighted keyword to pin down what it really means." />
+      <StageHeader eyebrow="Stage 1 · Read" prompt="Tap a highlighted keyword to define what it means and explain why." />
       <p className="font-display text-xl leading-relaxed text-foreground">
         {segmentMotion(motion.motion, motion.keywords).map((segment, i) => {
           if (segment.keyword) {
@@ -69,7 +69,7 @@ export function KeywordStep({
       </p>
       {active && (
         <div className="mt-3">
-          <VoiceOrTextInput label={`What's the scope of "${active.word}" here — and why?`} onSubmit={submit} />
+          <VoiceOrTextInput label={`Define "${active.word}"`} onSubmit={submit} />
           {active.hint && <p className="mt-2 text-sm text-muted-foreground">Hint: {active.hint}</p>}
           {reaction && <CoachBubble className="mt-3">{reaction}</CoachBubble>}
           {error && <p className="mt-2.5 text-muted-foreground">{error}</p>}

@@ -3,7 +3,7 @@
     "id": "m-kids-vote",
     "motion": "This House would let kids vote.",
     "keywords": [
-      { "word": "kids", "hint": "Age 5 or 17? Scope is the real fight." },
+      { "word": "kids", "hint": "Age 5 or 17?" },
       { "word": "vote", "hint": null }
     ],
     "sides": {
