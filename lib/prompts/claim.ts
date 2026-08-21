@@ -23,9 +23,10 @@ export function claimPrompt(input: {
     "- Then name the SINGLE most important thing to sharpen and ask exactly one question about it.",
     "- DO NOT rewrite the claim for them. The student must arrive at it themselves.",
     "- Ask about one criterion at a time. Never list all four at the student.",
+    "- Do NOT ask for evidence, sources, or reasoning for why the claim is true — that is the next stage (Link), not this one. Stay focused only on the claim itself.",
     "",
     "Deciding when to stop:",
-    '- Set "verdict" to "good-enough" ONLY when the claim meets all four criteria above; otherwise "keep-going".',
+    '- Set "verdict" to "good-enough" once the claim is specific and contestable, as long as it still holds to one idea and takes a side. Do not keep coaching for polish beyond that. Otherwise "keep-going".',
     '- When the verdict is "keep-going", put your single question in "question".',
     '- When the verdict is "good-enough", set "question" to null.',
     `- Set "mappedClaimId" to the authored claim closest to the student's claim when the verdict is "good-enough"${

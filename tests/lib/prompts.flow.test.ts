@@ -22,6 +22,31 @@ describe("flow prompts", () => {
     expect(p.user).toContain("1 of 3");
   });
 
+  it("forbids asking for evidence or reasoning — that belongs to the Link stage", () => {
+    const p = claimPrompt({
+      motion: "m",
+      side: "for",
+      studentClaim: "x",
+      authoredClaims: [{ id: "c1", claim: "y" }],
+      history: [],
+      attempt: 1,
+    });
+    expect(p.system.toLowerCase()).toContain("do not ask for evidence");
+  });
+
+  it("lets the claim through once it is specific and contestable, without demanding polish on every criterion", () => {
+    const p = claimPrompt({
+      motion: "m",
+      side: "for",
+      studentClaim: "x",
+      authoredClaims: [{ id: "c1", claim: "y" }],
+      history: [],
+      attempt: 1,
+    });
+    expect(p.system.toLowerCase()).toContain("specific and contestable");
+    expect(p.system.toLowerCase()).not.toContain("meets all four criteria");
+  });
+
   it("tells the coach to map on the final turn", () => {
     const p = claimPrompt({
       motion: "m",

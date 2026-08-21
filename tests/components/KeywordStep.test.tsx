@@ -17,4 +17,12 @@ describe("KeywordStep", () => {
     await userEvent.click(screen.getByText("homework"));
     expect(screen.getByText(/assigned after-school work/i)).toBeInTheDocument();
   });
+
+  it("prompts the student to define the keyword and explain why, without a redundant second instruction", async () => {
+    render(<KeywordStep motion={motion} onNext={() => {}} />);
+    expect(screen.getByText(/define what it means and explain why/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByText("homework"));
+    expect(screen.getByText('Define "homework"')).toBeInTheDocument();
+    expect(screen.queryByText(/what's the scope of/i)).not.toBeInTheDocument();
+  });
 });
