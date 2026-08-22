@@ -4,13 +4,14 @@ import { AnimatePresence, motion as m } from "motion/react";
 import { transitions } from "@/lib/motion";
 import { useFlowProgress } from "@/lib/state/useFlowProgress";
 import { flowMotionToMotion, claimToScenario } from "@/lib/flowMotions";
-import { otherSideUnlocked, type Side } from "@/lib/state/flowMachine";
+import { otherSideUnlocked, type FlowStage, type Side } from "@/lib/state/flowMachine";
 import { RestateStep } from "@/components/steps/RestateStep";
 import { KeywordStep } from "@/components/steps/KeywordStep";
 import { ClaimStage } from "@/components/stages/ClaimStage";
 import { ImpactStage } from "@/components/stages/ImpactStage";
 import { LinkCard } from "@/components/LinkCard";
 import { FlowRail } from "@/components/FlowRail";
+import { StageHeader } from "@/components/stages/StageHeader";
 import { AppShell } from "@/components/ui/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
   usePublishHelperContext,
 } from "@/components/helper/HelperContextProvider";
 import { HelperPanel } from "@/components/helper/HelperPanel";
-import type { FlowMotion } from "@/lib/schemas";
+import type { FlowMotion, Keyword } from "@/lib/schemas";
 
 export function FlowShell(props: { motion: FlowMotion; startSide?: Side; onExit: () => void }) {
   return (
@@ -41,6 +42,10 @@ function FlowShellInner({
   onExit: () => void;
 }) {
   const [progress, update] = useFlowProgress(motion.id, startSide);
+  // Browsing a completed stage from the rail never touches `progress` — it's a
+  // look-back, not navigation, so nothing here can push you backward or forward.
+  const [viewStage, setViewStage] = useState<FlowStage | null>(null);
+  const returnToWhereYouWere = () => setViewStage(null);
   usePublishHelperContext({
     activity: "journey",
     motion: motion.motion,
@@ -94,17 +99,30 @@ function FlowShellInner({
         </div>
 
         <div className="flex flex-1 flex-col md:flex-row">
-          <FlowRail stage={progress.stage} />
+          <FlowRail stage={progress.stage} onSelect={setViewStage} />
           <div className="flex-1 p-5 sm:p-6">
             <AnimatePresence mode="wait">
               <m.div
-                key={`${progress.stage}-${progress.readSubstep}`}
+                key={viewStage ? `view-${viewStage}` : `${progress.stage}-${progress.readSubstep}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={transitions.snappy}
               >
-                {bothComplete ? (
+                {viewStage === "read" ? (
+                  <ReadRecap motion={motion.motion} restate={progress.restate} keywords={motion.keywords} onReturn={returnToWhereYouWere} />
+                ) : viewStage === "claim" ? (
+                  <ClaimRecap side={progress.side} claim={mappedClaim?.claim ?? null} onReturn={returnToWhereYouWere} />
+                ) : viewStage === "link" ? (
+                  <div>
+                    <RevisitBanner onReturn={returnToWhereYouWere} />
+                    {mappedClaim ? (
+                      <LinkCard scenario={claimToScenario(motion.id, mappedClaim)} onComplete={returnToWhereYouWere} />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Your earlier claim isn&apos;t available anymore.</p>
+                    )}
+                  </div>
+                ) : bothComplete ? (
                   <div className="mx-auto max-w-md py-8 text-center">
                     <m.div
                       key={celebrationId}
@@ -206,5 +224,88 @@ function FlowShellInner({
         </div>
       </Card>
     </AppShell>
+  );
+}
+
+function RevisitBanner({ onReturn }: { onReturn: () => void }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs">
+      <span className="font-medium text-muted-foreground">Revisiting a completed stage — your progress is safe.</span>
+      <Button type="button" variant="ghost" size="sm" onClick={onReturn}>
+        ← Back to where you were
+      </Button>
+    </div>
+  );
+}
+
+function ReadRecap({
+  motion,
+  restate,
+  keywords,
+  onReturn,
+}: {
+  motion: string;
+  restate: string;
+  keywords: Keyword[];
+  onReturn: () => void;
+}) {
+  return (
+    <div>
+      <RevisitBanner onReturn={onReturn} />
+      <StageHeader eyebrow="Stage 1 · Read" />
+      <figure className="mb-4 border-l-4 border-border pl-3">
+        <figcaption className="text-xs font-medium uppercase tracking-wide text-muted-foreground">The motion</figcaption>
+        <blockquote className="font-display text-lg leading-snug text-foreground">{motion}</blockquote>
+      </figure>
+      {restate && (
+        <div className="rounded-lg border border-border bg-muted/40 p-3">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your restatement</div>
+          <p className="mt-0.5 font-medium text-foreground">{restate}</p>
+        </div>
+      )}
+      {keywords.some((k) => k.hint) && (
+        <div className="mt-3 space-y-1.5">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Keywords</div>
+          {keywords.map(
+            (k) =>
+              k.hint && (
+                <p key={k.word} className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">{k.word}</span> — {k.hint}
+                </p>
+              )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ClaimRecap({
+  side,
+  claim,
+  onReturn,
+}: {
+  side: Side;
+  claim: string | null;
+  onReturn: () => void;
+}) {
+  return (
+    <div>
+      <RevisitBanner onReturn={onReturn} />
+      <StageHeader eyebrow="Stage 2 · Claim" />
+      {claim ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            Your claim {side === "for" ? "for" : "against"} this motion:
+          </p>
+          <div className="mt-3 rounded-lg border border-evidence bg-evidence/10 p-3">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your claim</div>
+            <p className="mt-0.5 font-medium text-foreground">{claim}</p>
+          </div>
+        </>
+      ) : (
+        <p className="text-sm text-muted-foreground">Your earlier claim isn&apos;t available anymore.</p>
+      )}
+    </div>
   );
 }

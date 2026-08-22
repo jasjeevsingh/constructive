@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FlowShell } from "@/components/FlowShell";
 import { FLOW_STORAGE_KEY, emptyFlowProgress } from "@/lib/state/flowProgress";
@@ -176,5 +176,45 @@ describe("FlowShell", () => {
   it("offers the voice helper inside the journey", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
+  });
+
+  describe("revisiting a completed stage", () => {
+    beforeEach(() => {
+      seedProgress(motion.id, {
+        side: "for",
+        stage: "impact",
+        restate: "kids deserve rights",
+        mappedClaimId: "c-stake",
+        impact: "y",
+      });
+    });
+
+    it("shows a Read recap without disturbing where you actually are", async () => {
+      render(<FlowShell motion={motion} onExit={() => {}} />);
+      const railButtons = await screen.findAllByRole("button", { name: /read the motion$/i });
+      await userEvent.click(railButtons[0]);
+      expect(await screen.findByText("kids deserve rights")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: /back to where you were/i }));
+      expect(await screen.findByText(/say or type the impact/i)).toBeInTheDocument();
+
+      const saved = JSON.parse(localStorage.getItem(FLOW_STORAGE_KEY)!)[motion.id];
+      expect(saved.stage).toBe("impact");
+    });
+
+    it("shows a static recap of the mapped claim, not a live coach chat", async () => {
+      render(<FlowShell motion={motion} onExit={() => {}} />);
+      const railButtons = await screen.findAllByRole("button", { name: /claim$/i });
+      await userEvent.click(railButtons[0]);
+      expect(await screen.findByText("Kids deserve a say.")).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByRole("textbox")).toBeNull());
+    });
+
+    it("reuses the interactive Link card, since its bridge state is already saved", async () => {
+      render(<FlowShell motion={motion} onExit={() => {}} />);
+      const railButtons = await screen.findAllByRole("button", { name: /link$/i });
+      await userEvent.click(railButtons[0]);
+      expect(await screen.findByRole("button", { name: /test the bridge/i })).toBeInTheDocument();
+    });
   });
 });

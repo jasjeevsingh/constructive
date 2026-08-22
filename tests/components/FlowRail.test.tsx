@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { FlowRail } from "@/components/FlowRail";
 
 describe("FlowRail", () => {
@@ -17,5 +18,20 @@ describe("FlowRail", () => {
     render(<FlowRail stage="claim" />);
     // "Read the motion" is before "claim" → done → shows a check glyph.
     expect(screen.getAllByText("✓").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("lets you click a completed stage to revisit it", async () => {
+    const onSelect = vi.fn();
+    render(<FlowRail stage="claim" onSelect={onSelect} />);
+    const buttons = screen.getAllByRole("button", { name: /read the motion$/i });
+    await userEvent.click(buttons[0]);
+    expect(onSelect).toHaveBeenCalledWith("read");
+  });
+
+  it("does not make the current or an upcoming stage clickable", () => {
+    render(<FlowRail stage="claim" onSelect={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /claim$/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /link$/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /impact$/i })).toBeNull();
   });
 });
