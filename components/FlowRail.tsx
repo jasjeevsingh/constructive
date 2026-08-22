@@ -1,14 +1,7 @@
 "use client";
-import { STAGES, stageIndex, type FlowStage } from "@/lib/state/flowMachine";
+import { STAGES, STAGE_LABELS, stageIndex, type FlowStage } from "@/lib/state/flowMachine";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-
-const LABELS: Record<FlowStage, string> = {
-  read: "Read the motion",
-  claim: "Claim",
-  link: "Link",
-  impact: "Impact",
-};
 
 type StepState = "done" | "current" | "upcoming";
 
@@ -21,7 +14,13 @@ function dotClasses(state: StepState): string {
   );
 }
 
-export function FlowRail({ stage }: { stage: FlowStage }) {
+export function FlowRail({
+  stage,
+  onSelect,
+}: {
+  stage: FlowStage;
+  onSelect?: (stage: FlowStage) => void;
+}) {
   const cur = stageIndex(stage);
   const pct = (cur / (STAGES.length - 1)) * 100;
   const stateOf = (i: number): StepState => (i < cur ? "done" : i === cur ? "current" : "upcoming");
@@ -36,16 +35,8 @@ export function FlowRail({ stage }: { stage: FlowStage }) {
           {STAGES.map((s, i) => {
             const state = stateOf(i);
             return (
-              <li key={s} className="flex items-center gap-3">
-                <span className={dotClasses(state)}>{state === "done" ? "✓" : i + 1}</span>
-                <span
-                  className={cn(
-                    "text-sm",
-                    state === "current" ? "font-semibold text-foreground" : state === "done" ? "text-foreground" : "text-muted-foreground"
-                  )}
-                >
-                  {LABELS[s]}
-                </span>
+              <li key={s}>
+                <StepRow state={state} label={STAGE_LABELS[s]} index={i} onSelect={onSelect ? () => onSelect(s) : undefined} />
               </li>
             );
           })}
@@ -59,11 +50,14 @@ export function FlowRail({ stage }: { stage: FlowStage }) {
           {STAGES.map((s, i) => {
             const state = stateOf(i);
             return (
-              <li key={s} className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
-                <span className={dotClasses(state)}>{state === "done" ? "✓" : i + 1}</span>
-                <span className={cn("truncate text-[10px]", state === "current" ? "font-semibold text-foreground" : "text-muted-foreground")}>
-                  {LABELS[s]}
-                </span>
+              <li key={s} className="min-w-0 flex-1">
+                <StepRow
+                  state={state}
+                  label={STAGE_LABELS[s]}
+                  index={i}
+                  onSelect={onSelect ? () => onSelect(s) : undefined}
+                  layout="column"
+                />
               </li>
             );
           })}
@@ -71,4 +65,47 @@ export function FlowRail({ stage }: { stage: FlowStage }) {
       </nav>
     </>
   );
+}
+
+function StepRow({
+  state,
+  label,
+  index,
+  onSelect,
+  layout = "row",
+}: {
+  state: StepState;
+  label: string;
+  index: number;
+  onSelect?: () => void;
+  layout?: "row" | "column";
+}) {
+  const labelClasses = cn(
+    layout === "column" ? "truncate text-[10px]" : "text-sm",
+    state === "current" ? "font-semibold text-foreground" : state === "done" ? "text-foreground" : "text-muted-foreground"
+  );
+  const content = (
+    <>
+      <span className={dotClasses(state)}>{state === "done" ? "✓" : index + 1}</span>
+      <span className={labelClasses}>{label}</span>
+    </>
+  );
+  const wrapperClasses = cn(
+    "w-full items-center gap-3",
+    layout === "column" ? "flex flex-col text-center" : "flex"
+  );
+
+  // Only a completed stage can be revisited — the current and upcoming stages stay plain.
+  if (state === "done" && onSelect) {
+    return (
+      <button
+        type="button"
+        onClick={onSelect}
+        className={cn(wrapperClasses, "rounded text-left hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div className={wrapperClasses}>{content}</div>;
 }

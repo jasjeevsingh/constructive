@@ -6,6 +6,13 @@ export const STAGES: FlowStage[] = ["read", "claim", "link", "impact"];
 export const READ_SUBSTEPS: ReadSubstep[] = ["restate", "keyword"];
 export const SIDES: Side[] = ["for", "against"];
 
+export const STAGE_LABELS: Record<FlowStage, string> = {
+  read: "Read the motion",
+  claim: "Claim",
+  link: "Link",
+  impact: "Impact",
+};
+
 export function stageIndex(s: FlowStage): number {
   return STAGES.indexOf(s);
 }
