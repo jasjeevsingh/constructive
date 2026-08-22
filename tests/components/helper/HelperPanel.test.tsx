@@ -139,6 +139,26 @@ describe("HelperPanelView — text chat (open, not in call)", () => {
     expect(onStartCall).toHaveBeenCalled();
   });
 
+  // A stuck chat (e.g. the conversation-length cap) otherwise has no way
+  // out short of a full page reload, which loses the thread anyway — this
+  // gives students a way to recover in place instead of the chat looking
+  // permanently broken.
+  it("offers a way to start a fresh conversation when the chat has an error", async () => {
+    const onStartNewConversation = vi.fn();
+    renderView({
+      open: true,
+      state: { ...base, error: "This conversation has gotten long enough that the helper can't keep going." },
+      onStartNewConversation,
+    });
+    await userEvent.click(screen.getByRole("button", { name: /start a new conversation/i }));
+    expect(onStartNewConversation).toHaveBeenCalled();
+  });
+
+  it("does not show a way to start over when there is no error", () => {
+    renderView({ open: true });
+    expect(screen.queryByRole("button", { name: /start a new conversation/i })).toBeNull();
+  });
+
   // F1: voice availability may only ever disable "Start voice call" — never
   // the trigger (covered above) and never the composer (covered by the
   // surrounding tests in this block, all of which render with no
@@ -366,6 +386,7 @@ describe("HelperPanelView — in a live call", () => {
       ["thinking", /thinking/i],
       ["speaking", /speaking/i],
       ["connecting", /connecting/i],
+      ["error", /error/i],
     ] as const) {
       const { unmount } = renderView({ open: true, inCall: true, state: { ...base, phase } });
       expect(screen.getByText(label)).toBeInTheDocument();
@@ -659,6 +680,59 @@ describe("HelperPanel — wiring", () => {
     await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
     await waitFor(() => expect(screen.getByText("what do you think it needs?")).toBeInTheDocument());
   });
+
+  // A message over the server's per-turn cap always 400s. Warning before
+  // sending — instead of dispatching a doomed request and showing the
+  // generic "try again" message — means Send never fails in a way that
+  // looks fixable by retrying when it isn't.
+  it("warns before sending a message over the length cap, without calling the helper API", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/deepgram/token") return { ok: true, json: async () => ({}) } as Response;
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<HelperPanel />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    fetchMock.mockClear();
+
+    await userEvent.click(screen.getByRole("button", { name: /talk it through/i }));
+    await userEvent.click(screen.getByRole("textbox"));
+    await userEvent.paste("x".repeat(2001));
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+
+    expect(await screen.findByText(/too long/i)).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("lets a student start a fresh conversation, clearing the stuck thread", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url === "/api/deepgram/token") return { ok: true, json: async () => ({}) } as Response;
+      if (url === "/api/helper") return { ok: true, json: async () => ({ reply: "got it" }) } as Response;
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<HelperPanel />);
+    await userEvent.click(screen.getByRole("button", { name: /talk it through/i }));
+    const textbox = screen.getByRole("textbox");
+    await userEvent.click(textbox);
+    await userEvent.paste("what makes a claim good");
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+    await waitFor(() => expect(screen.getByText("got it")).toBeInTheDocument());
+
+    // Force the stuck-chat state a student would actually hit, then recover.
+    await userEvent.click(textbox);
+    await userEvent.paste("x".repeat(2001));
+    await userEvent.click(screen.getByRole("button", { name: /^send$/i }));
+    await screen.findByText(/too long/i);
+
+    await userEvent.click(screen.getByRole("button", { name: /start a new conversation/i }));
+
+    expect(screen.queryByText("what makes a claim good")).toBeNull();
+    expect(screen.queryByText("got it")).toBeNull();
+    expect(screen.queryByText(/too long/i)).toBeNull();
+  }, 15000);
 });
 
 // F2: turns spoken before an idle pause must survive Resume, and survive

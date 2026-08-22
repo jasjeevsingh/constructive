@@ -15,6 +15,7 @@ import {
 } from "@/lib/helper/agentMachine";
 import { createAgentSession, type AgentSocket } from "@/lib/helper/agentSession";
 import { createAudioQueue } from "@/lib/helper/audioQueue";
+import { helperSendGuard } from "@/lib/helper/limits";
 import { riseIn, transitions } from "@/lib/motion";
 
 const PHASE_LABEL: Partial<Record<HelperPhase, string>> = {
@@ -22,6 +23,7 @@ const PHASE_LABEL: Partial<Record<HelperPhase, string>> = {
   listening: "Listening…",
   thinking: "Thinking…",
   speaking: "Speaking…",
+  error: "Error",
 };
 
 // Live audio is billed per minute; if the conversation goes quiet this long
@@ -52,6 +54,7 @@ export function HelperPanelView({
   sending,
   onSend,
   onStartCall,
+  onStartNewConversation,
   voiceUnavailable = null,
 }: {
   state: HelperState;
@@ -62,6 +65,9 @@ export function HelperPanelView({
   sending: boolean;
   onSend: (text: string) => void;
   onStartCall: () => void;
+  // Clears a stuck chat (e.g. the conversation-length cap) in place, without
+  // needing a full page reload. Only offered in the text-chat error slot.
+  onStartNewConversation?: () => void;
   // A reason voice is unavailable (e.g. no Deepgram key configured), if any.
   // This only ever disables "Start voice call" — text chat needs neither a
   // key nor a microphone, so the trigger and the composer must both keep
@@ -225,7 +231,16 @@ export function HelperPanelView({
             )}
             {sending && <p className="text-xs text-muted-foreground">Sending…</p>}
           </div>
-          {state.error && <p className="text-xs text-muted-foreground">{state.error}</p>}
+          {state.error && (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">{state.error}</p>
+              {onStartNewConversation && (
+                <Button variant="outline" size="sm" onClick={onStartNewConversation}>
+                  Start a new conversation
+                </Button>
+              )}
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             value={draft}
@@ -498,8 +513,20 @@ export function HelperPanel() {
     }
   };
 
+  // Clears a stuck text thread in place (e.g. the conversation-length cap) —
+  // otherwise the only way out is a full page reload, which loses it anyway.
+  const handleStartNewConversation = () => {
+    setTurns([]);
+    setCallState(initialHelperState());
+  };
+
   const handleSend = async (text: string) => {
     if (sending) return;
+    const guardMessage = helperSendGuard(turnsRef.current.length, text);
+    if (guardMessage) {
+      setCallState((prev) => ({ ...prev, error: guardMessage }));
+      return;
+    }
     setSending(true);
     setCallState((prev) => ({ ...prev, error: null }));
     try {
@@ -572,6 +599,7 @@ export function HelperPanel() {
       sending={sending}
       onSend={(text) => void handleSend(text)}
       onStartCall={handleStartCall}
+      onStartNewConversation={handleStartNewConversation}
       voiceUnavailable={voiceUnavailable}
     />
   );
