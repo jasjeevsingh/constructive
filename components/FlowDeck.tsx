@@ -4,6 +4,7 @@ import { getFlowMotions } from "@/lib/flowMotions";
 import { FlowShell } from "@/components/FlowShell";
 import { AppShell } from "@/components/ui/app-shell";
 import { Landing } from "@/components/Landing";
+import { Lesson } from "@/components/Lesson";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { UniverseGenerator } from "@/components/UniverseGenerator";
@@ -40,6 +41,7 @@ export function FlowDeck() {
   const [choosing, setChoosing] = useState<FlowMotion | null>(null);
   const [practicePart, setPracticePart] = useState<PracticePart | null>(null);
   const [progress, setProgress] = useState<Record<string, FlowProgress>>({});
+  const [showLesson, setShowLesson] = useState(false);
 
   useEffect(() => {
     setProgress(loadAllFlowProgress(window.localStorage));
@@ -69,6 +71,13 @@ export function FlowDeck() {
     );
   }
   if (practicePart) return <PracticeShell part={practicePart} onExit={() => setPracticePart(null)} />;
+  if (showLesson) {
+    return (
+      <AppShell>
+        <Lesson onBack={() => setShowLesson(false)} />
+      </AppShell>
+    );
+  }
   if (choosing) {
     return (
       <AppShell>
@@ -100,9 +109,10 @@ export function FlowDeck() {
 
   return (
     <AppShell>
-      <Landing />
+      <Landing onOpenLesson={() => setShowLesson(true)} />
       <section className="mt-12">
-        <h2 className="font-display text-2xl font-semibold text-foreground">Pick a motion</h2>
+        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 2 · Build core skills</div>
+        <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Pick a motion</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {motions.map((m, i) => {
             const status = motionStatus(progress[m.id]);

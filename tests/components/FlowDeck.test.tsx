@@ -76,6 +76,14 @@ describe("FlowDeck", () => {
     expect(card.className).toContain("hover:shadow-md");
   });
 
+  it("opens the Claim/Link/Impact lesson from the home page and returns to the deck", async () => {
+    render(<FlowDeck />);
+    await userEvent.click(screen.getByRole("button", { name: /read the lesson/i }));
+    expect(await screen.findByRole("heading", { name: /claim.*link.*impact/i })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /back to motions/i }));
+    expect(await screen.findByRole("heading", { name: /pick a motion/i })).toBeInTheDocument();
+  });
+
   it("refreshes the deck badge after returning from a motion completed during the journey", async () => {
     const motions = getFlowMotions();
     const motionId = motions[0].id;

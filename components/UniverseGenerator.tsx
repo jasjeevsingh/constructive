@@ -114,7 +114,8 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion, sta
 
   return (
     <section className="mt-12">
-      <h2 className="font-display text-2xl font-semibold text-foreground">Bring your own universe</h2>
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 3 · Optional</div>
+      <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Bring your own universe</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Name a book, show, or game you love and we&apos;ll build debates from it.
       </p>
