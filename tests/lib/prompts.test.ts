@@ -43,4 +43,9 @@ describe("prompt builders", () => {
       expect(p.system).toContain(name);
     }
   });
+
+  it("forbids the scaffold generator from inventing real-world studies", () => {
+    const p = generateScaffoldPrompt("Naruto", "This House would ban the Chunin Exams.");
+    expect(p.system.toLowerCase()).toContain("never invent or cite real-world studies");
+  });
 });

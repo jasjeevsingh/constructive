@@ -26,6 +26,18 @@ describe("flow motions bank", () => {
       }
     }
   });
+  it("no evidence plank cites a named institution", () => {
+    const named = /\b(Harvard|Stanford|MIT|Oxford|Cambridge|Yale|Princeton)\b/i;
+    for (const m of getFlowMotions()) {
+      for (const side of ["for", "against"] as const) {
+        for (const c of m.sides[side].claims) {
+          for (const p of c.candidates) {
+            expect(p.text, `plank "${p.text}" cites a named institution`).not.toMatch(named);
+          }
+        }
+      }
+    }
+  });
   it("adapts a flow motion to a Motion (for KeywordStep)", () => {
     const m = getFlowMotion("m-kids-vote")!;
     const motion = flowMotionToMotion(m);

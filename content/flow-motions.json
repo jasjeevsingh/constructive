@@ -100,7 +100,7 @@
             "candidates": [
               { "id": "c1", "text": "Free evenings mean more sleep and family time.", "material": "reasoning", "verdict": "fits", "explanation": "Bridges the ban to the wellbeing impact." },
               { "id": "c2", "text": "Studies link heavy homework loads to student stress and lost sleep.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the wellbeing impact." },
-              { "id": "c3", "text": "A Harvard study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive, but it argues FOR homework — wrong direction for this impact." },
+              { "id": "c3", "text": "A widely cited study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive, but it argues FOR homework — wrong direction for this impact." },
               { "id": "c4", "text": "Homework teaches time management.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A different impact; doesn't connect to rest/family." }
             ]
           },
@@ -137,7 +137,7 @@
             "candidates": [
               { "id": "c1", "text": "Repeating a skill on your own is what moves it into long-term memory.", "material": "reasoning", "verdict": "fits", "explanation": "Links home practice to mastery." },
               { "id": "c2", "text": "Studies link regular spaced practice to stronger retention.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the mastery impact." },
-              { "id": "c3", "text": "A Harvard study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Strong and on-topic-sounding, but it measures test scores, not the mastery mechanism claimed here." },
+              { "id": "c3", "text": "A widely cited study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Strong and on-topic-sounding, but it measures test scores, not the mastery mechanism claimed here." },
               { "id": "c4", "text": "Some students dislike homework.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A preference, not a bridge to mastery." }
             ]
           },
