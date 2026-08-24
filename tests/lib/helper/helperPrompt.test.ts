@@ -12,6 +12,13 @@ describe("helperPrompt", () => {
     }
   });
 
+  it("carries the shared impact rubric", () => {
+    const p = helperPrompt(ctx);
+    for (const name of ["Magnitude", "Probability", "Timeframe"]) {
+      expect(p).toContain(name);
+    }
+  });
+
   it("forbids writing the student's argument for them", () => {
     expect(helperPrompt(ctx).toLowerCase()).toContain("never write");
   });

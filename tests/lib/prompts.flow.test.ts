@@ -75,4 +75,17 @@ describe("flow prompts", () => {
     expect(p.user).toContain("kids sleep more");
     expect(p.system).toContain('"kind":"impact"');
   });
+  it("impact prompt includes the magnitude/probability/timeframe rubric", () => {
+    const p = impactPrompt({
+      motion: "m",
+      claim: "c",
+      authoredImpact: "a",
+      studentImpact: "s",
+    });
+    for (const name of ["Magnitude", "Probability", "Timeframe"]) {
+      expect(p.system).toContain(name);
+    }
+    expect(p.system).toContain("one question");
+    expect(p.system.toLowerCase()).toContain("do not give the answer");
+  });
 });

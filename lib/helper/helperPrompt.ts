@@ -1,4 +1,5 @@
 import { renderRubric } from "@/lib/claimRubric";
+import { renderImpactRubric } from "@/lib/impactRubric";
 import { renderHelperContext, type HelperContext } from "@/lib/helper/context";
 import type { HelperReplyTurn } from "@/lib/helper/agentMachine";
 
@@ -60,6 +61,9 @@ export function helperPrompt(
     "",
     "This is what makes a claim good — use it to guide your questions, never recite it:",
     renderRubric(),
+    "",
+    "This is what makes an impact strong — use it the same way:",
+    renderImpactRubric(),
     ...renderPriorTurns(priorTurns),
     "",
     renderHelperContext(ctx),

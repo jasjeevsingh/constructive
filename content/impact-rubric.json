@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "intro": "A strong impact makes one or more clear comparisons that show why the argument matters beyond the debate — both on its own and against what the other side will say.",
+  "criteria": [
+    {
+      "id": "magnitude",
+      "name": "Magnitude",
+      "test": "Names who is affected and how many — and weighs by vulnerability, not just headcount.",
+      "bad": "It affects students.",
+      "good": "Millions of students spend hours every night on homework — that's time taken from every family."
+    },
+    {
+      "id": "probability",
+      "name": "Probability",
+      "test": "Says how likely the consequence is, with a reason to believe it — not a vague 'might happen.'",
+      "bad": "Things could get better.",
+      "good": "Schools that cut homework already saw students sleeping more and reporting less stress."
+    },
+    {
+      "id": "timeframe",
+      "name": "Timeframe",
+      "test": "Says when the consequence hits — immediately, over a semester, across a generation.",
+      "bad": "It'll help eventually.",
+      "good": "Students would get their evenings back starting the first week, and the mental health effects compound over a full school year."
+    }
+  ]
+}
