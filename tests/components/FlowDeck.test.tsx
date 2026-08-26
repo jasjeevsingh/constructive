@@ -47,7 +47,7 @@ describe("FlowDeck", () => {
   it("opens a practice drill when a Practice card is clicked", async () => {
     render(<FlowDeck />);
     await userEvent.click(screen.getByRole("button", { name: /practice impacts/i }));
-    expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+    expect(screen.getByText(/why does your argument matter beyond the debate/i)).toBeInTheDocument();
   });
 
   it("asks which side to argue first, then opens that side", async () => {

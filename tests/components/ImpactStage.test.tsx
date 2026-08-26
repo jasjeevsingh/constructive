@@ -14,7 +14,7 @@ describe("ImpactStage", () => {
   it("shows the prompt and reveals Finish after a coach reaction", async () => {
     const onComplete = vi.fn();
     render(<ImpactStage motion="m" claim="c" authoredImpact="a" onComplete={onComplete} />);
-    expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+    expect(screen.getByText(/why does your argument matter beyond the debate/i)).toBeInTheDocument();
     await userEvent.type(screen.getByRole("textbox"), "kids get more sleep");
     await userEvent.click(screen.getByRole("button", { name: /submit/i }));
     expect(await screen.findByText(/strong impact/i)).toBeInTheDocument();

@@ -6,9 +6,9 @@ import { loadPracticeCounts, type PracticeCounts } from "@/lib/state/practicePro
 import type { PracticePart } from "@/lib/practice";
 
 const CARDS: { part: PracticePart; title: string; blurb: string }[] = [
-  { part: "claim", title: "Practice Claims", blurb: "State a strong position in your own words." },
+  { part: "claim", title: "Practice Claims", blurb: "Make an argument in favor of your side." },
   { part: "link", title: "Practice the Link", blurb: "Build the bridge from claim to impact with evidence + reasoning." },
-  { part: "impact", title: "Practice Impacts", blurb: "Say why it matters — the bigger consequence." },
+  { part: "impact", title: "Practice Impacts", blurb: "Why your argument matters beyond the debate." },
 ];
 
 export function PracticeDeck({ onPick }: { onPick: (part: PracticePart) => void }) {

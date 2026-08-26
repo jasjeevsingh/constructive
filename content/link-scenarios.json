@@ -6,7 +6,7 @@
     "candidates": [
       { "id": "c1", "text": "Without homework, evenings are freed for rest and family.", "material": "reasoning", "verdict": "fits", "explanation": "Directly connects banning homework to the extra family time." },
       { "id": "c2", "text": "Research links heavy homework loads to student stress and lost sleep.", "material": "evidence", "verdict": "fits", "explanation": "Evidence that removing homework supports sleep and wellbeing." },
-      { "id": "c3", "text": "A Harvard study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive and real, but it argues FOR homework — it does not bridge to this impact." },
+      { "id": "c3", "text": "A widely cited study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive and real, but it argues FOR homework — it does not bridge to this impact." },
       { "id": "c4", "text": "Homework teaches time-management skills.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A point about a different impact; it does not connect to family/sleep/play time." }
     ]
   },

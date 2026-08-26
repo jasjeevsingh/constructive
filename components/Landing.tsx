@@ -2,9 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const STEPS = [
-  { label: "Claim", blurb: "Your position — what you believe and why." },
+  { label: "Claim", blurb: "An argument in favor of your side." },
   { label: "Link", blurb: "The bridge from your claim to why it matters." },
-  { label: "Impact", blurb: "So what? The bigger consequence." },
+  { label: "Impact", blurb: "Why your argument matters beyond the debate." },
 ];
 
 export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {

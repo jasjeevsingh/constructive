@@ -24,4 +24,13 @@ describe("link scenarios bank", () => {
       expect(s.candidates.some((c) => c.verdict === "great-but-wrong")).toBe(true);
     }
   });
+
+  it("no candidate cites a named institution", () => {
+    const named = /\b(Harvard|Stanford|MIT|Oxford|Cambridge|Yale|Princeton)\b/i;
+    for (const s of getScenarios()) {
+      for (const c of s.candidates) {
+        expect(c.text, `plank "${c.text}" cites a named institution`).not.toMatch(named);
+      }
+    }
+  });
 });

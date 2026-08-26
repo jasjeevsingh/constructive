@@ -30,14 +30,14 @@ describe("PracticeShell", () => {
 
   it("completes an impact rep, increments the count, and serves a fresh rep", async () => {
     render(<PracticeShell part="impact" onExit={() => {}} />);
-    expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+    expect(screen.getByText(/why does your argument matter beyond the debate/i)).toBeInTheDocument();
     await userEvent.type(screen.getByRole("textbox"), "kids get more sleep");
     await userEvent.click(screen.getByRole("button", { name: /submit/i }));
     await userEvent.click(await screen.findByRole("button", { name: /finish this side/i }));
     expect(await screen.findByRole("button", { name: /next rep/i })).toBeInTheDocument();
     expect(screen.getByText("1 done")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /next rep/i }));
-    expect(screen.getByText(/so what\? why does this claim matter/i)).toBeInTheDocument();
+    expect(screen.getByText(/why does your argument matter beyond the debate/i)).toBeInTheDocument();
   });
 
   it("offers the voice helper inside a practice drill", () => {
