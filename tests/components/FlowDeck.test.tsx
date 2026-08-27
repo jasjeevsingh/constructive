@@ -41,7 +41,7 @@ describe("FlowDeck", () => {
       })
     );
     render(<FlowDeck />);
-    expect(await screen.findByText(/both sides/i)).toBeInTheDocument();
+    expect(await screen.findByText(/✓ Both sides/)).toBeInTheDocument();
   });
 
   it("opens a practice drill when a Practice card is clicked", async () => {

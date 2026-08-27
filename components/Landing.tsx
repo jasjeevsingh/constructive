@@ -18,6 +18,14 @@ export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
         Debate is a search for what&apos;s true, not a fight to win. Make a claim, build the
         bridge to why it matters, and see the impact.
       </p>
+      <div className="mt-4 max-w-2xl rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+        <div className="font-medium text-foreground">How to use this tool</div>
+        <ol className="mt-2 list-inside list-decimal space-y-1">
+          <li><span className="font-medium text-foreground">Read the lesson below</span> — walk through Claim, Link, and Impact with a worked example.</li>
+          <li><span className="font-medium text-foreground">Pick a motion</span> and argue both sides to build your core skills.</li>
+          <li><span className="font-medium text-foreground">Bring your own universe</span> (optional) — practice with stories you already know.</li>
+        </ol>
+      </div>
       <Button type="button" variant="outline" className="mt-4" onClick={onOpenLesson}>
         Read the lesson: Claim → Link → Impact →
       </Button>
