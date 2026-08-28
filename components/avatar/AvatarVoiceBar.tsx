@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { pickRecorderMimeType } from "@/lib/voice/deepgramLive";
-import { speakCoach } from "@/lib/voice/playSpeech";
 import type { AvatarSession } from "@/lib/avatar/types";
 import { getModeConfig } from "@/lib/avatar/cohortAdapter";
 

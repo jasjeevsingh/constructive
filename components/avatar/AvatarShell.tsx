@@ -94,6 +94,19 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
           setSession(updated);
           saveAvatarSession(window.localStorage, updated);
           void speakCoach(avatarText);
+
+          // Re-check orchestrator now that both turns are counted — round
+          // completion fires at even transcript lengths (e.g. 6) which the
+          // pre-avatar check (odd length) can never reach.
+          let postAvatarResult: TurnResult;
+          switch (updated.mode) {
+            case "sparring": postAvatarResult = sparringNextTurn(updated); break;
+            case "pushback": postAvatarResult = pushbackNextTurn(updated); break;
+            case "collaborative": postAvatarResult = collaborativeNextTurn(updated); break;
+          }
+          if (postAvatarResult.roundComplete || postAvatarResult.sessionComplete) {
+            result = postAvatarResult;
+          }
         }
       } catch {
         // Network failure — the student turn is already saved, so just skip the avatar reply.

@@ -50,4 +50,31 @@ describe("Avatar sparring integration", () => {
     expect(await screen.findByText("My first speech.")).toBeInTheDocument();
     expect(await screen.findByText(/Avatar response 1\./)).toBeInTheDocument();
   });
+
+  it("shows ScoreCard after 3 exchanges (6 turns) complete a sparring round", async () => {
+    const user = userEvent.setup();
+    render(<AvatarShell onExit={() => {}} />);
+    await user.click(screen.getByRole("button", { name: /sparring/i }));
+    const motionButtons = screen.getAllByRole("button", { name: /This House/ });
+    await user.click(motionButtons[0]);
+    await user.click(screen.getByRole("button", { name: /argue for/i }));
+
+    // First 2 exchanges: verify avatar responds
+    for (let i = 0; i < 2; i++) {
+      const input = screen.getByPlaceholderText(/type your response/i);
+      await user.clear(input);
+      await user.type(input, `Speech ${i + 1}`);
+      await user.click(screen.getByRole("button", { name: /send/i }));
+      await screen.findByText(new RegExp(`Avatar response ${i + 1}\\.`), {}, { timeout: 3000 });
+    }
+
+    // 3rd exchange completes the round — ScoreCard replaces the transcript view
+    const input = screen.getByPlaceholderText(/type your response/i);
+    await user.clear(input);
+    await user.type(input, "Speech 3");
+    await user.click(screen.getByRole("button", { name: /send/i }));
+
+    expect(await screen.findByText(/round.*score/i, {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /next round/i })).toBeInTheDocument();
+  });
 });
