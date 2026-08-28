@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { UniverseGenerator } from "@/components/UniverseGenerator";
 import { PracticeDeck } from "@/components/PracticeDeck";
 import { PracticeShell } from "@/components/PracticeShell";
+import { AvatarShell } from "@/components/avatar/AvatarShell";
 import type { PracticePart } from "@/lib/practice";
 import type { FlowMotion } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export function FlowDeck() {
   const [practicePart, setPracticePart] = useState<PracticePart | null>(null);
   const [progress, setProgress] = useState<Record<string, FlowProgress>>({});
   const [showLesson, setShowLesson] = useState(false);
+  const [showAvatar, setShowAvatar] = useState(false);
 
   useEffect(() => {
     setProgress(loadAllFlowProgress(window.localStorage));
@@ -78,6 +80,7 @@ export function FlowDeck() {
       </AppShell>
     );
   }
+  if (showAvatar) return <AvatarShell onExit={() => setShowAvatar(false)} />;
   if (choosing) {
     return (
       <AppShell>
@@ -142,6 +145,16 @@ export function FlowDeck() {
         </div>
       </section>
       <UniverseGenerator onOpen={(m, side) => setActive({ motion: m, side })} />
+      <section className="mt-12">
+        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 3 · Spar with an AI</div>
+        <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Debate Avatar</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Practice debating against an AI opponent. Choose your mode: structured sparring, pushback coaching, or collaborative build + debate.
+        </p>
+        <Button type="button" variant="outline" className="mt-3" onClick={() => setShowAvatar(true)}>
+          Debate Avatar →
+        </Button>
+      </section>
       <PracticeDeck onPick={setPracticePart} />
     </AppShell>
   );

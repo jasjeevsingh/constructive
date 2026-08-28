@@ -112,4 +112,9 @@ describe("FlowDeck", () => {
     expect(await screen.findByText("1 side done")).toBeInTheDocument();
     expect(screen.queryByText("In progress")).toBeNull();
   });
+
+  it("renders a Debate Avatar entry card", () => {
+    render(<FlowDeck />);
+    expect(screen.getByRole("button", { name: /debate avatar/i })).toBeInTheDocument();
+  });
 });

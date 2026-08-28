@@ -4,16 +4,22 @@ import { AppShell } from "@/components/ui/app-shell";
 import { Button } from "@/components/ui/button";
 import { ModeCard } from "@/components/avatar/ModeCard";
 import { getFlowMotions } from "@/lib/flowMotions";
-import { initSparring } from "@/lib/avatar/orchestrators/sparringOrch";
-import { initPushback } from "@/lib/avatar/orchestrators/pushbackOrch";
-import { initCollaborative, collaborativeTransition } from "@/lib/avatar/orchestrators/collaborativeOrch";
+import { initSparring, sparringNextTurn, sparringAdvanceRound } from "@/lib/avatar/orchestrators/sparringOrch";
+import { initPushback, pushbackNextTurn } from "@/lib/avatar/orchestrators/pushbackOrch";
+import {
+  initCollaborative,
+  collaborativeTransition,
+  collaborativeNextTurn,
+  getCollaborativeArgs,
+} from "@/lib/avatar/orchestrators/collaborativeOrch";
 import { saveAvatarSession } from "@/lib/state/avatarSession";
-import type { AvatarMode, AvatarSession } from "@/lib/avatar/types";
+import type { AvatarMode, AvatarSession, AvatarTurn, AvatarTurnRequest, TurnResult } from "@/lib/avatar/types";
 import type { FlowMotion } from "@/lib/schemas";
 import type { Side } from "@/lib/state/flowMachine";
 import { TranscriptPane } from "@/components/avatar/TranscriptPane";
 import { AvatarVoiceBar } from "@/components/avatar/AvatarVoiceBar";
 import { ScoreCard } from "@/components/avatar/ScoreCard";
+import { speakCoach } from "@/lib/voice/playSpeech";
 
 const MODES: { mode: AvatarMode; title: string; description: string }[] = [
   { mode: "sparring", title: "Sparring", description: "Debate an opponent. Get scored after each round." },
@@ -29,6 +35,108 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
   const [selectedMode, setSelectedMode] = useState<AvatarMode | null>(null);
   const [selectedMotion, setSelectedMotion] = useState<FlowMotion | null>(null);
   const [session, setSession] = useState<AvatarSession | null>(null);
+
+  async function handleStudentTurn(studentText: string) {
+    if (!session) return;
+
+    const studentTurn: AvatarTurn = {
+      speaker: "student",
+      text: studentText,
+      timestampMs: Date.now() - session.startedAt,
+      durationMs: 0,
+    };
+
+    const updated: AvatarSession = { ...session, transcript: [...session.transcript, studentTurn] };
+    setSession(updated);
+    saveAvatarSession(window.localStorage, updated);
+
+    // Get orchestrator decision
+    let result: TurnResult;
+    switch (session.mode) {
+      case "sparring":
+        result = sparringNextTurn(updated);
+        break;
+      case "pushback":
+        result = pushbackNextTurn(updated);
+        break;
+      case "collaborative":
+        result = collaborativeNextTurn(updated);
+        break;
+    }
+
+    // Avatar responds
+    if (result.avatarShouldRespond) {
+      const turnReq: AvatarTurnRequest = {
+        mode: updated.mode,
+        phase: updated.phase,
+        motion: updated.motionText,
+        cohort: updated.cohort,
+        avatarSide: updated.avatarSide,
+        studentSide: updated.studentSide,
+        transcript: updated.transcript,
+        collaborativeArgs: updated.mode === "collaborative" ? getCollaborativeArgs(updated) : undefined,
+      };
+      const res = await fetch("/api/avatar/turn", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(turnReq),
+      });
+      if (res.ok) {
+        const { text: avatarText } = await res.json();
+        const avatarTurn: AvatarTurn = {
+          speaker: "avatar",
+          text: avatarText,
+          timestampMs: Date.now() - session.startedAt,
+          durationMs: 0,
+        };
+        updated.transcript = [...updated.transcript, avatarTurn];
+        setSession({ ...updated });
+        saveAvatarSession(window.localStorage, { ...updated });
+        void speakCoach(avatarText);
+      }
+    }
+
+    // Score
+    if (result.shouldScore && result.scoreSlice) {
+      const scoreType: "round" | "inline" =
+        updated.mode === "pushback" ? "inline" : result.roundComplete ? "round" : "inline";
+      const scoreReq = {
+        scoreType,
+        mode: updated.mode,
+        transcript: updated.transcript.slice(result.scoreSlice[0], result.scoreSlice[1]),
+        criteria: result.scoreCriteria ?? [],
+        cohort: updated.cohort,
+      };
+      const res = await fetch("/api/avatar/score", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(scoreReq),
+      });
+      if (res.ok) {
+        const scoreData = await res.json();
+        if (scoreType === "round") {
+          updated.roundScores = [...updated.roundScores, { ...scoreData, round: updated.currentRound }];
+        } else {
+          updated.inlineScores = [...updated.inlineScores, { ...scoreData, turnIndex: updated.transcript.length - 1 }];
+        }
+        setSession({ ...updated });
+        saveAvatarSession(window.localStorage, { ...updated });
+      }
+    }
+
+    // State transitions
+    if (result.phaseTransition) {
+      setStep("transition");
+    }
+    if (result.roundComplete) {
+      setStep("review");
+    }
+    if (result.sessionComplete) {
+      updated.endedAt = Date.now();
+      setSession({ ...updated });
+      saveAvatarSession(window.localStorage, { ...updated });
+    }
+  }
 
   function selectMode(mode: AvatarMode) {
     setSelectedMode(mode);
@@ -136,6 +244,27 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
     );
   }
 
+  if (step === "review" && session) {
+    return (
+      <AppShell>
+        <ScoreCard
+          mode={session.mode}
+          roundScores={session.roundScores}
+          onContinue={() => {
+            const advanced = sparringAdvanceRound(session);
+            setSession(advanced);
+            saveAvatarSession(window.localStorage, advanced);
+            setStep("session");
+          }}
+          onEnd={() => {
+            setSession(null);
+            setStep("mode");
+          }}
+        />
+      </AppShell>
+    );
+  }
+
   if (step === "session" && session) {
     return (
       <AppShell>
@@ -149,12 +278,7 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
           <div />
         </div>
         <TranscriptPane transcript={session.transcript} inlineScores={session.inlineScores} />
-        <AvatarVoiceBar
-          session={session}
-          onStudentTurn={(text: string) => {
-            // Wired in Task 12 integration
-          }}
-        />
+        <AvatarVoiceBar session={session} onStudentTurn={handleStudentTurn} />
       </AppShell>
     );
   }
