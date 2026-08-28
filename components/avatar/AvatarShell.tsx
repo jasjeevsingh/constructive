@@ -46,7 +46,7 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
       durationMs: 0,
     };
 
-    const updated: AvatarSession = { ...session, transcript: [...session.transcript, studentTurn] };
+    let updated: AvatarSession = { ...session, transcript: [...session.transcript, studentTurn] };
     setSession(updated);
     saveAvatarSession(window.localStorage, updated);
 
@@ -76,23 +76,27 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
         transcript: updated.transcript,
         collaborativeArgs: updated.mode === "collaborative" ? getCollaborativeArgs(updated) : undefined,
       };
-      const res = await fetch("/api/avatar/turn", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(turnReq),
-      });
-      if (res.ok) {
-        const { text: avatarText } = await res.json();
-        const avatarTurn: AvatarTurn = {
-          speaker: "avatar",
-          text: avatarText,
-          timestampMs: Date.now() - session.startedAt,
-          durationMs: 0,
-        };
-        updated.transcript = [...updated.transcript, avatarTurn];
-        setSession({ ...updated });
-        saveAvatarSession(window.localStorage, { ...updated });
-        void speakCoach(avatarText);
+      try {
+        const res = await fetch("/api/avatar/turn", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(turnReq),
+        });
+        if (res.ok) {
+          const { text: avatarText } = await res.json();
+          const avatarTurn: AvatarTurn = {
+            speaker: "avatar",
+            text: avatarText,
+            timestampMs: Date.now() - session.startedAt,
+            durationMs: 0,
+          };
+          updated = { ...updated, transcript: [...updated.transcript, avatarTurn] };
+          setSession(updated);
+          saveAvatarSession(window.localStorage, updated);
+          void speakCoach(avatarText);
+        }
+      } catch {
+        // Network failure — the student turn is already saved, so just skip the avatar reply.
       }
     }
 
@@ -107,20 +111,27 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
         criteria: result.scoreCriteria ?? [],
         cohort: updated.cohort,
       };
-      const res = await fetch("/api/avatar/score", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(scoreReq),
-      });
-      if (res.ok) {
-        const scoreData = await res.json();
-        if (scoreType === "round") {
-          updated.roundScores = [...updated.roundScores, { ...scoreData, round: updated.currentRound }];
-        } else {
-          updated.inlineScores = [...updated.inlineScores, { ...scoreData, turnIndex: updated.transcript.length - 1 }];
+      try {
+        const res = await fetch("/api/avatar/score", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(scoreReq),
+        });
+        if (res.ok) {
+          const scoreData = await res.json();
+          if (scoreType === "round") {
+            updated = { ...updated, roundScores: [...updated.roundScores, { ...scoreData, round: updated.currentRound }] };
+          } else {
+            updated = {
+              ...updated,
+              inlineScores: [...updated.inlineScores, { ...scoreData, turnIndex: updated.transcript.length - 1 }],
+            };
+          }
+          setSession(updated);
+          saveAvatarSession(window.localStorage, updated);
         }
-        setSession({ ...updated });
-        saveAvatarSession(window.localStorage, { ...updated });
+      } catch {
+        // Network failure — skip scoring, the transcript itself is unaffected.
       }
     }
 
@@ -132,9 +143,9 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
       setStep("review");
     }
     if (result.sessionComplete) {
-      updated.endedAt = Date.now();
-      setSession({ ...updated });
-      saveAvatarSession(window.localStorage, { ...updated });
+      updated = { ...updated, endedAt: Date.now() };
+      setSession(updated);
+      saveAvatarSession(window.localStorage, updated);
     }
   }
 
