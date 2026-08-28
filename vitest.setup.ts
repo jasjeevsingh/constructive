@@ -7,6 +7,11 @@ vi.mock("next/font/google", () => ({
   DM_Sans: () => ({ variable: "font-sans", className: "font-sans", style: { fontFamily: "DM Sans" } }),
 }));
 
+// jsdom doesn't implement scrollIntoView (used by auto-scrolling panes like TranscriptPane).
+if (typeof window !== "undefined" && !window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = () => {};
+}
+
 // motion's reduced-motion detection calls window.matchMedia, which jsdom lacks.
 if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = (query: string) =>
