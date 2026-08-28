@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { TranscriptPane } from "@/components/avatar/TranscriptPane";
+import userEvent from "@testing-library/user-event";
+import { TranscriptDrawer } from "@/components/avatar/TranscriptPane";
 import type { AvatarTurn, InlineScore } from "@/lib/avatar/types";
 
 const TRANSCRIPT: AvatarTurn[] = [
@@ -8,9 +9,9 @@ const TRANSCRIPT: AvatarTurn[] = [
   { speaker: "avatar", text: "But practice is important.", timestampMs: 5000, durationMs: 4000 },
 ];
 
-describe("TranscriptPane", () => {
-  it("renders each turn with speaker label", () => {
-    render(<TranscriptPane transcript={TRANSCRIPT} inlineScores={[]} />);
+describe("TranscriptDrawer", () => {
+  it("renders each turn with speaker label when open", () => {
+    render(<TranscriptDrawer transcript={TRANSCRIPT} inlineScores={[]} open onClose={() => {}} />);
     expect(screen.getByText("You")).toBeInTheDocument();
     expect(screen.getByText("Avatar")).toBeInTheDocument();
     expect(screen.getByText("Homework should be banned.")).toBeInTheDocument();
@@ -21,12 +22,12 @@ describe("TranscriptPane", () => {
     const scores: InlineScore[] = [
       { criterion: "Link", score: 2, rationale: "Solid connection.", turnIndex: 0 },
     ];
-    render(<TranscriptPane transcript={TRANSCRIPT} inlineScores={scores} />);
+    render(<TranscriptDrawer transcript={TRANSCRIPT} inlineScores={scores} open onClose={() => {}} />);
     expect(screen.getByText(/Link.*2/)).toBeInTheDocument();
   });
 
   it("renders empty state when no transcript", () => {
-    render(<TranscriptPane transcript={[]} inlineScores={[]} />);
-    expect(screen.getByText(/start speaking/i)).toBeInTheDocument();
+    render(<TranscriptDrawer transcript={[]} inlineScores={[]} open onClose={() => {}} />);
+    expect(screen.getByText(/no turns yet/i)).toBeInTheDocument();
   });
 });

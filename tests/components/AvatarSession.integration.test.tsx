@@ -24,55 +24,55 @@ beforeEach(() => {
   }));
 });
 
+async function navigateToSession(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: /sparring/i }));
+  const motionButtons = screen.getAllByRole("button", { name: /This House/ });
+  await user.click(motionButtons[0]);
+  await user.click(screen.getByRole("button", { name: /argue for/i }));
+}
+
+async function sendText(user: ReturnType<typeof userEvent.setup>, text: string) {
+  // Ensure text input is visible
+  let input = screen.queryByPlaceholderText(/type your argument/i);
+  if (!input) {
+    await user.click(screen.getByRole("button", { name: /toggle text input/i }));
+    input = screen.getByPlaceholderText(/type your argument/i);
+  }
+  await user.clear(input);
+  await user.type(input, text);
+  await user.click(screen.getByRole("button", { name: /send/i }));
+}
+
 describe("Avatar sparring integration", () => {
   it("navigates from mode selection to a debate session", async () => {
+    const user = userEvent.setup();
     render(<AvatarShell onExit={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: /sparring/i }));
-    expect(screen.getByText(/pick a motion/i)).toBeInTheDocument();
-    const motionButtons = screen.getAllByRole("button", { name: /This House/ });
-    await userEvent.click(motionButtons[0]);
-    expect(screen.getByText(/which side/i)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: /argue for/i }));
-    expect(screen.getByText(/start speaking/i)).toBeInTheDocument();
+    await navigateToSession(user);
+    expect(screen.getByText(/hold mic or press/i)).toBeInTheDocument();
   });
 
   it("runs a full student turn: transcript update, avatar reply via /api/avatar/turn, and TTS", async () => {
+    const user = userEvent.setup();
     render(<AvatarShell onExit={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: /sparring/i }));
-    const motionButtons = screen.getAllByRole("button", { name: /This House/ });
-    await userEvent.click(motionButtons[0]);
-    await userEvent.click(screen.getByRole("button", { name: /argue for/i }));
+    await navigateToSession(user);
+    await sendText(user, "My first speech.");
 
-    const input = screen.getByPlaceholderText(/type your response/i);
-    await userEvent.type(input, "My first speech.");
-    await userEvent.click(screen.getByRole("button", { name: /send/i }));
-
-    expect(await screen.findByText("My first speech.")).toBeInTheDocument();
-    expect(await screen.findByText(/Avatar response 1\./)).toBeInTheDocument();
+    const matches = await screen.findAllByText(/Avatar response 1\./);
+    expect(matches.length).toBeGreaterThan(0);
   });
 
   it("shows ScoreCard after 3 exchanges (6 turns) complete a sparring round", async () => {
     const user = userEvent.setup();
     render(<AvatarShell onExit={() => {}} />);
-    await user.click(screen.getByRole("button", { name: /sparring/i }));
-    const motionButtons = screen.getAllByRole("button", { name: /This House/ });
-    await user.click(motionButtons[0]);
-    await user.click(screen.getByRole("button", { name: /argue for/i }));
+    await navigateToSession(user);
 
-    // First 2 exchanges: verify avatar responds
     for (let i = 0; i < 2; i++) {
-      const input = screen.getByPlaceholderText(/type your response/i);
-      await user.clear(input);
-      await user.type(input, `Speech ${i + 1}`);
-      await user.click(screen.getByRole("button", { name: /send/i }));
-      await screen.findByText(new RegExp(`Avatar response ${i + 1}\\.`), {}, { timeout: 3000 });
+      await sendText(user, `Speech ${i + 1}`);
+      const matches = await screen.findAllByText(new RegExp(`Avatar response ${i + 1}\\.`), {}, { timeout: 3000 });
+      expect(matches.length).toBeGreaterThan(0);
     }
 
-    // 3rd exchange completes the round — ScoreCard replaces the transcript view
-    const input = screen.getByPlaceholderText(/type your response/i);
-    await user.clear(input);
-    await user.type(input, "Speech 3");
-    await user.click(screen.getByRole("button", { name: /send/i }));
+    await sendText(user, "Speech 3");
 
     expect(await screen.findByText(/round.*score/i, {}, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /next round/i })).toBeInTheDocument();

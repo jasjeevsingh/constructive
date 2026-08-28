@@ -18,6 +18,7 @@ import type { FlowMotion } from "@/lib/schemas";
 import type { Side } from "@/lib/state/flowMachine";
 import { TranscriptPane } from "@/components/avatar/TranscriptPane";
 import { AvatarVoiceBar } from "@/components/avatar/AvatarVoiceBar";
+import { cn } from "@/lib/utils";
 import { ScoreCard } from "@/components/avatar/ScoreCard";
 import { speakCoach } from "@/lib/voice/playSpeech";
 
@@ -35,6 +36,7 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
   const [selectedMode, setSelectedMode] = useState<AvatarMode | null>(null);
   const [selectedMotion, setSelectedMotion] = useState<FlowMotion | null>(null);
   const [session, setSession] = useState<AvatarSession | null>(null);
+  const [barStatus, setBarStatus] = useState<"idle" | "listening" | "transcribing" | "avatar-speaking">("idle");
 
   async function handleStudentTurn(studentText: string) {
     if (!session) return;
@@ -290,20 +292,85 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
   }
 
   if (step === "session" && session) {
+    const modeLabel = MODES.find((m) => m.mode === session.mode)?.title ?? "";
+    const roundLabel =
+      session.mode === "sparring"
+        ? `Round ${session.currentRound} of ${session.totalRounds}`
+        : session.mode === "collaborative"
+        ? session.phase === "collaborative" ? "Building" : "Debating"
+        : "";
+    const lastAvatarText = [...session.transcript].reverse().find((t) => t.speaker === "avatar")?.text;
+
     return (
-      <AppShell>
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <Button variant="ghost" size="sm" onClick={() => { setSession(null); setStep("mode"); }}>← Exit</Button>
-          <div className="text-sm font-medium text-foreground">
-            {MODES.find((m) => m.mode === session.mode)?.title}
-            {session.mode === "sparring" && ` · R${session.currentRound}/${session.totalRounds}`}
-            {session.mode === "collaborative" && ` · ${session.phase === "collaborative" ? "Building" : "Debating"}`}
+      <div className="fixed inset-0 z-30 flex flex-col bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="text-sm font-medium text-white/60">
+            {modeLabel}
+            {roundLabel && <span className="ml-2 text-white/40">{roundLabel}</span>}
           </div>
-          <div />
+          <TranscriptPane transcript={session.transcript} inlineScores={session.inlineScores} />
         </div>
-        <TranscriptPane transcript={session.transcript} inlineScores={session.inlineScores} />
-        <AvatarVoiceBar session={session} onStudentTurn={handleStudentTurn} />
-      </AppShell>
+
+        {/* Center — avatar circles + status */}
+        <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+          <div className="flex items-center gap-12">
+            {/* You */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className={cn(
+                  "flex h-24 w-24 items-center justify-center rounded-full border-2 text-3xl font-bold transition-all duration-300",
+                  barStatus === "listening"
+                    ? "border-green-400 bg-green-500/20 shadow-[0_0_32px_rgba(74,222,128,0.35)]"
+                    : "border-white/20 bg-white/5",
+                )}
+              >
+                <span className="text-white/80">You</span>
+              </div>
+              <span className="text-xs text-white/40">
+                {barStatus === "listening" ? "Speaking…" : barStatus === "transcribing" ? "Processing…" : ""}
+              </span>
+            </div>
+
+            <div className="text-2xl font-light text-white/20">vs</div>
+
+            {/* Avatar */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className={cn(
+                  "flex h-24 w-24 items-center justify-center rounded-full border-2 text-lg font-semibold transition-all duration-300",
+                  barStatus === "avatar-speaking"
+                    ? "border-blue-400 bg-blue-500/20 shadow-[0_0_32px_rgba(96,165,250,0.35)]"
+                    : "border-white/20 bg-white/5",
+                )}
+              >
+                <svg className="h-10 w-10 text-white/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+                </svg>
+              </div>
+              <span className="text-xs text-white/40">
+                {barStatus === "avatar-speaking" ? "Speaking…" : ""}
+              </span>
+            </div>
+          </div>
+
+          {/* Last avatar response preview */}
+          {lastAvatarText && (
+            <p className="max-w-md text-center text-sm leading-relaxed text-white/30">
+              &ldquo;{lastAvatarText.length > 120 ? lastAvatarText.slice(0, 120) + "…" : lastAvatarText}&rdquo;
+            </p>
+          )}
+        </div>
+
+        {/* Bottom call bar */}
+        <AvatarVoiceBar
+          session={session}
+          onStudentTurn={handleStudentTurn}
+          onEnd={() => { setSession(null); setStep("mode"); }}
+          onStatusChange={setBarStatus}
+        />
+      </div>
     );
   }
 
