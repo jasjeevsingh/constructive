@@ -314,6 +314,11 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
 
         {/* Center — avatar circles + status */}
         <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+          {/* Motion */}
+          <p className="max-w-lg text-center text-sm font-medium leading-relaxed text-white/50">
+            {session.motionText}
+          </p>
+
           <div className="flex items-center gap-12">
             {/* You */}
             <div className="flex flex-col items-center gap-3">
