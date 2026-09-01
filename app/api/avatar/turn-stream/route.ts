@@ -19,33 +19,28 @@ export async function POST(req: Request): Promise<Response> {
   const history = transcriptToHistory(body.transcript ?? []);
   const client = getChatClient({ json: false });
 
-  if (!client.completeStream) {
+  try {
     const text = await client.complete({ system, user, history });
-    return Response.json({ text }, { status: 200 });
-  }
-
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const chunk of client.completeStream!({ system, user, history })) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
-        }
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        // Send the full text as one SSE chunk — the client splits into
+        // sentences for parallel TTS, which is where the latency win lives.
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(text)}\n\n`));
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-      } catch (err) {
-        console.error("turn-stream error:", err);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify("[ERROR]")}\n\n`));
-      }
-      controller.close();
-    },
-  });
+        controller.close();
+      },
+    });
 
-  return new Response(stream, {
-    status: 200,
-    headers: {
-      "content-type": "text/event-stream",
-      "cache-control": "no-cache",
-      connection: "keep-alive",
-    },
-  });
+    return new Response(stream, {
+      status: 200,
+      headers: {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache",
+        connection: "keep-alive",
+      },
+    });
+  } catch {
+    return Response.json({ error: "avatar turn failed" }, { status: 500 });
+  }
 }
