@@ -120,9 +120,9 @@ async function drainAudioQueue(queue: Promise<Blob | null>[], seq: number): Prom
 }
 
 /**
- * Stream LLM text from the SSE turn-stream endpoint, split into sentences,
- * fire TTS per sentence, and play audio segments in order.
- * Returns the full accumulated text for transcript storage.
+ * Fetch the avatar reply from the regular turn endpoint, split into
+ * sentences, fire TTS per sentence in parallel, and play audio in order.
+ * Returns the full text for transcript storage.
  * Audio playback continues in the background after the text is returned.
  */
 export async function speakCoachStreaming(
@@ -131,62 +131,23 @@ export async function speakCoachStreaming(
   const seq = ++speakSeq;
   stopSpeech();
 
-  const res = await fetch("/api/avatar/turn-stream", {
+  const res = await fetch("/api/avatar/turn", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(turnReqBody),
   });
 
-  if (!res.ok || !res.body) {
-    const fallback = await res.json().catch(() => ({ text: "" }));
-    return fallback.text ?? "";
-  }
+  if (!res.ok) return "";
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let fullText = "";
-  const audioQueue: Promise<Blob | null>[] = [];
+  const { text } = await res.json().catch(() => ({ text: "" }));
+  if (!text || seq !== speakSeq) return text ?? "";
 
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (seq !== speakSeq) break;
+  const { sentences, remainder } = splitSentences(text);
+  const lastChunk = remainder.trim();
+  if (lastChunk) sentences.push(lastChunk);
 
-      const text = decoder.decode(value, { stream: true });
-      for (const line of text.split("\n")) {
-        if (!line.startsWith("data: ")) continue;
-        const payload = line.slice(6);
-        if (payload === "[DONE]" || payload === '"[ERROR]"') continue;
-
-        try {
-          const chunk: string = JSON.parse(payload);
-          fullText += chunk;
-          buffer += chunk;
-        } catch {
-          continue;
-        }
-
-        const { sentences, remainder } = splitSentences(buffer);
-        buffer = remainder;
-        for (const sentence of sentences) {
-          audioQueue.push(fetchTTS(sentence));
-        }
-      }
-    }
-  } catch {
-    // Stream read error — work with what we have
-  }
-
-  // Flush remaining text as a final sentence
-  const remaining = buffer.trim();
-  if (remaining) {
-    audioQueue.push(fetchTTS(remaining));
-  }
-
-  // Start audio playback in the background — don't block text return
+  const audioQueue = sentences.map((s) => fetchTTS(s));
   void drainAudioQueue(audioQueue, seq);
 
-  return fullText;
+  return text;
 }
