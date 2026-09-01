@@ -34,10 +34,11 @@ export function createAnthropicClient(
         .join("");
     },
     async *completeStream({ system, user, history }) {
-      const stream = anthropic.messages.stream({
+      const stream = await anthropic.messages.create({
         model,
         max_tokens: maxTokens,
         system,
+        stream: true,
         messages: [...(history ?? []), { role: "user", content: user }],
       });
       for await (const event of stream) {
