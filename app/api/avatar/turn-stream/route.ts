@@ -32,7 +32,8 @@ export async function POST(req: Request): Promise<Response> {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
         }
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-      } catch {
+      } catch (err) {
+        console.error("turn-stream error:", err);
         controller.enqueue(encoder.encode(`data: ${JSON.stringify("[ERROR]")}\n\n`));
       }
       controller.close();
