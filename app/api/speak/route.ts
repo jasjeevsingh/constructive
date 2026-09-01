@@ -1,4 +1,4 @@
-import { speakText } from "@/lib/ai/deepgram";
+import { speakTextStream } from "@/lib/ai/deepgram";
 import { MAX_SPEAK_TEXT_LENGTH } from "@/lib/ai/limits";
 
 export async function POST(req: Request): Promise<Response> {
@@ -18,10 +18,8 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   try {
-    const { audio, contentType } = await speakText(text);
-    // Buffer.concat yields Buffer<ArrayBufferLike>, which TS won't accept as BodyInit;
-    // a freshly-constructed Uint8Array is backed by a concrete ArrayBuffer.
-    return new Response(new Uint8Array(audio), {
+    const { stream, contentType } = await speakTextStream(text);
+    return new Response(stream, {
       status: 200,
       headers: { "content-type": contentType, "cache-control": "no-store" },
     });

@@ -47,3 +47,20 @@ export async function speakText(text: string): Promise<{ audio: Buffer; contentT
   const contentType = headers.get("content-type") ?? "audio/mpeg";
   return { audio, contentType };
 }
+
+/** Aura TTS — returns a ReadableStream of MP3 audio for streaming playback. */
+export async function speakTextStream(text: string): Promise<{ stream: ReadableStream; contentType: string }> {
+  const trimmed = text.trim();
+  if (!trimmed) throw new Error("empty text");
+
+  const response = await getClient().speak.request(
+    { text: trimmed },
+    { model: AURA_MODEL, encoding: "mp3" }
+  );
+  const dgStream = await response.getStream();
+  if (!dgStream) throw new Error("Deepgram speak returned no audio");
+
+  const headers = await response.getHeaders();
+  const contentType = headers.get("content-type") ?? "audio/mpeg";
+  return { stream: dgStream, contentType };
+}

@@ -5,6 +5,7 @@ export type ChatTurn = { role: "user" | "assistant"; content: string };
 
 export interface ChatClient {
   complete(args: { system: string; user: string; history?: ChatTurn[] }): Promise<string>;
+  completeStream?(args: { system: string; user: string; history?: ChatTurn[] }): AsyncIterable<string>;
 }
 
 const ANTHROPIC_MODEL = process.env.COACH_MODEL ?? "claude-sonnet-5";
@@ -31,6 +32,19 @@ export function createAnthropicClient(
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
         .map((b) => b.text)
         .join("");
+    },
+    async *completeStream({ system, user, history }) {
+      const stream = anthropic.messages.stream({
+        model,
+        max_tokens: maxTokens,
+        system,
+        messages: [...(history ?? []), { role: "user", content: user }],
+      });
+      for await (const event of stream) {
+        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+          yield event.delta.text;
+        }
+      }
     },
   };
 }
@@ -63,6 +77,23 @@ export function createOpenAIClient(
       if (!text) throw new Error("OpenAI returned empty content");
       return text;
     },
+    async *completeStream({ system, user, history }) {
+      const stream = await openai.chat.completions.create({
+        model,
+        max_tokens: maxTokens,
+        stream: true,
+        messages: [
+          { role: "system", content: system },
+          ...(history ?? []),
+          { role: "user", content: user },
+        ],
+        ...(json ? { response_format: { type: "json_object" as const } } : {}),
+      });
+      for await (const chunk of stream) {
+        const delta = chunk.choices[0]?.delta?.content;
+        if (delta) yield delta;
+      }
+    },
   };
 }
 
@@ -84,6 +115,14 @@ export function createFallbackClient(
         }
       }
       return fallback!.complete(args);
+    },
+    async *completeStream(args) {
+      const source = primary?.completeStream ? primary : fallback;
+      if (!source?.completeStream) {
+        yield await (primary ?? fallback)!.complete(args);
+        return;
+      }
+      yield* source.completeStream(args);
     },
   };
 }
