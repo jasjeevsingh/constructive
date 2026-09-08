@@ -56,6 +56,7 @@ export async function GET() {
     const entries = await Promise.all(
       blobs.map(async (blob) => {
         const result = await get(blob.url, { access: "private" });
+        if (!result?.stream) return null;
         const reader = result.stream.getReader();
         const chunks: Uint8Array[] = [];
         for (;;) {
@@ -67,8 +68,9 @@ export async function GET() {
         return { ...data, id: blob.pathname };
       }),
     );
-    entries.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-    return Response.json(entries);
+    const filtered = entries.filter((e): e is NonNullable<typeof e> => e !== null);
+    filtered.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+    return Response.json(filtered);
   } catch (err) {
     console.error("feedback list failed:", err instanceof Error ? err.message : err);
     return Response.json({ error: "could not list feedback" }, { status: 503 });
