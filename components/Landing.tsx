@@ -19,6 +19,7 @@ export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
           <li><span className="font-medium text-foreground">Read the lesson below</span> — walk through Claim, Link, and Impact with a worked example.</li>
           <li><span className="font-medium text-foreground">Pick a motion</span> and argue both sides to build your core skills.</li>
           <li><span className="font-medium text-foreground">Bring your own universe</span> (optional) — practice with stories you already know.</li>
+          <li><span className="font-medium text-foreground">Spar with the Debate Avatar</span> — argue against an AI opponent.</li>
         </ol>
       </div>
       <Button type="button" variant="outline" className="mt-4" onClick={onOpenLesson}>

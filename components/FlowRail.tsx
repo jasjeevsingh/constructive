@@ -1,4 +1,5 @@
 "use client";
+import type { ReactNode } from "react";
 import { STAGES, STAGE_LABELS, stageIndex, type FlowStage } from "@/lib/state/flowMachine";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -17,9 +18,12 @@ function dotClasses(state: StepState): string {
 export function FlowRail({
   stage,
   onSelect,
+  children,
 }: {
   stage: FlowStage;
   onSelect?: (stage: FlowStage) => void;
+  /** Rendered under the steps on desktop and under the stepper on mobile (e.g. the CLI cheat sheet). */
+  children?: ReactNode;
 }) {
   const cur = stageIndex(stage);
   const pct = (cur / (STAGES.length - 1)) * 100;
@@ -41,6 +45,7 @@ export function FlowRail({
             );
           })}
         </ol>
+        {children && <div className="mt-6">{children}</div>}
       </nav>
 
       {/* Mobile: horizontal stepper */}
@@ -62,6 +67,7 @@ export function FlowRail({
             );
           })}
         </ol>
+        {children && <div className="mt-3">{children}</div>}
       </nav>
     </>
   );

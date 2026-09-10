@@ -1,17 +1,24 @@
-export type FlowStage = "read" | "claim" | "link" | "impact";
-export type ReadSubstep = "restate" | "keyword";
+export type FlowStage = "claim" | "link" | "impact";
 export type Side = "for" | "against";
 
-export const STAGES: FlowStage[] = ["read", "claim", "link", "impact"];
-export const READ_SUBSTEPS: ReadSubstep[] = ["restate", "keyword"];
+/** The journey is Claim → Link → Impact. The old "Read the motion" stage was
+ *  retired after the Sept 2026 live test: students wanted to jump straight to
+ *  their claim, and key terms now live as an optional strip on the Claim stage. */
+export const STAGES: FlowStage[] = ["claim", "link", "impact"];
 export const SIDES: Side[] = ["for", "against"];
 
+/** Stage name stored by pre-retirement clients; loads as "claim". */
+export const LEGACY_READ_STAGE = "read";
+
 export const STAGE_LABELS: Record<FlowStage, string> = {
-  read: "Read the motion",
   claim: "Claim",
   link: "Link",
   impact: "Impact",
 };
+
+export function isFlowStage(v: unknown): v is FlowStage {
+  return typeof v === "string" && (STAGES as string[]).includes(v);
+}
 
 export function stageIndex(s: FlowStage): number {
   return STAGES.indexOf(s);

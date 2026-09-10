@@ -79,7 +79,7 @@ export function ClaimStage({
   return (
     <div>
       <StageHeader
-        eyebrow="Stage 2 · Claim"
+        eyebrow="Stage 1 · Claim"
         prompt={`What's your strongest claim ${side === "for" ? "for" : "against"} this motion?`}
       />
 

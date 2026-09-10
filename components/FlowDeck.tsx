@@ -144,9 +144,10 @@ export function FlowDeck() {
           })}
         </div>
       </section>
+      <PracticeDeck onPick={setPracticePart} />
       <UniverseGenerator onOpen={(m, side) => setActive({ motion: m, side })} />
       <section className="mt-12">
-        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 3 · Spar with an AI</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 4 · Spar with an AI</div>
         <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Debate Avatar</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Practice debating against an AI opponent. Choose your mode: structured sparring, pushback coaching, or collaborative build + debate.
@@ -155,7 +156,6 @@ export function FlowDeck() {
           Debate Avatar →
         </Button>
       </section>
-      <PracticeDeck onPick={setPracticePart} />
     </AppShell>
   );
 }

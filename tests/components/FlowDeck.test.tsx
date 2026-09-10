@@ -25,8 +25,9 @@ describe("FlowDeck", () => {
     await userEvent.click(screen.getByRole("button", { name: /let kids vote/i }));
     // Fresh motion → side picker first.
     await userEvent.click(screen.getByRole("button", { name: /argue for first/i }));
-    // FlowShell → RestateStep prompt.
-    expect(await screen.findByText(/your own words/i)).toBeInTheDocument();
+    // FlowShell opens straight on the Claim stage — no "read the motion" step.
+    expect(await screen.findByText(/strongest claim for/i)).toBeInTheDocument();
+    expect(screen.queryByText(/your own words/i)).toBeNull();
   });
 
   it("shows the completed badge for a finished motion (hydrated from localStorage)", async () => {
@@ -34,7 +35,7 @@ describe("FlowDeck", () => {
       FLOW_STORAGE_KEY,
       JSON.stringify({
         "m-kids-vote": {
-          side: "against", stage: "impact", readSubstep: "restate", restate: "x",
+          side: "against", stage: "impact",
           keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "y",
           forComplete: true, againstComplete: true,
         },
@@ -116,5 +117,19 @@ describe("FlowDeck", () => {
   it("renders a Debate Avatar entry card", () => {
     render(<FlowDeck />);
     expect(screen.getByRole("button", { name: /debate avatar/i })).toBeInTheDocument();
+  });
+
+  it("orders the home page: motions, then practice reps, then your own universe, then the avatar", () => {
+    render(<FlowDeck />);
+    const order = [
+      screen.getByRole("heading", { name: /pick a motion/i }),
+      screen.getByRole("heading", { name: /practice a skill/i }),
+      screen.getByText(/step 3 · your own universe/i),
+      screen.getByText(/step 4 · spar/i),
+    ];
+    for (let i = 1; i < order.length; i++) {
+      // DOCUMENT_POSITION_FOLLOWING (4): the later section comes after the earlier one.
+      expect(order[i - 1].compareDocumentPosition(order[i]) & 4).toBeTruthy();
+    }
   });
 });

@@ -41,7 +41,7 @@ export function ImpactStage({
 
   return (
     <div>
-      <StageHeader eyebrow="Stage 4 · Impact" prompt="Why does your argument matter beyond the debate?" />
+      <StageHeader eyebrow="Stage 3 · Impact" prompt="Why does your argument matter beyond the debate?" />
       <div className="mb-4 rounded-lg border border-evidence bg-evidence/10 p-3">
         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Your claim

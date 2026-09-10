@@ -1,26 +1,31 @@
 import { describe, it, expect } from "vitest";
 import {
-  STAGES, READ_SUBSTEPS, SIDES, nextStage, prevStage, stageIndex, isLastStage, otherSideUnlocked,
+  STAGES, SIDES, STAGE_LABELS, nextStage, prevStage, stageIndex, isLastStage, isFlowStage, otherSideUnlocked,
 } from "@/lib/state/flowMachine";
 
 describe("flowMachine", () => {
-  it("declares stages, read substeps, and sides in order", () => {
-    expect(STAGES).toEqual(["read", "claim", "link", "impact"]);
-    expect(READ_SUBSTEPS).toEqual(["restate", "keyword"]);
+  it("declares the three stages and the sides in order", () => {
+    expect(STAGES).toEqual(["claim", "link", "impact"]);
     expect(SIDES).toEqual(["for", "against"]);
+    expect(Object.keys(STAGE_LABELS)).toEqual(STAGES);
   });
   it("advances and clamps at the end", () => {
-    expect(nextStage("read")).toBe("claim");
+    expect(nextStage("claim")).toBe("link");
     expect(nextStage("impact")).toBe("impact");
   });
   it("goes back and clamps at the start", () => {
-    expect(prevStage("claim")).toBe("read");
-    expect(prevStage("read")).toBe("read");
+    expect(prevStage("link")).toBe("claim");
+    expect(prevStage("claim")).toBe("claim");
   });
   it("reports index and last-stage", () => {
-    expect(stageIndex("link")).toBe(2);
+    expect(stageIndex("link")).toBe(1);
     expect(isLastStage("impact")).toBe(true);
-    expect(isLastStage("read")).toBe(false);
+    expect(isLastStage("claim")).toBe(false);
+  });
+  it("recognises only live stage names", () => {
+    expect(isFlowStage("claim")).toBe(true);
+    expect(isFlowStage("read")).toBe(false);
+    expect(isFlowStage(3)).toBe(false);
   });
   it("unlocks the other side once either side is complete", () => {
     expect(otherSideUnlocked({ forComplete: false, againstComplete: false })).toBe(false);
