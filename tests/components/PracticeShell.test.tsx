@@ -28,6 +28,12 @@ describe("PracticeShell", () => {
     expect(screen.getByRole("button", { name: /test the bridge/i })).toBeInTheDocument();
   });
 
+  it("names the motion and the argument being built in the header of a link drill", () => {
+    render(<PracticeShell part="link" onExit={() => {}} />);
+    expect(screen.getByText(/^This House/)).toBeInTheDocument();
+    expect(screen.getByText(/building on:/i)).toBeInTheDocument();
+  });
+
   it("completes an impact rep, increments the count, and serves a fresh rep", async () => {
     render(<PracticeShell part="impact" onExit={() => {}} />);
     expect(screen.getByText(/why does your argument matter beyond the debate/i)).toBeInTheDocument();
@@ -57,6 +63,7 @@ describe("sideForPracticeItem", () => {
     expect(
       sideForPracticeItem({
         part: "link",
+        motion: "This House would ban homework.",
         scenario: { id: "s1", claim: "c", impact: "i", candidates: [] },
       })
     ).toBeNull();

@@ -6,7 +6,7 @@ export type PracticePart = "claim" | "link" | "impact";
 
 export type PracticeItem =
   | { part: "claim"; motion: string; side: Side; claims: { id: string; claim: string }[] }
-  | { part: "link"; scenario: LinkScenario }
+  | { part: "link"; motion: string; scenario: LinkScenario }
   | { part: "impact"; motion: string; claim: string; authoredImpact: string };
 
 const SIDES: Side[] = ["for", "against"];
@@ -45,7 +45,7 @@ export function drawItem(
   const claim = pick(claims, rand);
   if (part === "link") {
     // Practice-namespaced id keeps drill Link progress isolated from the journey.
-    return { part: "link", scenario: claimToScenario(`practice:${motion.id}`, claim) };
+    return { part: "link", motion: motion.motion, scenario: claimToScenario(`practice:${motion.id}`, claim) };
   }
   return { part: "impact", motion: motion.motion, claim: claim.claim, authoredImpact: claim.impact };
 }

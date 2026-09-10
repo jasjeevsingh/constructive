@@ -47,28 +47,41 @@ function seedProgress(motionId: string, overrides: Partial<FlowProgress> & { sid
 }
 
 describe("FlowShell", () => {
-  it("pins the motion, starts on Read/Restate, and locks AGAINST", () => {
+  it("pins the motion, starts on Claim, and locks AGAINST", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(screen.getAllByText(/let kids vote/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/your own words/i)).toBeInTheDocument();
+    expect(screen.getByText(/strongest claim for/i)).toBeInTheDocument();
+    expect(screen.queryByText(/your own words/i)).toBeNull();
     // AGAINST shown locked.
     expect(screen.getByText(/against/i)).toBeInTheDocument();
     expect(screen.getByText(/🔒/)).toBeInTheDocument();
   });
 
-  it("advances Restate → Keywords within the Read stage", async () => {
+  it("hides the key-terms strip when no keyword needs defining", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
-    await userEvent.type(screen.getByRole("textbox"), "kids should get a say");
-    await userEvent.click(screen.getByRole("button", { name: /submit/i }));
-    await userEvent.click(await screen.findByRole("button", { name: /next: keywords/i }));
-    // Keyword stage renders the clickable motion (the gold keyword "kids").
-    expect(await screen.findByText("kids")).toBeInTheDocument();
+    expect(screen.queryByTestId("key-terms-strip")).toBeNull();
+  });
+
+  it("offers an optional key-terms strip above Claim when a keyword has a hint", async () => {
+    const ambiguous: FlowMotion = { ...motion, keywords: [{ word: "kids", hint: "Age 5 or 17?" }] };
+    render(<FlowShell motion={ambiguous} onExit={() => {}} />);
+    expect(screen.getByTestId("key-terms-strip")).toBeInTheDocument();
+    // The Claim input is available right away — defining a term never blocks it.
+    expect(screen.getByText(/strongest claim for/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "kids" }));
+    expect(screen.getByText(/age 5 or 17/i)).toBeInTheDocument();
+  });
+
+  it("shows the CLI quick reference in the rail, highlighting the current stage", () => {
+    render(<FlowShell motion={motion} onExit={() => {}} />);
+    const sheets = screen.getAllByTestId("cli-cheatsheet");
+    expect(sheets.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByTestId("cheatsheet-current")[0]).toHaveTextContent(/^Claim/);
   });
 
   it("shows a completion state (not the Impact input) once the FOR side is complete", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+      [motion.id]: { side: "for", stage: "impact",         keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
     }));
     const onExit = vi.fn();
     render(<FlowShell motion={motion} onExit={onExit} />);
@@ -79,8 +92,7 @@ describe("FlowShell", () => {
 
   it("offers a switch to the AGAINST side once FOR is complete, landing on the AGAINST Claim stage", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+      [motion.id]: { side: "for", stage: "impact",         keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
     }));
     render(<FlowShell motion={motion} onExit={() => {}} />);
     const switchBtn = await screen.findByRole("button", { name: /argue the other side/i });
@@ -91,8 +103,7 @@ describe("FlowShell", () => {
 
   it("shows a both-sides-complete closure once AGAINST is also done", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+      [motion.id]: { side: "against", stage: "impact",         keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
     }));
     const onExit = vi.fn();
     render(<FlowShell motion={motion} onExit={onExit} />);
@@ -103,8 +114,7 @@ describe("FlowShell", () => {
 
   it("carries a celebration in the both-sides-complete panel", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+      [motion.id]: { side: "against", stage: "impact",         keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
     }));
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(await screen.findByTestId("both-sides-celebration")).toBeInTheDocument();
@@ -112,8 +122,7 @@ describe("FlowShell", () => {
 
   it("does not show the both-sides celebration when only one side is complete", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "for", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
+      [motion.id]: { side: "for", stage: "impact",         keywordAnswers: {}, mappedClaimId: "c-stake", impact: "y", forComplete: true, againstComplete: false },
     }));
     render(<FlowShell motion={motion} onExit={() => {}} />);
     await screen.findByText(/built the for case/i);
@@ -122,8 +131,7 @@ describe("FlowShell", () => {
 
   it("keeps back-to-motions usable immediately alongside the both-sides celebration", async () => {
     localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify({
-      [motion.id]: { side: "against", stage: "impact", readSubstep: "restate", restate: "x",
-        keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
+      [motion.id]: { side: "against", stage: "impact",         keywordAnswers: {}, mappedClaimId: "a-maturity", impact: "z", forComplete: true, againstComplete: true },
     }));
     const onExit = vi.fn();
     render(<FlowShell motion={motion} onExit={onExit} />);
@@ -162,17 +170,6 @@ describe("FlowShell", () => {
     expect(await screen.findByText(/strongest claim/i)).toBeInTheDocument();
   });
 
-  it("cross-fades from the Read stage into the Claim stage", async () => {
-    render(<FlowShell motion={motion} onExit={() => {}} />);
-    await userEvent.type(screen.getByRole("textbox"), "kids should get a say");
-    await userEvent.click(screen.getByRole("button", { name: /submit/i }));
-    await userEvent.click(await screen.findByRole("button", { name: /next: keywords/i }));
-    await screen.findByText("kids");
-    await userEvent.click(screen.getByRole("button", { name: /next: claim/i }));
-    // Claim stage content appears after the stage cross-fade settles.
-    expect(await screen.findByText(/strongest claim for/i)).toBeInTheDocument();
-  });
-
   it("offers the voice helper inside the journey", () => {
     render(<FlowShell motion={motion} onExit={() => {}} />);
     expect(screen.getByRole("button", { name: /talk it through/i })).toBeInTheDocument();
@@ -183,19 +180,20 @@ describe("FlowShell", () => {
       seedProgress(motion.id, {
         side: "for",
         stage: "impact",
-        restate: "kids deserve rights",
         mappedClaimId: "c-stake",
         impact: "y",
       });
     });
 
-    it("shows a Read recap without disturbing where you actually are", async () => {
+    it("shows a Claim recap without disturbing where you actually are", async () => {
       render(<FlowShell motion={motion} onExit={() => {}} />);
-      const railButtons = await screen.findAllByRole("button", { name: /read the motion$/i });
+      const railButtons = await screen.findAllByRole("button", { name: /claim$/i });
       await userEvent.click(railButtons[0]);
-      expect(await screen.findByText("kids deserve rights")).toBeInTheDocument();
+      const back = await screen.findByRole("button", { name: /back to where you were/i });
+      expect(screen.getByText(/revisiting a completed stage/i)).toBeInTheDocument();
+      expect(screen.getAllByText("Kids deserve a say.").length).toBeGreaterThanOrEqual(1);
 
-      await userEvent.click(screen.getByRole("button", { name: /back to where you were/i }));
+      await userEvent.click(back);
       expect(await screen.findByText(/say or type the impact/i)).toBeInTheDocument();
 
       const saved = JSON.parse(localStorage.getItem(FLOW_STORAGE_KEY)!)[motion.id];

@@ -40,6 +40,7 @@ describe("drawItem", () => {
   it("draws a link item with a practice-namespaced scenario id", () => {
     const item = drawItem("link", motions, () => 0);
     if (item.part !== "link") throw new Error("wrong part");
+    expect(item.motion).toBe("Motion one.");
     expect(item.scenario.id).toBe("practice:m1:c1");
     expect(item.scenario.candidates).toHaveLength(2);
   });

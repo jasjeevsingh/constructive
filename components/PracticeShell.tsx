@@ -46,7 +46,7 @@ function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () =
   usePublishHelperContext({
     activity: "practice",
     stage: part,
-    motion: item.part === "link" ? "" : item.motion,
+    motion: item.motion,
     side: sideForPracticeItem(item),
   });
 
@@ -64,7 +64,7 @@ function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () =
     setDone(false);
   }
 
-  const drilledMotion = item.part === "link" ? null : item.motion;
+  const drilledClaim = item.part === "link" ? item.scenario.claim : null;
 
   return (
     <AppShell>
@@ -77,8 +77,12 @@ function PracticeShellInner({ part, onExit }: { part: PracticePart; onExit: () =
             <div className="font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
               {TITLES[part]}
             </div>
-            {drilledMotion && (
-              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{drilledMotion}</p>
+            <p className="mt-1 max-w-xl text-sm text-muted-foreground">{item.motion}</p>
+            {drilledClaim && (
+              <p className="mt-1 max-w-xl text-sm text-foreground">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Building on: </span>
+                {drilledClaim}
+              </p>
             )}
           </div>
           <Badge variant="secondary" className="shrink-0">{count} done</Badge>

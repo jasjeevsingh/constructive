@@ -102,7 +102,7 @@ export function LinkCard({
 
   return (
     <div>
-      <StageHeader eyebrow="Stage 3 · Link" />
+      <StageHeader eyebrow="Stage 2 · Link" />
       <p className="mb-4 text-sm text-muted-foreground">
         Build the bridge: choose the planks that connect the claim to the impact. Strong bridges use{" "}
         <span className="font-medium text-evidence">evidence</span> and{" "}

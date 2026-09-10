@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getFlowMotions, getFlowMotion, flowMotionToMotion, claimToScenario } from "@/lib/flowMotions";
+import { getFlowMotions, getFlowMotion, claimToScenario } from "@/lib/flowMotions";
 
 describe("flow motions bank", () => {
   it("loads and validates the bank", () => {
@@ -37,11 +37,6 @@ describe("flow motions bank", () => {
         }
       }
     }
-  });
-  it("adapts a flow motion to a Motion (for KeywordStep)", () => {
-    const m = getFlowMotion("m-kids-vote")!;
-    const motion = flowMotionToMotion(m);
-    expect(motion).toEqual({ id: m.id, motion: m.motion, keywords: m.keywords, theme: "general" });
   });
   it("adapts a claim to a LinkScenario (for LinkCard)", () => {
     const c = getFlowMotion("m-kids-vote")!.sides.for.claims[0];

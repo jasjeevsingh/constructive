@@ -20,7 +20,8 @@ export function PracticeDeck({ onPick }: { onPick: (part: PracticePart) => void 
 
   return (
     <section className="mt-12">
-      <h2 className="font-display text-2xl font-semibold text-foreground">Practice a skill</h2>
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 2 · Guided reps</div>
+      <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Practice a skill</h2>
       <p className="mt-1 text-sm text-muted-foreground">Drill one part of the framework with quick reps.</p>
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {CARDS.map((c, i) => (

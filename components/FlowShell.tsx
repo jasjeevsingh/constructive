@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion as m } from "motion/react";
 import { transitions } from "@/lib/motion";
 import { useFlowProgress } from "@/lib/state/useFlowProgress";
-import { flowMotionToMotion, claimToScenario } from "@/lib/flowMotions";
+import { claimToScenario } from "@/lib/flowMotions";
 import { otherSideUnlocked, type FlowStage, type Side } from "@/lib/state/flowMachine";
-import { RestateStep } from "@/components/steps/RestateStep";
-import { KeywordStep } from "@/components/steps/KeywordStep";
+import { KeyTermsStrip } from "@/components/steps/KeyTermsStrip";
+import { CliCheatSheet } from "@/components/CliCheatSheet";
 import { ClaimStage } from "@/components/stages/ClaimStage";
 import { ImpactStage } from "@/components/stages/ImpactStage";
 import { LinkCard } from "@/components/LinkCard";
@@ -21,7 +21,7 @@ import {
   usePublishHelperContext,
 } from "@/components/helper/HelperContextProvider";
 import { HelperPanel } from "@/components/helper/HelperPanel";
-import type { FlowMotion, Keyword } from "@/lib/schemas";
+import type { FlowMotion } from "@/lib/schemas";
 
 export function FlowShell(props: { motion: FlowMotion; startSide?: Side; onExit: () => void }) {
   return (
@@ -41,7 +41,7 @@ function FlowShellInner({
   startSide?: Side;
   onExit: () => void;
 }) {
-  const [progress, update] = useFlowProgress(motion.id, startSide);
+  const [progress, update, hydrated] = useFlowProgress(motion.id, startSide);
   // Browsing a completed stage from the rail never touches `progress` — it's a
   // look-back, not navigation, so nothing here can push you backward or forward.
   const [viewStage, setViewStage] = useState<FlowStage | null>(null);
@@ -99,19 +99,20 @@ function FlowShellInner({
         </div>
 
         <div className="flex flex-1 flex-col md:flex-row">
-          <FlowRail stage={progress.stage} onSelect={setViewStage} />
+          <FlowRail stage={progress.stage} onSelect={setViewStage}>
+            <CliCheatSheet stage={viewStage ?? progress.stage} />
+          </FlowRail>
           <div className="flex-1 p-5 sm:p-6">
             <AnimatePresence mode="wait">
+              {hydrated && (
               <m.div
-                key={viewStage ? `view-${viewStage}` : `${progress.stage}-${progress.readSubstep}`}
+                key={viewStage ? `view-${viewStage}` : progress.stage}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={transitions.snappy}
               >
-                {viewStage === "read" ? (
-                  <ReadRecap motion={motion.motion} restate={progress.restate} keywords={motion.keywords} onReturn={returnToWhereYouWere} />
-                ) : viewStage === "claim" ? (
+                {viewStage === "claim" ? (
                   <ClaimRecap side={progress.side} claim={mappedClaim?.claim ?? null} onReturn={returnToWhereYouWere} />
                 ) : viewStage === "link" ? (
                   <div>
@@ -170,23 +171,16 @@ function FlowShellInner({
                   </div>
                 ) : (
                   <>
-                    {progress.stage === "read" && progress.readSubstep === "restate" && (
-                      <RestateStep
-                        motion={motion.motion}
-                        initial={progress.restate}
-                        onNext={(restate) => update({ restate, readSubstep: "keyword" })}
-                      />
-                    )}
-                    {progress.stage === "read" && progress.readSubstep === "keyword" && (
-                      <KeywordStep motion={flowMotionToMotion(motion)} onNext={() => update({ stage: "claim" })} />
-                    )}
                     {progress.stage === "claim" && (
-                      <ClaimStage
-                        motion={motion.motion}
-                        side={progress.side}
-                        claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
-                        onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
-                      />
+                      <>
+                        <KeyTermsStrip motion={motion.motion} keywords={motion.keywords} />
+                        <ClaimStage
+                          motion={motion.motion}
+                          side={progress.side}
+                          claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
+                          onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
+                        />
+                      </>
                     )}
                     {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && (
                       <ClaimStage
@@ -219,6 +213,7 @@ function FlowShellInner({
                   </>
                 )}
               </m.div>
+              )}
             </AnimatePresence>
           </div>
         </div>
@@ -238,48 +233,6 @@ function RevisitBanner({ onReturn }: { onReturn: () => void }) {
   );
 }
 
-function ReadRecap({
-  motion,
-  restate,
-  keywords,
-  onReturn,
-}: {
-  motion: string;
-  restate: string;
-  keywords: Keyword[];
-  onReturn: () => void;
-}) {
-  return (
-    <div>
-      <RevisitBanner onReturn={onReturn} />
-      <StageHeader eyebrow="Stage 1 · Read" />
-      <figure className="mb-4 border-l-4 border-border pl-3">
-        <figcaption className="text-xs font-medium uppercase tracking-wide text-muted-foreground">The motion</figcaption>
-        <blockquote className="font-display text-lg leading-snug text-foreground">{motion}</blockquote>
-      </figure>
-      {restate && (
-        <div className="rounded-lg border border-border bg-muted/40 p-3">
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your restatement</div>
-          <p className="mt-0.5 font-medium text-foreground">{restate}</p>
-        </div>
-      )}
-      {keywords.some((k) => k.hint) && (
-        <div className="mt-3 space-y-1.5">
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Keywords</div>
-          {keywords.map(
-            (k) =>
-              k.hint && (
-                <p key={k.word} className="text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground">{k.word}</span> — {k.hint}
-                </p>
-              )
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ClaimRecap({
   side,
   claim,
@@ -292,7 +245,7 @@ function ClaimRecap({
   return (
     <div>
       <RevisitBanner onReturn={onReturn} />
-      <StageHeader eyebrow="Stage 2 · Claim" />
+      <StageHeader eyebrow="Stage 1 · Claim" />
       {claim ? (
         <>
           <p className="text-sm text-muted-foreground">

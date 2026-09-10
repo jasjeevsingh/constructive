@@ -3,7 +3,6 @@ import {
   FlowMotionsFileSchema,
   type FlowMotion,
   type FlowClaim,
-  type Motion,
   type LinkScenario,
 } from "@/lib/schemas";
 
@@ -16,11 +15,6 @@ export function getFlowMotions(): FlowMotion[] {
 
 export function getFlowMotion(id: string): FlowMotion | undefined {
   return motions.find((m) => m.id === id);
-}
-
-/** KeywordStep expects a Motion; flow motions carry the same fields plus a fixed theme. */
-export function flowMotionToMotion(fm: FlowMotion): Motion {
-  return { id: fm.id, motion: fm.motion, keywords: fm.keywords, theme: "general" };
 }
 
 /**
