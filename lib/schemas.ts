@@ -16,7 +16,7 @@ export type Motion = z.infer<typeof MotionSchema>;
 
 export const MotionsFileSchema = z.array(MotionSchema);
 
-export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link", "claim", "impact"]);
+export const CoachStepSchema = z.enum(["restate", "keyword", "refine", "link", "claim", "impact", "choice"]);
 export type CoachStep = z.infer<typeof CoachStepSchema>;
 
 export const CoachTurnSchema = z.object({
@@ -67,6 +67,10 @@ export const ImpactResponseSchema = z.object({
   kind: z.literal("impact"),
   reaction: z.string(),
 });
+export const ChoiceResponseSchema = z.object({
+  kind: z.literal("choice"),
+  reaction: z.string(),
+});
 export const CoachResponseSchema = z.discriminatedUnion("kind", [
   RestateResponseSchema,
   KeywordResponseSchema,
@@ -74,6 +78,7 @@ export const CoachResponseSchema = z.discriminatedUnion("kind", [
   LinkResponseSchema,
   ClaimResponseSchema,
   ImpactResponseSchema,
+  ChoiceResponseSchema,
 ]);
 export type CoachResponse = z.infer<typeof CoachResponseSchema>;
 export type RefineVerdict = z.infer<typeof RefineVerdictSchema>;
@@ -103,17 +108,68 @@ export type LinkScenario = z.infer<typeof LinkScenarioSchema>;
 
 export const LinkScenariosFileSchema = z.array(LinkScenarioSchema);
 
+// --- Multiple-choice Claim and Impact (seeded bank only; generated motions stay open-input) ---
+
+export const ClaimChoiceVerdictSchema = z.enum(["strong", "too-broad", "not-contestable", "wrong-side"]);
+export type ClaimChoiceVerdict = z.infer<typeof ClaimChoiceVerdictSchema>;
+export const ImpactChoiceVerdictSchema = z.enum(["strong", "restates-claim", "different-claim", "no-scale"]);
+export type ImpactChoiceVerdict = z.infer<typeof ImpactChoiceVerdictSchema>;
+
+export const ClaimChoiceSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  verdict: ClaimChoiceVerdictSchema,
+  explanation: z.string().min(1),
+  /** The authored claim this option stands for; required (and only meaningful) on the strong option. */
+  claimId: z.string().min(1).optional(),
+});
+export type ClaimChoice = z.infer<typeof ClaimChoiceSchema>;
+
+export const ImpactChoiceSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  verdict: ImpactChoiceVerdictSchema,
+  explanation: z.string().min(1),
+});
+export type ImpactChoice = z.infer<typeof ImpactChoiceSchema>;
+
+function exactlyOneStrong(choices: { verdict: string }[]): boolean {
+  return choices.filter((c) => c.verdict === "strong").length === 1;
+}
+
 export const FlowClaimSchema = z.object({
   id: z.string().min(1),
   claim: z.string().min(1),
   impact: z.string().min(1),
   candidates: z.array(LinkCandidateSchema).min(2),
+  impactChoices: z
+    .array(ImpactChoiceSchema)
+    .min(2)
+    .refine(exactlyOneStrong, { message: "impactChoices needs exactly one strong option" })
+    .optional(),
 });
 export type FlowClaim = z.infer<typeof FlowClaimSchema>;
 
-export const FlowSideSchema = z.object({
-  claims: z.array(FlowClaimSchema),
-});
+export const FlowSideSchema = z
+  .object({
+    claims: z.array(FlowClaimSchema),
+    claimChoices: z
+      .array(ClaimChoiceSchema)
+      .min(2)
+      .refine(exactlyOneStrong, { message: "claimChoices needs exactly one strong option" })
+      .optional(),
+  })
+  .superRefine((side, ctx) => {
+    const strong = side.claimChoices?.find((c) => c.verdict === "strong");
+    if (!strong) return;
+    if (!strong.claimId || !side.claims.some((c) => c.id === strong.claimId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["claimChoices"],
+        message: "the strong claim choice must name an authored claim id on this side",
+      });
+    }
+  });
 
 export const FlowMotionSchema = z.object({
   id: z.string().min(1),

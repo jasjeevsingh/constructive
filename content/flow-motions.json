@@ -3,8 +3,14 @@
     "id": "m-kids-vote",
     "motion": "This House would let kids vote.",
     "keywords": [
-      { "word": "kids", "hint": "Age 5 or 17?" },
-      { "word": "vote", "hint": null }
+      {
+        "word": "kids",
+        "hint": "Age 5 or 17?"
+      },
+      {
+        "word": "vote",
+        "hint": null
+      }
     ],
     "sides": {
       "for": {
@@ -14,10 +20,60 @@
             "claim": "Kids deserve a say in decisions that affect their future.",
             "impact": "A government answerable to young people invests more in their long-term future.",
             "candidates": [
-              { "id": "c1", "text": "Politicians chase the votes they need, so youth issues rise up the agenda.", "material": "reasoning", "verdict": "fits", "explanation": "Links enfranchising kids to what politicians prioritize." },
-              { "id": "c2", "text": "Places that lowered the voting age saw more youth-focused budget measures.", "material": "evidence", "verdict": "fits", "explanation": "Evidence tying the vote to the investment impact." },
-              { "id": "c3", "text": "A Nobel Prize was awarded for research on voting systems.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative but says nothing about whether kids voting shifts investment." },
-              { "id": "c4", "text": "Kids can already hold part-time jobs in many places.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A maturity analogy that doesn't bridge to the investment impact." }
+              {
+                "id": "c1",
+                "text": "Politicians chase the votes they need, so youth issues rise up the agenda.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links enfranchising kids to what politicians prioritize."
+              },
+              {
+                "id": "c2",
+                "text": "Places that lowered the voting age saw more youth-focused budget measures.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence tying the vote to the investment impact."
+              },
+              {
+                "id": "c3",
+                "text": "A Nobel Prize was awarded for research on voting systems.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative but says nothing about whether kids voting shifts investment."
+              },
+              {
+                "id": "c4",
+                "text": "Kids can already hold part-time jobs in many places.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A maturity analogy that doesn't bridge to the investment impact."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "A government answerable to young people invests more in their long-term future.",
+                "verdict": "strong",
+                "explanation": "It says what changes in the world, and for a whole generation. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So kids would finally get a say in their future.",
+                "verdict": "restates-claim",
+                "explanation": "That just repeats the claim. What changes once they have a say?"
+              },
+              {
+                "id": "i-other",
+                "text": "Teens would get real practice using what they learn in civics class.",
+                "verdict": "different-claim",
+                "explanation": "A real impact, but it follows from a different claim about civics lessons, not from kids deserving a say."
+              },
+              {
+                "id": "i-small",
+                "text": "Some kids would feel a bit more included.",
+                "verdict": "no-scale",
+                "explanation": "Small and vague. How many kids, and what actually changes for them?"
+              }
             ]
           },
           {
@@ -25,10 +81,34 @@
             "claim": "Voting young builds a lifelong habit of participation.",
             "impact": "A generation of engaged, lifelong voters strengthens democracy.",
             "candidates": [
-              { "id": "c1", "text": "Casting a first vote while still in school builds a routine that carries into adulthood.", "material": "reasoning", "verdict": "fits", "explanation": "Links early voting to the lifelong-habit impact." },
-              { "id": "c2", "text": "Turnout studies show first voting at 16-17 predicts higher lifelong turnout.", "material": "evidence", "verdict": "fits", "explanation": "Direct evidence for the impact." },
-              { "id": "c3", "text": "Social media use among teens is at an all-time high.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "A striking stat that doesn't connect to voting habits." },
-              { "id": "c4", "text": "Adults sometimes forget to register.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About adults, not about kids building a habit." }
+              {
+                "id": "c1",
+                "text": "Casting a first vote while still in school builds a routine that carries into adulthood.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links early voting to the lifelong-habit impact."
+              },
+              {
+                "id": "c2",
+                "text": "Turnout studies show first voting at 16-17 predicts higher lifelong turnout.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Direct evidence for the impact."
+              },
+              {
+                "id": "c3",
+                "text": "Social media use among teens is at an all-time high.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "A striking stat that doesn't connect to voting habits."
+              },
+              {
+                "id": "c4",
+                "text": "Adults sometimes forget to register.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About adults, not about kids building a habit."
+              }
             ]
           },
           {
@@ -36,11 +116,62 @@
             "claim": "Teens learn civics in school right when they could use it.",
             "impact": "Voting reinforces classroom civics with real practice, producing better-informed citizens.",
             "candidates": [
-              { "id": "c1", "text": "Applying civics lessons to a real ballot cements the learning.", "material": "reasoning", "verdict": "fits", "explanation": "Links school civics + voting to informed citizens." },
-              { "id": "c2", "text": "Schools with mock-then-real voting programs report higher civic knowledge scores.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the informed-citizen impact." },
-              { "id": "c3", "text": "Most teenagers own a smartphone.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "True and modern-sounding, but unrelated to civic knowledge." },
-              { "id": "c4", "text": "Some adults can't name their representatives.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A point about adults, not about teens' classroom civics." }
+              {
+                "id": "c1",
+                "text": "Applying civics lessons to a real ballot cements the learning.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links school civics + voting to informed citizens."
+              },
+              {
+                "id": "c2",
+                "text": "Schools with mock-then-real voting programs report higher civic knowledge scores.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the informed-citizen impact."
+              },
+              {
+                "id": "c3",
+                "text": "Most teenagers own a smartphone.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "True and modern-sounding, but unrelated to civic knowledge."
+              },
+              {
+                "id": "c4",
+                "text": "Some adults can't name their representatives.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A point about adults, not about teens' classroom civics."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Kids deserve a say in decisions that affect their future.",
+            "verdict": "strong",
+            "explanation": "Specific, takes a side, and the other team can fight it. That's a claim.",
+            "claimId": "c-stake"
+          },
+          {
+            "id": "k-broad",
+            "text": "Voting is important.",
+            "verdict": "too-broad",
+            "explanation": "A theme, not a stance about kids. The other side has nothing to push against."
+          },
+          {
+            "id": "k-fact",
+            "text": "Kids are affected by laws that adults pass.",
+            "verdict": "not-contestable",
+            "explanation": "True, but nobody would argue against it. A fact, not a claim."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Kids are too young to understand politics.",
+            "verdict": "wrong-side",
+            "explanation": "That's the AGAINST case. Your claim has to argue for your side."
           }
         ]
       },
@@ -51,10 +182,60 @@
             "claim": "Most young kids don't yet have the experience to weigh complex trade-offs.",
             "impact": "Rushed votes from unprepared voters lead to worse collective decisions.",
             "candidates": [
-              { "id": "c1", "text": "Big policy choices involve trade-offs that take years of context to judge.", "material": "reasoning", "verdict": "fits", "explanation": "Links limited experience to weaker decisions." },
-              { "id": "c2", "text": "Studies show reasoning about long-term trade-offs keeps developing through the teen years.", "material": "evidence", "verdict": "fits", "explanation": "Evidence that the capacity is still forming." },
-              { "id": "c3", "text": "A famous economist won a prize for work on voting paradoxes.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative but about voting math, not kids' readiness." },
-              { "id": "c4", "text": "Kids can already use social media.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Unrelated to weighing policy trade-offs." }
+              {
+                "id": "c1",
+                "text": "Big policy choices involve trade-offs that take years of context to judge.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links limited experience to weaker decisions."
+              },
+              {
+                "id": "c2",
+                "text": "Studies show reasoning about long-term trade-offs keeps developing through the teen years.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence that the capacity is still forming."
+              },
+              {
+                "id": "c3",
+                "text": "A famous economist won a prize for work on voting paradoxes.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative but about voting math, not kids' readiness."
+              },
+              {
+                "id": "c4",
+                "text": "Kids can already use social media.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Unrelated to weighing policy trade-offs."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Rushed votes from unprepared voters lead to worse collective decisions.",
+                "verdict": "strong",
+                "explanation": "It names the consequence for everyone, not just the young voters. That's scale."
+              },
+              {
+                "id": "i-restate",
+                "text": "So kids would be voting without enough experience.",
+                "verdict": "restates-claim",
+                "explanation": "Repeats the claim. It doesn't say what happens next."
+              },
+              {
+                "id": "i-other",
+                "text": "Kids would be robbed of their childhood by adult duties.",
+                "verdict": "different-claim",
+                "explanation": "Belongs to the 'burden' argument, not the experience one."
+              },
+              {
+                "id": "i-small",
+                "text": "A few votes might be a little less thought-through.",
+                "verdict": "no-scale",
+                "explanation": "Too small to matter. Why would a whole election come out worse?"
+              }
             ]
           },
           {
@@ -62,10 +243,34 @@
             "claim": "Younger voters are easier to sway with slogans and pressure.",
             "impact": "Elections get decided by manipulation rather than reasoning.",
             "candidates": [
-              { "id": "c1", "text": "Simple, emotional messaging lands harder when someone has less practice spotting spin.", "material": "reasoning", "verdict": "fits", "explanation": "Links persuadability to manipulated outcomes." },
-              { "id": "c2", "text": "Media-literacy research finds younger teens are more influenced by viral claims.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the manipulation risk." },
-              { "id": "c3", "text": "Voter turnout hit record highs in a recent election.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive turnout stat, but says nothing about manipulation." },
-              { "id": "c4", "text": "Adults are sometimes swayed by ads too.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About adults; doesn't bridge to kids specifically." }
+              {
+                "id": "c1",
+                "text": "Simple, emotional messaging lands harder when someone has less practice spotting spin.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links persuadability to manipulated outcomes."
+              },
+              {
+                "id": "c2",
+                "text": "Media-literacy research finds younger teens are more influenced by viral claims.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the manipulation risk."
+              },
+              {
+                "id": "c3",
+                "text": "Voter turnout hit record highs in a recent election.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Impressive turnout stat, but says nothing about manipulation."
+              },
+              {
+                "id": "c4",
+                "text": "Adults are sometimes swayed by ads too.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About adults; doesn't bridge to kids specifically."
+              }
             ]
           },
           {
@@ -73,11 +278,62 @@
             "claim": "Voting is a serious responsibility that shouldn't be forced on children.",
             "impact": "Pushing adult duties onto kids robs them of childhood.",
             "candidates": [
-              { "id": "c1", "text": "Loading civic obligations onto kids crowds out the freedom to just be a kid.", "material": "reasoning", "verdict": "fits", "explanation": "Links the duty to lost childhood." },
-              { "id": "c2", "text": "Child-development guidance warns against overloading kids with adult responsibilities.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the childhood-burden impact." },
-              { "id": "c3", "text": "Some countries have compulsory voting with heavy fines.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Real fact about adults' compulsory voting — not about burdening kids." },
-              { "id": "c4", "text": "Kids get pocket money.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Irrelevant to the responsibility burden." }
+              {
+                "id": "c1",
+                "text": "Loading civic obligations onto kids crowds out the freedom to just be a kid.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links the duty to lost childhood."
+              },
+              {
+                "id": "c2",
+                "text": "Child-development guidance warns against overloading kids with adult responsibilities.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the childhood-burden impact."
+              },
+              {
+                "id": "c3",
+                "text": "Some countries have compulsory voting with heavy fines.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Real fact about adults' compulsory voting — not about burdening kids."
+              },
+              {
+                "id": "c4",
+                "text": "Kids get pocket money.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Irrelevant to the responsibility burden."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Most young kids don't yet have the experience to weigh complex trade-offs.",
+            "verdict": "strong",
+            "explanation": "Specific and contestable: the other side can argue kids are more capable than this.",
+            "claimId": "a-maturity"
+          },
+          {
+            "id": "k-broad",
+            "text": "Letting kids vote is a bad idea.",
+            "verdict": "too-broad",
+            "explanation": "A verdict, not an argument. Bad why?"
+          },
+          {
+            "id": "k-fact",
+            "text": "Voting involves choosing between candidates.",
+            "verdict": "not-contestable",
+            "explanation": "Everyone agrees. There's nothing to debate."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Voting young builds a lifelong habit of participation.",
+            "verdict": "wrong-side",
+            "explanation": "That's the FOR case. Your claim has to argue against the motion."
           }
         ]
       }
@@ -87,8 +343,14 @@
     "id": "m-homework",
     "motion": "This House would ban homework.",
     "keywords": [
-      { "word": "ban", "hint": "A total ban, or limits? The strength of the wording matters." },
-      { "word": "homework", "hint": "Reading? Projects? What counts?" }
+      {
+        "word": "ban",
+        "hint": "A total ban, or limits? The strength of the wording matters."
+      },
+      {
+        "word": "homework",
+        "hint": "Reading? Projects? What counts?"
+      }
     ],
     "sides": {
       "for": {
@@ -98,10 +360,60 @@
             "claim": "Banning homework gives kids time to rest and be with family.",
             "impact": "Better-rested kids have stronger wellbeing and family relationships.",
             "candidates": [
-              { "id": "c1", "text": "Free evenings mean more sleep and family time.", "material": "reasoning", "verdict": "fits", "explanation": "Bridges the ban to the wellbeing impact." },
-              { "id": "c2", "text": "Studies link heavy homework loads to student stress and lost sleep.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the wellbeing impact." },
-              { "id": "c3", "text": "A widely cited study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Impressive, but it argues FOR homework — wrong direction for this impact." },
-              { "id": "c4", "text": "Homework teaches time management.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A different impact; doesn't connect to rest/family." }
+              {
+                "id": "c1",
+                "text": "Free evenings mean more sleep and family time.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Bridges the ban to the wellbeing impact."
+              },
+              {
+                "id": "c2",
+                "text": "Studies link heavy homework loads to student stress and lost sleep.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the wellbeing impact."
+              },
+              {
+                "id": "c3",
+                "text": "A widely cited study found homework raises standardized-test scores.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Impressive, but it argues FOR homework — wrong direction for this impact."
+              },
+              {
+                "id": "c4",
+                "text": "Homework teaches time management.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A different impact; doesn't connect to rest/family."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Better-rested kids have stronger wellbeing and family relationships.",
+                "verdict": "strong",
+                "explanation": "It says what the extra time leads to, for kids in general. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So students would have more free time in the evening.",
+                "verdict": "restates-claim",
+                "explanation": "Just the claim again. What does the free time lead to?"
+              },
+              {
+                "id": "i-other",
+                "text": "Poorer students would no longer be punished for lacking a quiet home.",
+                "verdict": "different-claim",
+                "explanation": "Real, but it's the equity argument's impact, not the rest one."
+              },
+              {
+                "id": "i-small",
+                "text": "Some kids might be slightly less tired on some days.",
+                "verdict": "no-scale",
+                "explanation": "Too small and hedged. Why does this matter at scale?"
+              }
             ]
           },
           {
@@ -109,10 +421,34 @@
             "claim": "Homework punishes kids who lack a quiet home or help.",
             "impact": "Removing homework narrows the gap between rich and poor students.",
             "candidates": [
-              { "id": "c1", "text": "Kids without a desk or help fall behind on homework they can't do at home.", "material": "reasoning", "verdict": "fits", "explanation": "Links homework to the equity gap." },
-              { "id": "c2", "text": "Achievement-gap research ties homework burden to home resources.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the equity impact." },
-              { "id": "c3", "text": "The best universities assign heavy reading loads.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Prestigious-sounding but irrelevant to K-12 equity." },
-              { "id": "c4", "text": "Some kids enjoy homework.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Preference, not the equity bridge." }
+              {
+                "id": "c1",
+                "text": "Kids without a desk or help fall behind on homework they can't do at home.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links homework to the equity gap."
+              },
+              {
+                "id": "c2",
+                "text": "Achievement-gap research ties homework burden to home resources.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the equity impact."
+              },
+              {
+                "id": "c3",
+                "text": "The best universities assign heavy reading loads.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Prestigious-sounding but irrelevant to K-12 equity."
+              },
+              {
+                "id": "c4",
+                "text": "Some kids enjoy homework.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Preference, not the equity bridge."
+              }
             ]
           },
           {
@@ -120,11 +456,62 @@
             "claim": "Without homework, class time can be used for real learning.",
             "impact": "Learning concentrated in school leads to deeper understanding.",
             "candidates": [
-              { "id": "c1", "text": "Teachers can guide practice in class instead of sending it home to struggle alone.", "material": "reasoning", "verdict": "fits", "explanation": "Links no-homework to in-class depth." },
-              { "id": "c2", "text": "Some no-homework schools report equal or better comprehension.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the understanding impact." },
-              { "id": "c3", "text": "The school day is six hours long on average.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "A neutral fact that doesn't bridge to deeper learning." },
-              { "id": "c4", "text": "Homework can be graded for credit.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About grading, not about in-class depth." }
+              {
+                "id": "c1",
+                "text": "Teachers can guide practice in class instead of sending it home to struggle alone.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links no-homework to in-class depth."
+              },
+              {
+                "id": "c2",
+                "text": "Some no-homework schools report equal or better comprehension.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the understanding impact."
+              },
+              {
+                "id": "c3",
+                "text": "The school day is six hours long on average.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "A neutral fact that doesn't bridge to deeper learning."
+              },
+              {
+                "id": "c4",
+                "text": "Homework can be graded for credit.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About grading, not about in-class depth."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Banning homework gives kids time to rest and be with family.",
+            "verdict": "strong",
+            "explanation": "Specific, takes a side, and gives the other team something real to push against.",
+            "claimId": "c-rest"
+          },
+          {
+            "id": "k-broad",
+            "text": "Homework is bad for students.",
+            "verdict": "too-broad",
+            "explanation": "A feeling, not a claim. Bad how, and for whom?"
+          },
+          {
+            "id": "k-fact",
+            "text": "Homework is work students do outside of class.",
+            "verdict": "not-contestable",
+            "explanation": "A definition. Nobody disagrees, so there's nothing to argue."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Practice at home is how skills actually stick.",
+            "verdict": "wrong-side",
+            "explanation": "That argues AGAINST the ban. Your claim has to argue for it."
           }
         ]
       },
@@ -135,10 +522,60 @@
             "claim": "Practice at home is how skills actually stick.",
             "impact": "Without homework, students master less and fall behind.",
             "candidates": [
-              { "id": "c1", "text": "Repeating a skill on your own is what moves it into long-term memory.", "material": "reasoning", "verdict": "fits", "explanation": "Links home practice to mastery." },
-              { "id": "c2", "text": "Studies link regular spaced practice to stronger retention.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the mastery impact." },
-              { "id": "c3", "text": "A widely cited study found homework raises standardized-test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Strong and on-topic-sounding, but it measures test scores, not the mastery mechanism claimed here." },
-              { "id": "c4", "text": "Some students dislike homework.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A preference, not a bridge to mastery." }
+              {
+                "id": "c1",
+                "text": "Repeating a skill on your own is what moves it into long-term memory.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links home practice to mastery."
+              },
+              {
+                "id": "c2",
+                "text": "Studies link regular spaced practice to stronger retention.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the mastery impact."
+              },
+              {
+                "id": "c3",
+                "text": "A widely cited study found homework raises standardized-test scores.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Strong and on-topic-sounding, but it measures test scores, not the mastery mechanism claimed here."
+              },
+              {
+                "id": "c4",
+                "text": "Some students dislike homework.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A preference, not a bridge to mastery."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Without homework, students master less and fall behind.",
+                "verdict": "strong",
+                "explanation": "It names what happens to students' learning over time. That's the consequence."
+              },
+              {
+                "id": "i-restate",
+                "text": "So students would get less practice at home.",
+                "verdict": "restates-claim",
+                "explanation": "Restates the claim. What's the consequence of less practice?"
+              },
+              {
+                "id": "i-other",
+                "text": "Students would grow up less organized and disciplined.",
+                "verdict": "different-claim",
+                "explanation": "That's the discipline argument's impact, not the practice one."
+              },
+              {
+                "id": "i-small",
+                "text": "A few students might forget a lesson now and then.",
+                "verdict": "no-scale",
+                "explanation": "Trivial. How many students, and what happens over a whole year?"
+              }
             ]
           },
           {
@@ -146,10 +583,34 @@
             "claim": "Homework builds time-management and self-discipline.",
             "impact": "Students grow into organized, independent adults.",
             "candidates": [
-              { "id": "c1", "text": "Planning and finishing work without a teacher watching builds self-management.", "material": "reasoning", "verdict": "fits", "explanation": "Links homework to independence." },
-              { "id": "c2", "text": "Longitudinal studies tie homework routines to later self-regulation.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the independence impact." },
-              { "id": "c3", "text": "The average backpack weighs several pounds.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "A concrete-sounding fact with no link to self-discipline." },
-              { "id": "c4", "text": "Homework can be done on a laptop.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About tools, not discipline." }
+              {
+                "id": "c1",
+                "text": "Planning and finishing work without a teacher watching builds self-management.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links homework to independence."
+              },
+              {
+                "id": "c2",
+                "text": "Longitudinal studies tie homework routines to later self-regulation.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the independence impact."
+              },
+              {
+                "id": "c3",
+                "text": "The average backpack weighs several pounds.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "A concrete-sounding fact with no link to self-discipline."
+              },
+              {
+                "id": "c4",
+                "text": "Homework can be done on a laptop.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About tools, not discipline."
+              }
             ]
           },
           {
@@ -157,11 +618,62 @@
             "claim": "Homework lets teachers and parents see where a student is struggling.",
             "impact": "Problems get caught and fixed earlier.",
             "candidates": [
-              { "id": "c1", "text": "Work done alone reveals gaps that in-class group work can hide.", "material": "reasoning", "verdict": "fits", "explanation": "Links homework to early detection." },
-              { "id": "c2", "text": "Teachers report using homework patterns to flag students who need help.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the early-intervention impact." },
-              { "id": "c3", "text": "Report cards are usually issued four times a year.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "A real fact about grading cadence, not about homework as a signal." },
-              { "id": "c4", "text": "Homework is often graded for points.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About grading, not about spotting struggles." }
+              {
+                "id": "c1",
+                "text": "Work done alone reveals gaps that in-class group work can hide.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links homework to early detection."
+              },
+              {
+                "id": "c2",
+                "text": "Teachers report using homework patterns to flag students who need help.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the early-intervention impact."
+              },
+              {
+                "id": "c3",
+                "text": "Report cards are usually issued four times a year.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "A real fact about grading cadence, not about homework as a signal."
+              },
+              {
+                "id": "c4",
+                "text": "Homework is often graded for points.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About grading, not about spotting struggles."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Practice at home is how skills actually stick.",
+            "verdict": "strong",
+            "explanation": "Specific and contestable: the other side can argue practice happens fine in class.",
+            "claimId": "a-practice"
+          },
+          {
+            "id": "k-broad",
+            "text": "Homework is good.",
+            "verdict": "too-broad",
+            "explanation": "Good how? There's nothing specific to defend."
+          },
+          {
+            "id": "k-fact",
+            "text": "Teachers assign homework to most students.",
+            "verdict": "not-contestable",
+            "explanation": "True and undebatable. A fact, not a stance."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Homework punishes kids who lack a quiet home or help.",
+            "verdict": "wrong-side",
+            "explanation": "That's the FOR case. Your claim has to argue against the ban."
           }
         ]
       }
@@ -171,8 +683,14 @@
     "id": "m-school-uniforms",
     "motion": "This House would require school uniforms.",
     "keywords": [
-      { "word": "require", "hint": "Mandatory for everyone, or optional with a default?" },
-      { "word": "uniforms", "hint": "A single item like a shirt, or a full standard outfit?" }
+      {
+        "word": "require",
+        "hint": "Mandatory for everyone, or optional with a default?"
+      },
+      {
+        "word": "uniforms",
+        "hint": "A single item like a shirt, or a full standard outfit?"
+      }
     ],
     "sides": {
       "for": {
@@ -182,10 +700,60 @@
             "claim": "Uniforms hide differences in how much a family can spend on clothes.",
             "impact": "Less appearance-based bullying and social division among students.",
             "candidates": [
-              { "id": "c1", "text": "When everyone dresses alike, expensive brands stop signaling who has money.", "material": "reasoning", "verdict": "fits", "explanation": "Bridges uniforms to reduced status signaling and bullying." },
-              { "id": "c2", "text": "Schools that adopted uniforms report fewer clothing-related bullying incidents.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the bullying-reduction impact." },
-              { "id": "c3", "text": "A famous fashion designer has studied how color affects mood.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds authoritative but is about color psychology, not bullying or wealth signaling." },
-              { "id": "c4", "text": "Uniforms are cheaper to buy in bulk for schools.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A cost argument, not a bridge to bullying reduction." }
+              {
+                "id": "c1",
+                "text": "When everyone dresses alike, expensive brands stop signaling who has money.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Bridges uniforms to reduced status signaling and bullying."
+              },
+              {
+                "id": "c2",
+                "text": "Schools that adopted uniforms report fewer clothing-related bullying incidents.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the bullying-reduction impact."
+              },
+              {
+                "id": "c3",
+                "text": "A famous fashion designer has studied how color affects mood.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Sounds authoritative but is about color psychology, not bullying or wealth signaling."
+              },
+              {
+                "id": "c4",
+                "text": "Uniforms are cheaper to buy in bulk for schools.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A cost argument, not a bridge to bullying reduction."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Less appearance-based bullying and social division among students.",
+                "verdict": "strong",
+                "explanation": "It says what changes across the whole school. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So nobody would be able to tell who has expensive clothes.",
+                "verdict": "restates-claim",
+                "explanation": "Repeats the claim. What changes because of that?"
+              },
+              {
+                "id": "i-other",
+                "text": "Students would feel more pride in belonging to their school.",
+                "verdict": "different-claim",
+                "explanation": "Real, but it follows from the shared-identity claim, not this one."
+              },
+              {
+                "id": "i-small",
+                "text": "A couple of students might get teased a little less.",
+                "verdict": "no-scale",
+                "explanation": "Too small. Why does this matter across a whole school?"
+              }
             ]
           },
           {
@@ -193,10 +761,34 @@
             "claim": "Uniforms remove the daily task of choosing and judging outfits.",
             "impact": "More classroom focus on learning instead of appearance.",
             "candidates": [
-              { "id": "c1", "text": "Without outfit choices to plan or judge, mornings and class time shift toward schoolwork.", "material": "reasoning", "verdict": "fits", "explanation": "Links removing outfit decisions to more focus on learning." },
-              { "id": "c2", "text": "Surveys of uniformed schools show students report less time worrying about clothes.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the focus impact." },
-              { "id": "c3", "text": "A university study found classroom lighting affects test scores.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding research, but about lighting, not uniforms or focus." },
-              { "id": "c4", "text": "Uniforms make laundry simpler for parents.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A convenience argument, not about classroom focus." }
+              {
+                "id": "c1",
+                "text": "Without outfit choices to plan or judge, mornings and class time shift toward schoolwork.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links removing outfit decisions to more focus on learning."
+              },
+              {
+                "id": "c2",
+                "text": "Surveys of uniformed schools show students report less time worrying about clothes.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the focus impact."
+              },
+              {
+                "id": "c3",
+                "text": "A university study found classroom lighting affects test scores.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding research, but about lighting, not uniforms or focus."
+              },
+              {
+                "id": "c4",
+                "text": "Uniforms make laundry simpler for parents.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A convenience argument, not about classroom focus."
+              }
             ]
           },
           {
@@ -204,11 +796,62 @@
             "claim": "Uniforms give students a visible, shared sense of belonging to their school.",
             "impact": "Stronger school pride and community identity.",
             "candidates": [
-              { "id": "c1", "text": "Wearing the same colors and crest visibly ties students to their school's identity.", "material": "reasoning", "verdict": "fits", "explanation": "Links shared dress to school pride." },
-              { "id": "c2", "text": "Schools that introduced uniforms report increases in attendance at school-spirit events.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the school-pride impact." },
-              { "id": "c3", "text": "Professional sports teams generate billions of dollars in jersey sales each year.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds relevant to shared dress, but it's about pro sports merchandising, not school identity." },
-              { "id": "c4", "text": "Some students prefer to express individuality through their clothing.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "An argument against uniforms, not a bridge to the identity impact." }
+              {
+                "id": "c1",
+                "text": "Wearing the same colors and crest visibly ties students to their school's identity.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links shared dress to school pride."
+              },
+              {
+                "id": "c2",
+                "text": "Schools that introduced uniforms report increases in attendance at school-spirit events.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the school-pride impact."
+              },
+              {
+                "id": "c3",
+                "text": "Professional sports teams generate billions of dollars in jersey sales each year.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Sounds relevant to shared dress, but it's about pro sports merchandising, not school identity."
+              },
+              {
+                "id": "c4",
+                "text": "Some students prefer to express individuality through their clothing.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "An argument against uniforms, not a bridge to the identity impact."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Uniforms hide differences in how much a family can spend on clothes.",
+            "verdict": "strong",
+            "explanation": "Specific, takes a side, and the other team can argue status shows up anyway.",
+            "claimId": "c-bullying"
+          },
+          {
+            "id": "k-broad",
+            "text": "Uniforms are good for schools.",
+            "verdict": "too-broad",
+            "explanation": "Good how? There's nothing to argue against."
+          },
+          {
+            "id": "k-fact",
+            "text": "Uniforms mean students wear the same clothes.",
+            "verdict": "not-contestable",
+            "explanation": "A definition, not a stance."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Uniforms strip away a student's ability to express who they are.",
+            "verdict": "wrong-side",
+            "explanation": "That's the AGAINST case."
           }
         ]
       },
@@ -219,10 +862,60 @@
             "claim": "Uniforms strip away a student's ability to express who they are through clothing.",
             "impact": "Students lose a healthy daily outlet for individuality, which hurts their sense of identity and confidence.",
             "candidates": [
-              { "id": "c1", "text": "Clothing choice is one of the few everyday ways students get to show their personality, and a uniform removes that outlet.", "material": "reasoning", "verdict": "fits", "explanation": "Links the uniform requirement to lost self-expression." },
-              { "id": "c2", "text": "Surveys of students at uniform-free schools report higher scores on measures of self-expression and confidence.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the identity/confidence impact." },
-              { "id": "c3", "text": "A well-known child psychologist's bestselling book explores how teenagers form identity through many different life experiences.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds directly relevant to identity, but it's about identity formation broadly, not specifically about clothing or uniforms." },
-              { "id": "c4", "text": "Uniforms are often made from more durable, long-lasting fabric.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About durability, not about self-expression." }
+              {
+                "id": "c1",
+                "text": "Clothing choice is one of the few everyday ways students get to show their personality, and a uniform removes that outlet.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links the uniform requirement to lost self-expression."
+              },
+              {
+                "id": "c2",
+                "text": "Surveys of students at uniform-free schools report higher scores on measures of self-expression and confidence.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the identity/confidence impact."
+              },
+              {
+                "id": "c3",
+                "text": "A well-known child psychologist's bestselling book explores how teenagers form identity through many different life experiences.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Sounds directly relevant to identity, but it's about identity formation broadly, not specifically about clothing or uniforms."
+              },
+              {
+                "id": "c4",
+                "text": "Uniforms are often made from more durable, long-lasting fabric.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About durability, not about self-expression."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Students lose a healthy daily outlet for individuality, which hurts their sense of identity and confidence.",
+                "verdict": "strong",
+                "explanation": "It names what students lose and why it matters to who they become. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So students can't choose their own clothes at school.",
+                "verdict": "restates-claim",
+                "explanation": "Restates the claim. What does losing that choice do?"
+              },
+              {
+                "id": "i-other",
+                "text": "Families would be forced to spend money on clothes they don't need.",
+                "verdict": "different-claim",
+                "explanation": "That's the cost argument's impact."
+              },
+              {
+                "id": "i-small",
+                "text": "Some students might be a bit annoyed in the morning.",
+                "verdict": "no-scale",
+                "explanation": "Too small and vague. What's really at stake?"
+              }
             ]
           },
           {
@@ -230,10 +923,34 @@
             "claim": "Requiring a specific uniform forces every family to buy extra, dedicated clothing regardless of what they already own.",
             "impact": "Removing the uniform requirement saves low-income families money and reduces financial strain.",
             "candidates": [
-              { "id": "c1", "text": "When a special outfit is mandatory, families can't rely on hand-me-downs or existing clothes, so they must spend more.", "material": "reasoning", "verdict": "fits", "explanation": "Links the mandatory uniform to added household cost." },
-              { "id": "c2", "text": "Surveys of parents at uniform schools report higher yearly clothing costs than parents at schools without a uniform policy.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the financial-strain impact." },
-              { "id": "c3", "text": "Government data show clothing prices overall have risen faster than inflation in recent years.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds directly on-topic for cost, but it's about general clothing inflation, not the added cost created specifically by a mandatory uniform." },
-              { "id": "c4", "text": "Kids grow out of any clothing quickly at this age.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "True of all clothes, not specific to the added burden a mandatory uniform creates." }
+              {
+                "id": "c1",
+                "text": "When a special outfit is mandatory, families can't rely on hand-me-downs or existing clothes, so they must spend more.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links the mandatory uniform to added household cost."
+              },
+              {
+                "id": "c2",
+                "text": "Surveys of parents at uniform schools report higher yearly clothing costs than parents at schools without a uniform policy.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the financial-strain impact."
+              },
+              {
+                "id": "c3",
+                "text": "Government data show clothing prices overall have risen faster than inflation in recent years.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Sounds directly on-topic for cost, but it's about general clothing inflation, not the added cost created specifically by a mandatory uniform."
+              },
+              {
+                "id": "c4",
+                "text": "Kids grow out of any clothing quickly at this age.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "True of all clothes, not specific to the added burden a mandatory uniform creates."
+              }
             ]
           },
           {
@@ -241,11 +958,62 @@
             "claim": "Uniforms don't stop status competition — it just shifts to shoes, bags, and accessories.",
             "impact": "The promised drop in bullying and appearance-based conflict doesn't materialize, so uniforms add cost without the benefit.",
             "candidates": [
-              { "id": "c1", "text": "When shirts and pants are identical, students wanting to show off status simply shift to the items a uniform doesn't cover, like shoes or backpacks.", "material": "reasoning", "verdict": "fits", "explanation": "Links the uniform to displaced, not reduced, status competition." },
-              { "id": "c2", "text": "Several studies comparing uniform and non-uniform schools find no significant difference in reported bullying rates.", "material": "evidence", "verdict": "fits", "explanation": "Evidence that the anti-bullying benefit doesn't hold up." },
-              { "id": "c3", "text": "A landmark study found strict dress codes are linked to improved classroom attendance.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding, but about attendance, not about whether uniforms reduce bullying or status competition." },
-              { "id": "c4", "text": "Uniforms are usually made from durable, easy-to-clean fabric.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "About fabric, unrelated to whether uniforms actually reduce status competition." }
+              {
+                "id": "c1",
+                "text": "When shirts and pants are identical, students wanting to show off status simply shift to the items a uniform doesn't cover, like shoes or backpacks.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links the uniform to displaced, not reduced, status competition."
+              },
+              {
+                "id": "c2",
+                "text": "Several studies comparing uniform and non-uniform schools find no significant difference in reported bullying rates.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence that the anti-bullying benefit doesn't hold up."
+              },
+              {
+                "id": "c3",
+                "text": "A landmark study found strict dress codes are linked to improved classroom attendance.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding, but about attendance, not about whether uniforms reduce bullying or status competition."
+              },
+              {
+                "id": "c4",
+                "text": "Uniforms are usually made from durable, easy-to-clean fabric.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "About fabric, unrelated to whether uniforms actually reduce status competition."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Uniforms strip away a student's ability to express who they are through clothing.",
+            "verdict": "strong",
+            "explanation": "Specific and contestable: the other side can argue expression happens in other ways.",
+            "claimId": "a-expression"
+          },
+          {
+            "id": "k-broad",
+            "text": "Uniforms are unfair.",
+            "verdict": "too-broad",
+            "explanation": "Unfair how, and to whom?"
+          },
+          {
+            "id": "k-fact",
+            "text": "Students have different tastes in clothing.",
+            "verdict": "not-contestable",
+            "explanation": "Obviously true. Nothing to debate."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Uniforms give students a visible, shared sense of belonging.",
+            "verdict": "wrong-side",
+            "explanation": "That's the FOR case."
           }
         ]
       }
@@ -255,8 +1023,14 @@
     "id": "m-phones-in-school",
     "motion": "This House would ban phones in school.",
     "keywords": [
-      { "word": "ban", "hint": "Only during class, or the whole campus, all day?" },
-      { "word": "phones", "hint": "Do smartwatches and tablets count too?" }
+      {
+        "word": "ban",
+        "hint": "Only during class, or the whole campus, all day?"
+      },
+      {
+        "word": "phones",
+        "hint": "Do smartwatches and tablets count too?"
+      }
     ],
     "sides": {
       "for": {
@@ -266,10 +1040,60 @@
             "claim": "Phones pull students' attention away from the lesson in front of them.",
             "impact": "Banning phones raises classroom focus and learning.",
             "candidates": [
-              { "id": "c1", "text": "Without a phone to check, a student's attention stays on the lesson.", "material": "reasoning", "verdict": "fits", "explanation": "Bridges removing phones to sustained classroom attention." },
-              { "id": "c2", "text": "Schools that banned phones saw test scores rise in follow-up studies.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the learning impact." },
-              { "id": "c3", "text": "A major tech company's internal study found office employees check phones every ten minutes.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding but about adult employees at work, not student learning in school." },
-              { "id": "c4", "text": "Phones can be used to quickly look up answers during class.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "An argument against banning, not a bridge to the focus impact." }
+              {
+                "id": "c1",
+                "text": "Without a phone to check, a student's attention stays on the lesson.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Bridges removing phones to sustained classroom attention."
+              },
+              {
+                "id": "c2",
+                "text": "Schools that banned phones saw test scores rise in follow-up studies.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the learning impact."
+              },
+              {
+                "id": "c3",
+                "text": "A major tech company's internal study found office employees check phones every ten minutes.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding but about adult employees at work, not student learning in school."
+              },
+              {
+                "id": "c4",
+                "text": "Phones can be used to quickly look up answers during class.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "An argument against banning, not a bridge to the focus impact."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Banning phones raises classroom focus and learning.",
+                "verdict": "strong",
+                "explanation": "It says what changes for learning, across every class. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So students wouldn't be looking at their phones in class.",
+                "verdict": "restates-claim",
+                "explanation": "Restates the claim. So what?"
+              },
+              {
+                "id": "i-other",
+                "text": "Students would talk to each other face to face more.",
+                "verdict": "different-claim",
+                "explanation": "That's the social-skills argument's impact."
+              },
+              {
+                "id": "i-small",
+                "text": "A student or two might catch one extra sentence of the lesson.",
+                "verdict": "no-scale",
+                "explanation": "Trivial. Why does it matter for a whole class over a year?"
+              }
             ]
           },
           {
@@ -277,10 +1101,34 @@
             "claim": "Cyberbullying often happens in real time during the school day.",
             "impact": "Removing phones cuts down on in-school harassment.",
             "candidates": [
-              { "id": "c1", "text": "Without a phone handy, students can't screenshot or message insults between classes.", "material": "reasoning", "verdict": "fits", "explanation": "Links removing phones to less real-time in-school harassment." },
-              { "id": "c2", "text": "Schools with phone bans report fewer reported incidents of in-school cyberbullying.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the harassment-reduction impact." },
-              { "id": "c3", "text": "A national survey found most teen bullying now happens online in general.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding statistic, but about bullying overall, not specifically reducing in-school incidents." },
-              { "id": "c4", "text": "Some students use phones to call a parent in an emergency.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "A safety consideration against the ban, not a bridge to reduced harassment." }
+              {
+                "id": "c1",
+                "text": "Without a phone handy, students can't screenshot or message insults between classes.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links removing phones to less real-time in-school harassment."
+              },
+              {
+                "id": "c2",
+                "text": "Schools with phone bans report fewer reported incidents of in-school cyberbullying.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the harassment-reduction impact."
+              },
+              {
+                "id": "c3",
+                "text": "A national survey found most teen bullying now happens online in general.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding statistic, but about bullying overall, not specifically reducing in-school incidents."
+              },
+              {
+                "id": "c4",
+                "text": "Some students use phones to call a parent in an emergency.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "A safety consideration against the ban, not a bridge to reduced harassment."
+              }
             ]
           },
           {
@@ -288,11 +1136,62 @@
             "claim": "Without phones to scroll, students talk to each other face to face.",
             "impact": "Stronger in-person social skills and friendships.",
             "candidates": [
-              { "id": "c1", "text": "Idle time once spent scrolling becomes time spent talking with classmates.", "material": "reasoning", "verdict": "fits", "explanation": "Bridges removing phones to more face-to-face interaction." },
-              { "id": "c2", "text": "Teachers at phone-free schools report more lunchtime conversation and group play.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the in-person social impact." },
-              { "id": "c3", "text": "A well-known psychologist wrote a bestselling book on rising anxiety among teens.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding, but about teen anxiety broadly, not specifically about in-person social skills from a phone ban." },
-              { "id": "c4", "text": "Group chats help students coordinate homework with each other.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "An argument for keeping phones, not a bridge to stronger in-person social skills." }
+              {
+                "id": "c1",
+                "text": "Idle time once spent scrolling becomes time spent talking with classmates.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Bridges removing phones to more face-to-face interaction."
+              },
+              {
+                "id": "c2",
+                "text": "Teachers at phone-free schools report more lunchtime conversation and group play.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the in-person social impact."
+              },
+              {
+                "id": "c3",
+                "text": "A well-known psychologist wrote a bestselling book on rising anxiety among teens.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding, but about teen anxiety broadly, not specifically about in-person social skills from a phone ban."
+              },
+              {
+                "id": "c4",
+                "text": "Group chats help students coordinate homework with each other.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "An argument for keeping phones, not a bridge to stronger in-person social skills."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "Phones pull students' attention away from the lesson in front of them.",
+            "verdict": "strong",
+            "explanation": "Specific, takes a side, and the other team can argue students can self-regulate.",
+            "claimId": "c-attention"
+          },
+          {
+            "id": "k-broad",
+            "text": "Phones are bad for kids.",
+            "verdict": "too-broad",
+            "explanation": "A theme, not a claim about school."
+          },
+          {
+            "id": "k-fact",
+            "text": "Most students own a phone.",
+            "verdict": "not-contestable",
+            "explanation": "A fact nobody disputes."
+          },
+          {
+            "id": "k-wrong",
+            "text": "In an emergency, a phone lets a student reach a parent immediately.",
+            "verdict": "wrong-side",
+            "explanation": "That's the AGAINST case."
           }
         ]
       },
@@ -303,10 +1202,34 @@
             "claim": "Phones give students instant access to research tools, calculators, and educational apps that support learning.",
             "impact": "Banning phones removes a resource that helps students learn more effectively.",
             "candidates": [
-              { "id": "c1", "text": "Being able to look something up or use an app mid-lesson turns a phone into an on-demand learning tool.", "material": "reasoning", "verdict": "fits", "explanation": "Links allowed phone use to a learning-support impact." },
-              { "id": "c2", "text": "Classrooms that allow supervised phone use for research report students completing more in-class research tasks.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the learning-support impact." },
-              { "id": "c3", "text": "A major university study found laptops in lectures are linked to improved note-taking.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding, but it's about laptops and note-taking specifically, not phones as a general learning resource." },
-              { "id": "c4", "text": "Phone batteries last much longer than they used to.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Irrelevant to whether phones help students learn." }
+              {
+                "id": "c1",
+                "text": "Being able to look something up or use an app mid-lesson turns a phone into an on-demand learning tool.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links allowed phone use to a learning-support impact."
+              },
+              {
+                "id": "c2",
+                "text": "Classrooms that allow supervised phone use for research report students completing more in-class research tasks.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the learning-support impact."
+              },
+              {
+                "id": "c3",
+                "text": "A major university study found laptops in lectures are linked to improved note-taking.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding, but it's about laptops and note-taking specifically, not phones as a general learning resource."
+              },
+              {
+                "id": "c4",
+                "text": "Phone batteries last much longer than they used to.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Irrelevant to whether phones help students learn."
+              }
             ]
           },
           {
@@ -314,10 +1237,60 @@
             "claim": "In an emergency, a phone lets a student immediately reach a parent or call for help.",
             "impact": "Banning phones removes a critical safety tool during emergencies like lockdowns or accidents.",
             "candidates": [
-              { "id": "c1", "text": "When seconds matter, having a phone in hand means a student doesn't have to wait for an adult or an office phone to get help.", "material": "reasoning", "verdict": "fits", "explanation": "Links keeping phones to faster emergency response." },
-              { "id": "c2", "text": "After school-safety incidents, several districts cite direct parent contact via students' own phones as critical to a fast response.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the emergency-safety impact." },
-              { "id": "c3", "text": "National statistics show that average 911 dispatcher response times have improved over the past decade.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Sounds safety-relevant and authoritative, but it's about dispatcher response times generally, not a student's own ability to reach help via their phone." },
-              { "id": "c4", "text": "Phones can play music during free periods.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Unrelated to emergency safety." }
+              {
+                "id": "c1",
+                "text": "When seconds matter, having a phone in hand means a student doesn't have to wait for an adult or an office phone to get help.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links keeping phones to faster emergency response."
+              },
+              {
+                "id": "c2",
+                "text": "After school-safety incidents, several districts cite direct parent contact via students' own phones as critical to a fast response.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the emergency-safety impact."
+              },
+              {
+                "id": "c3",
+                "text": "National statistics show that average 911 dispatcher response times have improved over the past decade.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Sounds safety-relevant and authoritative, but it's about dispatcher response times generally, not a student's own ability to reach help via their phone."
+              },
+              {
+                "id": "c4",
+                "text": "Phones can play music during free periods.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Unrelated to emergency safety."
+              }
+            ],
+            "impactChoices": [
+              {
+                "id": "i-strong",
+                "text": "Banning phones removes a critical safety tool during emergencies like lockdowns or accidents.",
+                "verdict": "strong",
+                "explanation": "It names the moment that matters most and what's lost in it. That's the so-what."
+              },
+              {
+                "id": "i-restate",
+                "text": "So students couldn't call their parents from school.",
+                "verdict": "restates-claim",
+                "explanation": "Restates the claim. What's at stake when they can't?"
+              },
+              {
+                "id": "i-other",
+                "text": "Students would lose access to research tools and calculators.",
+                "verdict": "different-claim",
+                "explanation": "Belongs to the learning argument, not the safety one."
+              },
+              {
+                "id": "i-small",
+                "text": "Someone might occasionally have to wait to make a call.",
+                "verdict": "no-scale",
+                "explanation": "Too small. Think about the moment it matters most."
+              }
             ]
           },
           {
@@ -325,11 +1298,62 @@
             "claim": "Students need practice managing their own phone use, not having it taken away entirely.",
             "impact": "Learning to self-regulate phone use in a low-stakes school setting builds a skill students need before adulthood, when no one bans their phone.",
             "candidates": [
-              { "id": "c1", "text": "Practicing when to check a phone and when to ignore it, with real consequences, builds self-control that an outright ban never asks for.", "material": "reasoning", "verdict": "fits", "explanation": "Links guided phone use to the self-regulation impact." },
-              { "id": "c2", "text": "Schools that use guided phone-use policies instead of outright bans report students self-regulate better over time.", "material": "evidence", "verdict": "fits", "explanation": "Evidence for the self-regulation impact." },
-              { "id": "c3", "text": "An industry report found employees who used personal devices at work reported higher job satisfaction.", "material": "evidence", "verdict": "great-but-wrong", "explanation": "Authoritative-sounding, but about adult employees' job satisfaction, not students building self-regulation." },
-              { "id": "c4", "text": "Some students like to personalize their phone cases.", "material": "reasoning", "verdict": "doesnt-fit", "explanation": "Irrelevant to building self-regulation." }
+              {
+                "id": "c1",
+                "text": "Practicing when to check a phone and when to ignore it, with real consequences, builds self-control that an outright ban never asks for.",
+                "material": "reasoning",
+                "verdict": "fits",
+                "explanation": "Links guided phone use to the self-regulation impact."
+              },
+              {
+                "id": "c2",
+                "text": "Schools that use guided phone-use policies instead of outright bans report students self-regulate better over time.",
+                "material": "evidence",
+                "verdict": "fits",
+                "explanation": "Evidence for the self-regulation impact."
+              },
+              {
+                "id": "c3",
+                "text": "An industry report found employees who used personal devices at work reported higher job satisfaction.",
+                "material": "evidence",
+                "verdict": "great-but-wrong",
+                "explanation": "Authoritative-sounding, but about adult employees' job satisfaction, not students building self-regulation."
+              },
+              {
+                "id": "c4",
+                "text": "Some students like to personalize their phone cases.",
+                "material": "reasoning",
+                "verdict": "doesnt-fit",
+                "explanation": "Irrelevant to building self-regulation."
+              }
             ]
+          }
+        ],
+        "claimChoices": [
+          {
+            "id": "k-strong",
+            "text": "In an emergency, a phone lets a student immediately reach a parent or call for help.",
+            "verdict": "strong",
+            "explanation": "Specific and contestable: the other side can argue the school office handles emergencies.",
+            "claimId": "a-safety"
+          },
+          {
+            "id": "k-broad",
+            "text": "Banning phones is unfair.",
+            "verdict": "too-broad",
+            "explanation": "Unfair how?"
+          },
+          {
+            "id": "k-fact",
+            "text": "Phones can make calls and send messages.",
+            "verdict": "not-contestable",
+            "explanation": "A fact, not a stance."
+          },
+          {
+            "id": "k-wrong",
+            "text": "Phones pull students' attention away from the lesson.",
+            "verdict": "wrong-side",
+            "explanation": "That's the FOR case."
           }
         ]
       }
