@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CoachBubble } from "@/components/CoachBubble";
 import { cn } from "@/lib/utils";
 import { BridgeScene } from "@/components/stages/BridgeScene";
+import { FallacyCard } from "@/components/FallacyCard";
 
 /**
  * Every authored claim in the bank lists its candidates in the same order
@@ -70,6 +71,7 @@ export function Bridge({
         {status === "wrong" && (
           <>{(c.verdict === "great-but-wrong" ? "🪤 Great but wrong — " : "Doesn't fit — ") + c.explanation}</>
         )}
+        {status === "wrong" && c.fallacy && <FallacyCard id={c.fallacy} className="mt-2" />}
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => onTalkThrough(c)}>
             💬 Talk this through

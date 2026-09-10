@@ -1,4 +1,5 @@
 import { renderImpactRubric } from "@/lib/impactRubric";
+import { renderFallacyList } from "@/lib/fallacies";
 
 export function impactPrompt(input: {
   motion: string;
@@ -20,7 +21,11 @@ export function impactPrompt(input: {
     "- Do not give the answer away; help them see it.",
     "- Do not recite the rubric criteria at them.",
     "",
-    'Respond ONLY as JSON: {"kind":"impact","reaction":string}.',
+    "Fallacy check:",
+    '- If the student\'s impact clearly commits one of these fallacies (a slippery slope is the usual one), set "fallacy" to its id and let your nudge point at it. Otherwise set "fallacy" to null. Only flag a clear case.',
+    renderFallacyList(),
+    "",
+    'Respond ONLY as JSON: {"kind":"impact","reaction":string,"fallacy":string|null}.',
   ].join("\n");
   const user = [
     `Motion: "${input.motion}"`,

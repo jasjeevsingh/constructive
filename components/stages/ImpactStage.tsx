@@ -4,6 +4,7 @@ import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { CoachBubble } from "@/components/CoachBubble";
+import { FallacyCard } from "@/components/FallacyCard";
 import type { CoachResponse } from "@/lib/schemas";
 
 export function ImpactStage({
@@ -20,6 +21,7 @@ export function ImpactStage({
   const [reaction, setReaction] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [saved, setSaved] = useState("");
+  const [fallacy, setFallacy] = useState<string | null>(null);
 
   async function submit(text: string) {
     if (!text.trim()) return;
@@ -33,7 +35,10 @@ export function ImpactStage({
       });
       if (!res.ok) throw new Error("coach failed");
       const data: CoachResponse = await res.json();
-      if (data.kind === "impact") setReaction(data.reaction);
+      if (data.kind === "impact") {
+        setReaction(data.reaction);
+        setFallacy(data.fallacy ?? null);
+      }
     } catch {
       setError(true);
     }
@@ -50,6 +55,7 @@ export function ImpactStage({
       </div>
       <VoiceOrTextInput label="Say or type the impact" onSubmit={submit} />
       {reaction && <CoachBubble className="mt-3">{reaction}</CoachBubble>}
+      {reaction && fallacy && <FallacyCard id={fallacy} className="mt-2" />}
       {error && <p className="mt-3 text-muted-foreground">Coach unavailable — keep going.</p>}
       {(reaction || error) && (
         <Button type="button" className="mt-3" onClick={() => onComplete(saved)}>

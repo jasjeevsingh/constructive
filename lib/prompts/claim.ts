@@ -1,4 +1,5 @@
 import { renderRubric, CLAIM_TURN_CAP } from "@/lib/claimRubric";
+import { renderFallacyList } from "@/lib/fallacies";
 import type { CoachTurn } from "@/lib/schemas";
 
 export function claimPrompt(input: {
@@ -37,7 +38,11 @@ export function claimPrompt(input: {
       : "",
     "- Never invent a claim id. Use only the ids provided.",
     "",
-    'Respond ONLY as JSON: {"kind":"claim","reaction":string,"verdict":"keep-going"|"good-enough","question":string|null,"mappedClaimId":string|null}.',
+    "Fallacy check:",
+    '- If the student\'s latest claim clearly commits one of these fallacies, set "fallacy" to its id and let your question point at it. Otherwise set "fallacy" to null. Only flag a clear case.',
+    renderFallacyList(),
+    "",
+    'Respond ONLY as JSON: {"kind":"claim","reaction":string,"verdict":"keep-going"|"good-enough","question":string|null,"mappedClaimId":string|null,"fallacy":string|null}.',
   ]
     .filter(Boolean)
     .join("\n");

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FALLACY_IDS } from "@/lib/fallacies";
 
 export const KeywordSchema = z.object({
   word: z.string().min(1),
@@ -56,16 +57,21 @@ export const LinkResponseSchema = z.object({
   kind: z.literal("link"),
   reaction: z.string(),
 });
+/** Loose on purpose: a hallucinated id must not fail the whole coach reply; the UI ignores unknown ids. */
+const LooseFallacy = z.string().nullable().optional();
+
 export const ClaimResponseSchema = z.object({
   kind: z.literal("claim"),
   reaction: z.string(),
   verdict: z.enum(["keep-going", "good-enough"]),
   question: z.string().nullable(),
   mappedClaimId: z.string().nullable(),
+  fallacy: LooseFallacy,
 });
 export const ImpactResponseSchema = z.object({
   kind: z.literal("impact"),
   reaction: z.string(),
+  fallacy: LooseFallacy,
 });
 export const ChoiceResponseSchema = z.object({
   kind: z.literal("choice"),
@@ -89,12 +95,16 @@ export type LinkMaterial = z.infer<typeof LinkMaterialSchema>;
 export const LinkVerdictSchema = z.enum(["fits", "doesnt-fit", "great-but-wrong"]);
 export type LinkVerdict = z.infer<typeof LinkVerdictSchema>;
 
+export const FallacyIdSchema = z.enum(FALLACY_IDS);
+
 export const LinkCandidateSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),
   material: LinkMaterialSchema,
   verdict: LinkVerdictSchema,
   explanation: z.string().min(1),
+  /** Set only on distractors that honestly commit a named fallacy; surfaces a penalty card when placed. */
+  fallacy: FallacyIdSchema.optional(),
 });
 export type LinkCandidate = z.infer<typeof LinkCandidateSchema>;
 
@@ -195,6 +205,7 @@ export const GeneratedCandidateSchema = z.object({
   material: LinkMaterialSchema,
   verdict: LinkVerdictSchema,
   explanation: z.string().min(1),
+  fallacy: z.string().nullable().optional(),
 });
 export const GeneratedClaimSchema = z.object({
   claim: z.string().min(1),
