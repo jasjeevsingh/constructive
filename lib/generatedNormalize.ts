@@ -1,3 +1,4 @@
+import { isFallacyId } from "@/lib/fallacies";
 import type { FlowMotion, FlowClaim, LinkCandidate, Keyword, GeneratedSides } from "@/lib/schemas";
 
 export class ScaffoldError extends Error {}
@@ -65,6 +66,8 @@ export function assembleFlowMotion(
         material: cand.material,
         verdict: cand.verdict,
         explanation: cand.explanation,
+        // Only distractors carry a card, and only when the model named a real one.
+        ...(cand.verdict !== "fits" && isFallacyId(cand.fallacy) ? { fallacy: cand.fallacy } : {}),
       }));
       return { id: `c${ci + 1}`, claim: c.claim, impact: c.impact, candidates };
     });

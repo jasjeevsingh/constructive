@@ -39,7 +39,8 @@
                 "text": "A Nobel Prize was awarded for research on voting systems.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Authoritative but says nothing about whether kids voting shifts investment."
+                "explanation": "Authoritative but says nothing about whether kids voting shifts investment.",
+                "fallacy": "appeal-to-authority"
               },
               {
                 "id": "c4",
@@ -201,7 +202,8 @@
                 "text": "A famous economist won a prize for work on voting paradoxes.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Authoritative but about voting math, not kids' readiness."
+                "explanation": "Authoritative but about voting math, not kids' readiness.",
+                "fallacy": "appeal-to-authority"
               },
               {
                 "id": "c4",
@@ -719,7 +721,8 @@
                 "text": "A famous fashion designer has studied how color affects mood.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Sounds authoritative but is about color psychology, not bullying or wealth signaling."
+                "explanation": "Sounds authoritative but is about color psychology, not bullying or wealth signaling.",
+                "fallacy": "appeal-to-authority"
               },
               {
                 "id": "c4",
@@ -881,7 +884,8 @@
                 "text": "A well-known child psychologist's bestselling book explores how teenagers form identity through many different life experiences.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Sounds directly relevant to identity, but it's about identity formation broadly, not specifically about clothing or uniforms."
+                "explanation": "Sounds directly relevant to identity, but it's about identity formation broadly, not specifically about clothing or uniforms.",
+                "fallacy": "appeal-to-authority"
               },
               {
                 "id": "c4",
@@ -1059,7 +1063,8 @@
                 "text": "A major tech company's internal study found office employees check phones every ten minutes.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Authoritative-sounding but about adult employees at work, not student learning in school."
+                "explanation": "Authoritative-sounding but about adult employees at work, not student learning in school.",
+                "fallacy": "hasty-generalization"
               },
               {
                 "id": "c4",
@@ -1155,7 +1160,8 @@
                 "text": "A well-known psychologist wrote a bestselling book on rising anxiety among teens.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Authoritative-sounding, but about teen anxiety broadly, not specifically about in-person social skills from a phone ban."
+                "explanation": "Authoritative-sounding, but about teen anxiety broadly, not specifically about in-person social skills from a phone ban.",
+                "fallacy": "appeal-to-authority"
               },
               {
                 "id": "c4",
@@ -1317,7 +1323,8 @@
                 "text": "An industry report found employees who used personal devices at work reported higher job satisfaction.",
                 "material": "evidence",
                 "verdict": "great-but-wrong",
-                "explanation": "Authoritative-sounding, but about adult employees' job satisfaction, not students building self-regulation."
+                "explanation": "Authoritative-sounding, but about adult employees' job satisfaction, not students building self-regulation.",
+                "fallacy": "hasty-generalization"
               },
               {
                 "id": "c4",

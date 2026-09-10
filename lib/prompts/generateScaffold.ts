@@ -1,3 +1,4 @@
+import { FALLACY_IDS } from "@/lib/fallacies";
 import { renderRubric } from "@/lib/claimRubric";
 
 export function generateScaffoldPrompt(universe: string, motion: string): { system: string; user: string } {
@@ -8,7 +9,8 @@ Return ONLY a single JSON object, no prose, matching exactly one of these shapes
 - Refusal: {"refused": true, "reason": string}
 
 Each CLAIM is: {"claim": string, "impact": string, "candidates":[CANDIDATE,...]}
-Each CANDIDATE is: {"text": string, "material":"evidence"|"reasoning", "verdict":"fits"|"doesnt-fit"|"great-but-wrong", "explanation": string}
+Each CANDIDATE is: {"text": string, "material":"evidence"|"reasoning", "verdict":"fits"|"doesnt-fit"|"great-but-wrong", "explanation": string, "fallacy": FALLACY|null}
+FALLACY is one of: ${FALLACY_IDS.map((id) => `"${id}"`).join(" | ")}. Set it ONLY on a distractor that genuinely commits that fallacy (e.g. a big name cited with no finding = "appeal-to-authority"); otherwise null.
 
 Rules:
 - Give 1-2 claims per side. Each claim needs an "impact": why it matters, the bigger consequence.

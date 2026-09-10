@@ -4,6 +4,7 @@ import { VoiceOrTextInput } from "@/components/VoiceOrTextInput";
 import { Button } from "@/components/ui/button";
 import { StageHeader } from "@/components/stages/StageHeader";
 import { CoachBubble } from "@/components/CoachBubble";
+import { FallacyCard } from "@/components/FallacyCard";
 import { usePublishHelperContext } from "@/components/helper/HelperContextProvider";
 import { CLAIM_TURN_CAP } from "@/lib/claimRubric";
 import type { CoachResponse, CoachTurn } from "@/lib/schemas";
@@ -25,6 +26,7 @@ export function ClaimStage({
   const [fallback, setFallback] = useState(false);
   const [sending, setSending] = useState(false);
   const [lastStudentClaim, setLastStudentClaim] = useState<string | null>(null);
+  const [fallacy, setFallacy] = useState<string | null>(null);
   const sendingRef = useRef(false);
 
   const attempt = turns.filter((t) => t.role === "student").length;
@@ -63,6 +65,7 @@ export function ClaimStage({
       setTurns(nextTurns);
       setMappedId(data.mappedClaimId);
       setLastStudentClaim(text);
+      setFallacy(data.fallacy ?? null);
 
       const studentTurns = nextTurns.filter((t) => t.role === "student").length;
       setDone(data.verdict === "good-enough" || studentTurns >= CLAIM_TURN_CAP);
@@ -91,7 +94,10 @@ export function ClaimStage({
                 You said: {t.text}
               </p>
             ) : (
-              <CoachBubble key={i}>{t.text}</CoachBubble>
+              <div key={i}>
+                <CoachBubble>{t.text}</CoachBubble>
+                {i === turns.length - 1 && fallacy && <FallacyCard id={fallacy} className="mt-2" />}
+              </div>
             )
           )}
         </div>
