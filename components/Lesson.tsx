@@ -1,180 +1,207 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
+import { motion as m } from "motion/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { CLI_DEFINITIONS } from "@/lib/cli";
+import { transitions } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const MOTION = "This House believes that homework should be banned.";
 
-function WatchOut({ title, items }: { title: string; items: { name: string; body: string }[] }) {
-  return (
-    <div className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-sm">
-      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        ⚠ Watch out — {title}
-      </div>
-      <div className="mt-2 space-y-2">
-        {items.map((it) => (
-          <p key={it.name} className="text-muted-foreground">
-            <span className="font-medium text-foreground">{it.name}.</span> {it.body}
-          </p>
-        ))}
-      </div>
-    </div>
-  );
-}
+/** The homework example, one row per layer. Row `i` lights up once the
+ *  learner reaches step `i`, so the argument builds cumulatively on the right
+ *  while the teaching on the left stays short. */
+const EXAMPLE: { key: string; label: string; tone: string; text: string }[] = [
+  {
+    key: "claim",
+    label: "Claim",
+    tone: "bg-foreground text-background",
+    text: "Homework takes up too much student free time.",
+  },
+  {
+    key: "reasoning",
+    label: "Link · Reasoning",
+    tone: "bg-reasoning text-reasoning-foreground",
+    text: "When students spend hours on homework every night, they lose time for sleep, exercise, and the things outside school that shape who they become — and an exhausted student doesn't learn well anyway.",
+  },
+  {
+    key: "evidence",
+    label: "Link · Evidence",
+    tone: "bg-evidence text-evidence-foreground",
+    text: "A widely cited study of over 4,300 high school students found that more than three hours of nightly homework led to higher stress, more health problems, and less time for friends and family — which shows the harm isn't theoretical.",
+  },
+  {
+    key: "impact",
+    label: "Impact",
+    tone: "bg-success text-success-foreground",
+    text: "This is happening to millions of students right now, and the ones hit hardest have the least support at home. Homework doesn't raise standards — it widens the gap.",
+  },
+];
 
-function BuiltUpBox({ lines }: { lines: { label: string; text: string }[] }) {
-  return (
-    <div className="mt-3 rounded-lg border border-evidence bg-evidence/10 p-3 text-sm">
-      {lines.map((l) => (
-        <p key={l.label} className="mt-1.5 first:mt-0">
-          <span className="font-semibold text-foreground">{l.label}</span>{" "}
-          <span className="text-foreground">{l.text}</span>
-        </p>
-      ))}
-    </div>
-  );
-}
+type Step = {
+  eyebrow: string;
+  banner: { src: string; alt: string };
+  headline: string;
+  body: React.ReactNode;
+};
 
-// One step at a time, not the whole lesson at once — a student reads Claim,
-// then Link/Reasoning, then Link/Evidence, then Impact, each building on the
-// last (mirrors the progressive reveal the source guide itself specs).
-const STEPS: { eyebrow: string; render: () => React.ReactNode }[] = [
+const { claim, link, impact } = CLI_DEFINITIONS;
+
+const STEPS: Step[] = [
   {
     eyebrow: "C · Claim",
-    render: () => (
+    banner: { src: "/lesson/claim.jpg", alt: `Claim — ${claim.tag}. ${claim.definition}` },
+    headline: "Take a side the other team can push back on.",
+    body: (
       <>
-        <h2 className="mt-1 font-display text-xl font-semibold text-foreground">An argument in favor of your side</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Not a question, not a fact — a stance the other side could disagree with and have something
-          real to argue back.
-        </p>
         <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
           <li>
-            <span className="font-medium text-foreground">Specific</span> — does it say something
-            precise, not just a general theme?
+            <span className="font-medium text-foreground">Specific</span> — says something precise, not a
+            general theme.
           </li>
           <li>
-            <span className="font-medium text-foreground">Contestable</span> — could a reasonable
-            person disagree? If everyone would agree, it&apos;s a fact, not a claim.
+            <span className="font-medium text-foreground">Contestable</span> — a reasonable person could
+            disagree. If everyone agrees, it&apos;s a fact, not a claim.
           </li>
         </ul>
-        <div className="mt-3 space-y-2 text-sm">
-          <p className="text-muted-foreground">
-            <span className="font-medium text-destructive">✗ Too broad:</span> &ldquo;Homework is bad
-            for students.&rdquo; A feeling, not a claim — nothing for the other side to grab onto.
-          </p>
-          <p className="text-muted-foreground">
-            <span className="font-medium text-foreground">✓ Specific and contestable:</span>{" "}
-            &ldquo;Homework takes up too much student free time.&rdquo;
-          </p>
-        </div>
-        <BuiltUpBox lines={[{ label: "Claim —", text: "Homework takes up too much student free time." }]} />
+        <Compare
+          bad={{ text: "Homework is bad for students.", why: "A feeling. Nothing to argue against." }}
+          good={{ text: "Homework takes up too much student free time.", why: "Specific, and the other side can fight it." }}
+        />
       </>
     ),
   },
   {
     eyebrow: "L · Link — Reasoning",
-    render: () => (
+    banner: { src: "/lesson/link-reasoning.jpg", alt: `Link — ${link.tag}, Reasoning. ${link.definition}` },
+    headline: "Explain why your claim is true, step by step.",
+    body: (
       <>
-        <h2 className="mt-1 font-display text-xl font-semibold text-foreground">The bridge between your Claim and your Impact</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Don&apos;t repeat the Claim — explain the chain of cause and effect that makes it true. No
-          sources needed yet, just clear thinking.
+        <p className="mt-3 text-sm text-muted-foreground">
+          Don&apos;t repeat the claim. Walk through the chain of cause and effect. No sources yet — just clear
+          thinking.
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          One-sentence test: complete <span className="font-medium text-foreground">&ldquo;[Your Claim] because [your reasoning].&rdquo;</span>{" "}
+        <Callout label="One-sentence test">
+          &ldquo;[Your Claim] <span className="font-semibold text-foreground">because</span> [your reasoning].&rdquo;
           If it sounds circular, keep pushing.
-        </p>
-        <BuiltUpBox
-          lines={[
-            { label: "Claim —", text: "Homework takes up too much student free time." },
-            {
-              label: "Reasoning —",
-              text: "When students spend hours on homework every night, they lose time for sleep, exercise, and the things outside school that shape who they become — and an exhausted student doesn't learn well anyway.",
-            },
-          ]}
-        />
-        <WatchOut
-          title="weak bridges"
-          items={[
-            { name: "Slippery Slope", body: "Claiming one thing automatically leads to an extreme, without proving the steps in between." },
-            { name: "False Dilemma", body: "Pretending there are only two options when more exist." },
-            { name: "False Cause", body: "Assuming one thing caused another just because they happened together." },
-          ]}
-        />
+        </Callout>
       </>
     ),
   },
   {
     eyebrow: "L · Link — Evidence",
-    render: () => (
+    banner: { src: "/lesson/link-evidence.jpg", alt: `Link — ${link.tag}, Evidence. ${link.definition}` },
+    headline: "Back your reasoning with something real.",
+    body: (
       <>
-        <h2 className="mt-1 font-display text-xl font-semibold text-foreground">Proof that your Reasoning isn&apos;t just opinion</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Evidence should never come without the Reasoning it supports — Evidence strengthens the bridge, it doesn&apos;t replace it. Frame
-          it: <span className="font-medium text-foreground">&ldquo;According to [source], [finding] — which shows that [connection back to your Reasoning].&rdquo;</span>
+        <p className="mt-3 text-sm text-muted-foreground">
+          A fact, study, or example that proves your reasoning isn&apos;t just opinion. Evidence strengthens
+          the bridge — it doesn&apos;t replace it.
         </p>
-        <BuiltUpBox
-          lines={[
-            { label: "Claim —", text: "Homework takes up too much student free time." },
-            {
-              label: "Reasoning —",
-              text: "When students spend hours on homework every night, they lose time for sleep, exercise, and the things that shape who they become.",
-            },
-            {
-              label: "Evidence —",
-              text: "A widely cited study of over 4,300 high school students found that more than three hours of nightly homework led to higher stress, more health problems, and less time for friends and family — which shows the harm isn't theoretical.",
-            },
-          ]}
-        />
-        <WatchOut
-          title="evidence traps"
-          items={[
-            { name: "Appeal to Authority", body: "Citing a source because it sounds impressive, without saying what it found or why it applies." },
-            { name: "Generalization", body: "Evidence that doesn't actually apply to your motion's age group or context." },
-          ]}
-        />
+        <Callout label="Frame it">
+          &ldquo;According to [source], [finding] —{" "}
+          <span className="font-semibold text-foreground">which shows that</span> [your reasoning].&rdquo;
+        </Callout>
       </>
     ),
   },
   {
     eyebrow: "I · Impact",
-    render: () => (
+    banner: { src: "/lesson/impact.jpg", alt: `Impact — ${impact.tag}. ${impact.definition}` },
+    headline: "Show what changes in the world if you're right.",
+    body: (
       <>
-        <h2 className="mt-1 font-display text-xl font-semibold text-foreground">Why your argument matters beyond the debate</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Who is affected, and how many? What actually changes if your side is right? Use one or more of
-          these tools — not all three every time.
+        <p className="mt-3 text-sm text-muted-foreground">
+          Who is affected, and how many? Pick one or two of these — not all three every time.
         </p>
         <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-          <li><span className="font-medium text-foreground">Magnitude</span> — how many people are affected?</li>
-          <li><span className="font-medium text-foreground">Probability</span> — how likely is this outcome?</li>
-          <li><span className="font-medium text-foreground">Timeframe</span> — how soon does this happen?</li>
+          <li><span className="font-medium text-foreground">Magnitude</span> — how many people?</li>
+          <li><span className="font-medium text-foreground">Probability</span> — how likely?</li>
+          <li><span className="font-medium text-foreground">Timeframe</span> — how soon?</li>
         </ul>
-        <BuiltUpBox
-          lines={[
-            { label: "Claim —", text: "Homework takes up too much student free time." },
-            { label: "Reasoning —", text: "Long nights of homework cut into sleep, exercise, and family time." },
-            { label: "Evidence —", text: "A widely cited study found over 3 hours of nightly homework raised stress and health problems, even for motivated students." },
-            {
-              label: "Impact —",
-              text: "This isn't one school's problem — it's happening to millions of students right now. The ones hit hardest are often the ones with the least support at home. Piling on homework doesn't raise standards — it widens the gap between kids who can absorb the pressure and kids who can't.",
-            },
-          ]}
-        />
-        <WatchOut
-          title="Impact without a bridge"
-          items={[
-            {
-              name: "Skipping the Link",
-              body: "Jumping straight from Claim to Impact is the most common structural error. Without the Reasoning and Evidence underneath, the other side can dismiss it in one sentence: \"They haven't shown why that would actually happen.\"",
-            },
-          ]}
-        />
       </>
     ),
   },
 ];
+
+function Callout({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+      <div className="text-xs font-semibold uppercase tracking-wide text-primary">{label}</div>
+      <p className="mt-1">{children}</p>
+    </div>
+  );
+}
+
+function Compare({ bad, good }: { bad: { text: string; why: string }; good: { text: string; why: string } }) {
+  return (
+    <div className="mt-3 space-y-2 text-sm">
+      <div className="rounded-md border border-destructive/30 bg-destructive/5 p-2.5">
+        <div className="text-xs font-semibold text-destructive">✗ Too broad</div>
+        <p className="mt-0.5 font-medium text-foreground">&ldquo;{bad.text}&rdquo;</p>
+        <p className="text-xs text-muted-foreground">{bad.why}</p>
+      </div>
+      <div className="rounded-md border border-success/30 bg-success/5 p-2.5">
+        <div className="text-xs font-semibold text-success">✓ Specific and contestable</div>
+        <p className="mt-0.5 font-medium text-foreground">&ldquo;{good.text}&rdquo;</p>
+        <p className="text-xs text-muted-foreground">{good.why}</p>
+      </div>
+    </div>
+  );
+}
+
+/** The right-hand column: the homework argument, built up one layer per step. */
+function SeeItInAction({ litCount }: { litCount: number }) {
+  return (
+    <aside data-testid="see-it-in-action" aria-label="See it in action" className="md:sticky md:top-20">
+      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        See it in action — building up
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">&ldquo;{MOTION}&rdquo;</p>
+      <ol className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
+        {EXAMPLE.map((row, i) => {
+          const lit = i < litCount;
+          return (
+            <li
+              key={row.key}
+              data-testid={lit ? "action-row-lit" : "action-row-dim"}
+              className={cn(
+                "flex border-b border-border last:border-b-0 transition-opacity",
+                !lit && "opacity-40"
+              )}
+            >
+              <div
+                className={cn(
+                  "w-24 shrink-0 px-2.5 py-3 text-[11px] font-semibold uppercase leading-tight tracking-wide sm:w-28",
+                  lit ? row.tone : "bg-muted text-muted-foreground"
+                )}
+              >
+                {row.label}
+              </div>
+              <div className="flex-1 px-3 py-3 text-sm leading-snug">
+                {lit ? (
+                  <m.p
+                    key="lit"
+                    className="text-foreground"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={transitions.gentle}
+                  >
+                    {row.text}
+                  </m.p>
+                ) : (
+                  <p className="italic text-muted-foreground">Coming next →</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </aside>
+  );
+}
 
 export function Lesson({ onBack }: { onBack: () => void }) {
   const [stepIndex, setStepIndex] = useState(0);
@@ -193,10 +220,18 @@ export function Lesson({ onBack }: { onBack: () => void }) {
       <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
         Claim → Link → Impact
       </h1>
-      <p className="mt-3 max-w-2xl text-muted-foreground">
-        Every strong argument has three parts, built in order. Here&apos;s each one, worked through with
-        one motion: <span className="font-medium text-foreground">&ldquo;{MOTION}&rdquo;</span>
+      <p className="mt-2 max-w-2xl text-muted-foreground">
+        Three parts, built in order. A claim on one side, the impact on the other, and the link is the
+        bridge between them.
       </p>
+
+      <img
+        src="/lesson/cli-bridge.jpg"
+        alt={`The bridge: Claim — ${claim.tag}: ${claim.definition} Link — ${link.tag}: ${link.definition} Impact — ${impact.tag}: ${impact.definition}`}
+        className="mt-5 w-full rounded-xl border border-border"
+        width={1600}
+        height={1194}
+      />
 
       <div className="mt-6">
         <div className="text-xs font-medium text-muted-foreground">
@@ -205,14 +240,33 @@ export function Lesson({ onBack }: { onBack: () => void }) {
         <Progress value={pct} className="mt-2" />
       </div>
 
-      <Card className="mt-4">
-        <CardContent className="p-5">
-          <div className="font-display text-xs font-semibold uppercase tracking-wide text-primary">
-            {step.eyebrow}
-          </div>
-          {step.render()}
-        </CardContent>
-      </Card>
+      <div className="mt-4 grid gap-5 md:grid-cols-2 md:items-start">
+        <m.div
+          key={stepIndex}
+          initial={{ opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={transitions.snappy}
+        >
+            <Card className="overflow-hidden">
+              <img
+                src={step.banner.src}
+                alt={step.banner.alt}
+                className="w-full border-b border-border"
+                width={1600}
+                height={496}
+              />
+              <CardContent className="p-5">
+                <div className="font-display text-xs font-semibold uppercase tracking-wide text-primary">
+                  {step.eyebrow}
+                </div>
+                <h2 className="mt-1 font-display text-xl font-semibold text-foreground">{step.headline}</h2>
+                {step.body}
+              </CardContent>
+            </Card>
+        </m.div>
+
+        <SeeItInAction litCount={stepIndex + 1} />
+      </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <Button
