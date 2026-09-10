@@ -1,11 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CLI_DEFINITIONS, CLI_PARTS, type CliPart } from "@/lib/cli";
+import { FALLACIES, FALLACY_IDS, type FallacyId } from "@/lib/fallacies";
+import { FallacyCard } from "@/components/FallacyCard";
 import { hasAdvancedAnywhere } from "@/lib/state/flowProgress";
 import type { FlowStage } from "@/lib/state/flowMachine";
 import { cn } from "@/lib/utils";
 
 export const CHEATSHEET_STORAGE_KEY = "constructive:cheatsheet:v1";
+
+type Tab = "cli" | "fallacies";
 
 /** A student's explicit open/close choice wins; before they've made one, the
  *  sheet is open until they've advanced past Claim anywhere. */
@@ -36,8 +40,74 @@ function MiniBridge({ current }: { current: FlowStage }) {
   );
 }
 
+function CliTab({ stage }: { stage: FlowStage }) {
+  return (
+    <>
+      <MiniBridge current={stage} />
+      <dl className="mt-2 space-y-2">
+        {CLI_PARTS.map((part) => {
+          const d = CLI_DEFINITIONS[part];
+          const current = part === stage;
+          return (
+            <div
+              key={part}
+              data-testid={current ? "cheatsheet-current" : undefined}
+              className={cn("rounded-md border-l-2 pl-2", current ? "border-primary" : "border-transparent")}
+            >
+              <dt className="flex items-center gap-1.5 text-xs">
+                <span className={cn("h-2 w-2 rounded-full", PART_TONE[part])} aria-hidden />
+                <span className={cn("font-semibold", current ? "text-foreground" : "text-muted-foreground")}>
+                  {d.label}
+                </span>
+                <span className="text-muted-foreground">{d.tag}</span>
+              </dt>
+              <dd className={cn("mt-0.5 text-xs leading-snug", current ? "text-foreground" : "text-muted-foreground")}>
+                {d.definition}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    </>
+  );
+}
+
+/** The eight penalty cards as a compact list; tapping one shows the full card. */
+function FallaciesTab() {
+  const [openId, setOpenId] = useState<FallacyId | null>(null);
+  return (
+    <ul className="mt-2 space-y-1.5" data-testid="cheatsheet-fallacies">
+      {FALLACY_IDS.map((id) => {
+        const f = FALLACIES[id];
+        const open = openId === id;
+        return (
+          <li key={id}>
+            <button
+              type="button"
+              aria-expanded={open}
+              onClick={() => setOpenId(open ? null : id)}
+              className="flex w-full items-start gap-1.5 rounded text-left hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span
+                className={cn("mt-1 h-2 w-2 shrink-0 rounded-sm", f.card === "red" ? "bg-[#D63030]" : "bg-[#E8C840]")}
+                aria-hidden
+              />
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold text-foreground">{f.name}</span>
+                <span className="block text-xs leading-snug text-muted-foreground">{f.definition}</span>
+              </span>
+            </button>
+            {open && <FallacyCard id={id} className="mt-2" />}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function CliCheatSheet({ stage, className }: { stage: FlowStage; className?: string }) {
   const [open, setOpen] = useState(true);
+  const [tab, setTab] = useState<Tab>("cli");
 
   useEffect(() => {
     setOpen(cheatSheetDefaultOpen(window.localStorage));
@@ -50,6 +120,21 @@ export function CliCheatSheet({ stage, className }: { stage: FlowStage; classNam
       return next;
     });
   }
+
+  const tabButton = (id: Tab, label: string) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={tab === id}
+      onClick={() => setTab(id)}
+      className={cn(
+        "rounded-md px-2 py-1 text-xs font-semibold",
+        tab === id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <section data-testid="cli-cheatsheet" className={cn("rounded-lg border border-border bg-muted/30", className)}>
@@ -64,31 +149,11 @@ export function CliCheatSheet({ stage, className }: { stage: FlowStage; classNam
       </button>
       {open && (
         <div className="px-3 pb-3">
-          <MiniBridge current={stage} />
-          <dl className="mt-2 space-y-2">
-            {CLI_PARTS.map((part) => {
-              const d = CLI_DEFINITIONS[part];
-              const current = part === stage;
-              return (
-                <div
-                  key={part}
-                  data-testid={current ? "cheatsheet-current" : undefined}
-                  className={cn("rounded-md border-l-2 pl-2", current ? "border-primary" : "border-transparent")}
-                >
-                  <dt className="flex items-center gap-1.5 text-xs">
-                    <span className={cn("h-2 w-2 rounded-full", PART_TONE[part])} aria-hidden />
-                    <span className={cn("font-semibold", current ? "text-foreground" : "text-muted-foreground")}>
-                      {d.label}
-                    </span>
-                    <span className="text-muted-foreground">{d.tag}</span>
-                  </dt>
-                  <dd className={cn("mt-0.5 text-xs leading-snug", current ? "text-foreground" : "text-muted-foreground")}>
-                    {d.definition}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
+          <div role="tablist" aria-label="Quick reference sections" className="flex gap-1 rounded-md bg-muted p-0.5">
+            {tabButton("cli", "Claim · Link · Impact")}
+            {tabButton("fallacies", "Fallacies")}
+          </div>
+          {tab === "cli" ? <CliTab stage={stage} /> : <FallaciesTab />}
         </div>
       )}
     </section>
