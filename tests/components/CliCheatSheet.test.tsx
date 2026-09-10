@@ -49,4 +49,27 @@ describe("CliCheatSheet", () => {
       expect(screen.getByRole("button", { name: /quick reference/i })).toHaveAttribute("aria-expanded", "false")
     );
   });
+
+  it("has a Fallacies tab listing the eight cards, with the CLI tab selected by default", async () => {
+    render(<CliCheatSheet stage="link" />);
+    expect(screen.getByRole("tab", { name: /claim · link · impact/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByTestId("cheatsheet-fallacies")).toBeNull();
+    await userEvent.click(screen.getByRole("tab", { name: /fallacies/i }));
+    expect(screen.getByRole("tab", { name: /fallacies/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("cheatsheet-fallacies").querySelectorAll("li")).toHaveLength(8);
+    expect(screen.getByText("Straw Man")).toBeInTheDocument();
+    expect(screen.getByText(/attacked the person/i)).toBeInTheDocument();
+    // The stage definitions are hidden while the fallacies tab is showing.
+    expect(screen.queryByText(/step-by-step logic/i)).toBeNull();
+  });
+
+  it("expands a fallacy into its full card and collapses it again", async () => {
+    render(<CliCheatSheet stage="claim" />);
+    await userEvent.click(screen.getByRole("tab", { name: /fallacies/i }));
+    expect(screen.queryByTestId("fallacy-card")).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /ad hominem/i }));
+    expect(screen.getByTestId("fallacy-card")).toHaveAttribute("data-fallacy", "ad-hominem");
+    await userEvent.click(screen.getByRole("button", { name: /ad hominem/i }));
+    expect(screen.queryByTestId("fallacy-card")).toBeNull();
+  });
 });
