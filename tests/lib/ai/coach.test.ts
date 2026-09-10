@@ -51,4 +51,17 @@ describe("runCoach", () => {
       runCoach({ step: "restate", motion: "m", payload: { restate: "x" } }, fakeClient(reply))
     ).rejects.toThrow();
   });
+
+  it("parses a choice response", async () => {
+    const reply = JSON.stringify({ kind: "choice", reaction: "Tempting, but it's a theme." });
+    const res = await runCoach(
+      {
+        step: "choice",
+        motion: "THW ban homework.",
+        payload: { side: "for", part: "claim", chosen: "Homework is bad.", verdictLabel: "Too broad", explanation: "A feeling.", best: "x" },
+      },
+      fakeClient(reply)
+    );
+    expect(res).toMatchObject({ kind: "choice", reaction: "Tempting, but it's a theme." });
+  });
 });

@@ -215,4 +215,71 @@ describe("FlowShell", () => {
       expect(await screen.findByRole("button", { name: /test the bridge/i })).toBeInTheDocument();
     });
   });
+
+  describe("choice mode (seeded motions ship pick-the-best options)", () => {
+    const seeded: FlowMotion = {
+      ...motion,
+      sides: {
+        for: {
+          ...motion.sides.for,
+          claimChoices: [
+            { id: "k-strong", text: "Kids deserve a say.", verdict: "strong", explanation: "Specific and contestable.", claimId: "c-stake" },
+            { id: "k-broad", text: "Voting is important.", verdict: "too-broad", explanation: "A theme." },
+            { id: "k-fact", text: "Kids are affected by laws.", verdict: "not-contestable", explanation: "A fact." },
+            { id: "k-wrong", text: "Kids are too young.", verdict: "wrong-side", explanation: "Other side." },
+          ],
+          claims: [
+            {
+              ...motion.sides.for.claims[0],
+              impactChoices: [
+                { id: "i-strong", text: "Better future.", verdict: "strong", explanation: "Says what changes." },
+                { id: "i-restate", text: "So kids get a say.", verdict: "restates-claim", explanation: "Repeats the claim." },
+                { id: "i-other", text: "Teens practise civics.", verdict: "different-claim", explanation: "Different claim." },
+                { id: "i-small", text: "A few kids feel included.", verdict: "no-scale", explanation: "Too small." },
+              ],
+            },
+          ],
+        },
+        against: motion.sides.against,
+      },
+    };
+
+    it("offers four claim options instead of a text box", () => {
+      render(<FlowShell motion={seeded} onExit={() => {}} />);
+      expect(screen.getAllByRole("radio")).toHaveLength(4);
+      expect(screen.queryByRole("textbox")).toBeNull();
+      expect(screen.getByText(/which is the strongest claim for/i)).toBeInTheDocument();
+    });
+
+    it("carries the strong claim into the Link stage", async () => {
+      render(<FlowShell motion={seeded} onExit={() => {}} />);
+      await userEvent.click(screen.getByRole("radio", { name: /deserve a say/i }));
+      await userEvent.click(screen.getByRole("button", { name: /lock it in/i }));
+      await userEvent.click(screen.getByRole("button", { name: /build the link/i }));
+      expect(await screen.findByRole("button", { name: /test the bridge/i })).toBeInTheDocument();
+      const saved = JSON.parse(localStorage.getItem(FLOW_STORAGE_KEY)!)[seeded.id];
+      expect(saved).toMatchObject({ stage: "link", mappedClaimId: "c-stake" });
+    });
+
+    it("offers impact options for the strong claim and finishes the side with the chosen text", async () => {
+      seedProgress(seeded.id, { side: "for", stage: "impact", mappedClaimId: "c-stake" });
+      render(<FlowShell motion={seeded} onExit={() => {}} />);
+      expect(await screen.findByText(/which impact shows why/i)).toBeInTheDocument();
+      expect(screen.queryByRole("textbox")).toBeNull();
+      await userEvent.click(screen.getByRole("radio", { name: /better future/i }));
+      await userEvent.click(screen.getByRole("button", { name: /lock it in/i }));
+      await userEvent.click(screen.getByRole("button", { name: /finish this side/i }));
+      expect(await screen.findByText(/built the for case/i)).toBeInTheDocument();
+      const saved = JSON.parse(localStorage.getItem(FLOW_STORAGE_KEY)!)[seeded.id];
+      expect(saved).toMatchObject({ forComplete: true, impact: "Better future." });
+    });
+
+    it("falls back to open input on a side without choices (the AGAINST side here)", async () => {
+      seedProgress(seeded.id, { side: "against", stage: "claim", forComplete: true });
+      render(<FlowShell motion={seeded} onExit={() => {}} />);
+      expect(await screen.findByText(/strongest claim against/i)).toBeInTheDocument();
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
+      expect(screen.queryAllByRole("radio")).toHaveLength(0);
+    });
+  });
 });

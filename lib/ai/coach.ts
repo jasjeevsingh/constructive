@@ -4,6 +4,7 @@ import { refinePrompt } from "@/lib/prompts/refine";
 import { linkPrompt } from "@/lib/prompts/link";
 import { claimPrompt } from "@/lib/prompts/claim";
 import { impactPrompt } from "@/lib/prompts/impact";
+import { choicePrompt } from "@/lib/prompts/choice";
 import { CoachResponseSchema, type CoachRequest, type CoachResponse } from "@/lib/schemas";
 import type { ChatClient } from "@/lib/ai/claude";
 
@@ -47,6 +48,17 @@ function buildPrompt(req: CoachRequest): { system: string; user: string } {
         claim: String(p.claim ?? ""),
         authoredImpact: String(p.authoredImpact ?? ""),
         studentImpact: String(p.studentImpact ?? ""),
+      });
+    case "choice":
+      return choicePrompt({
+        motion: req.motion,
+        side: String(p.side ?? ""),
+        part: p.part === "impact" ? "impact" : "claim",
+        claim: typeof p.claim === "string" ? p.claim : null,
+        chosen: String(p.chosen ?? ""),
+        verdictLabel: String(p.verdictLabel ?? ""),
+        explanation: String(p.explanation ?? ""),
+        best: String(p.best ?? ""),
       });
   }
 }

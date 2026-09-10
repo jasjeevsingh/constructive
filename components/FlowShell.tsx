@@ -8,6 +8,8 @@ import { otherSideUnlocked, type FlowStage, type Side } from "@/lib/state/flowMa
 import { KeyTermsStrip } from "@/components/steps/KeyTermsStrip";
 import { CliCheatSheet } from "@/components/CliCheatSheet";
 import { ClaimStage } from "@/components/stages/ClaimStage";
+import { ChoiceStage } from "@/components/stages/ChoiceStage";
+import { strongChoice } from "@/lib/choices";
 import { ImpactStage } from "@/components/stages/ImpactStage";
 import { LinkCard } from "@/components/LinkCard";
 import { FlowRail } from "@/components/FlowRail";
@@ -54,6 +56,77 @@ function FlowShellInner({
   });
   const sideClaims = motion.sides[progress.side].claims;
   const mappedClaim = sideClaims.find((c) => c.id === progress.mappedClaimId) ?? null;
+  const claimChoices = motion.sides[progress.side].claimChoices ?? null;
+  const impactChoices = mappedClaim?.impactChoices ?? null;
+
+  /** Seeded motions ship pick-the-best options; generated motions (no choices)
+   *  keep the open-input coached stage. */
+  function claimStage() {
+    if (claimChoices) {
+      return (
+        <ChoiceStage
+          part="claim"
+          eyebrow="Stage 1 · Claim"
+          prompt={`Which is the strongest claim ${progress.side === "for" ? "for" : "against"} this motion?`}
+          motion={motion.motion}
+          side={progress.side}
+          choices={claimChoices}
+          seed={`${motion.id}:${progress.side}:claim`}
+          continueLabel="Build the link →"
+          onComplete={() => update({ mappedClaimId: strongChoice(claimChoices).claimId ?? null, stage: "link" })}
+        />
+      );
+    }
+    return (
+      <ClaimStage
+        motion={motion.motion}
+        side={progress.side}
+        claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
+        onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
+      />
+    );
+  }
+
+  function finishSide(impact: string) {
+    update({
+      impact,
+      forComplete: progress.side === "for" ? true : progress.forComplete,
+      againstComplete: progress.side === "against" ? true : progress.againstComplete,
+    });
+  }
+
+  function impactStage(claim: NonNullable<typeof mappedClaim>) {
+    if (impactChoices) {
+      return (
+        <ChoiceStage
+          part="impact"
+          eyebrow="Stage 3 · Impact"
+          prompt="Which impact shows why your argument matters?"
+          motion={motion.motion}
+          side={progress.side}
+          claim={claim.claim}
+          choices={impactChoices}
+          seed={`${motion.id}:${claim.id}:impact`}
+          context={
+            <div className="mb-4 rounded-lg border border-evidence bg-evidence/10 p-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your claim</div>
+              <p className="mt-0.5 font-medium text-foreground">{claim.claim}</p>
+            </div>
+          }
+          continueLabel="Finish this side ✓"
+          onComplete={(chosen) => finishSide(chosen.text)}
+        />
+      );
+    }
+    return (
+      <ImpactStage
+        motion={motion.motion}
+        claim={claim.claim}
+        authoredImpact={claim.impact}
+        onComplete={finishSide}
+      />
+    );
+  }
 
   const otherSide: Side = progress.side === "for" ? "against" : "for";
   const isComplete = (s: Side) => (s === "for" ? progress.forComplete : progress.againstComplete);
@@ -174,42 +247,17 @@ function FlowShellInner({
                     {progress.stage === "claim" && (
                       <>
                         <KeyTermsStrip motion={motion.motion} keywords={motion.keywords} />
-                        <ClaimStage
-                          motion={motion.motion}
-                          side={progress.side}
-                          claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
-                          onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
-                        />
+                        {claimStage()}
                       </>
                     )}
-                    {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && (
-                      <ClaimStage
-                        motion={motion.motion}
-                        side={progress.side}
-                        claims={sideClaims.map((c) => ({ id: c.id, claim: c.claim }))}
-                        onComplete={(mappedClaimId) => update({ mappedClaimId, stage: "link" })}
-                      />
-                    )}
+                    {(progress.stage === "link" || progress.stage === "impact") && !mappedClaim && claimStage()}
                     {progress.stage === "link" && mappedClaim && (
                       <LinkCard
                         scenario={claimToScenario(motion.id, mappedClaim)}
                         onComplete={() => update({ stage: "impact" })}
                       />
                     )}
-                    {progress.stage === "impact" && mappedClaim && (
-                      <ImpactStage
-                        motion={motion.motion}
-                        claim={mappedClaim.claim}
-                        authoredImpact={mappedClaim.impact}
-                        onComplete={(impact) =>
-                          update({
-                            impact,
-                            forComplete: progress.side === "for" ? true : progress.forComplete,
-                            againstComplete: progress.side === "against" ? true : progress.againstComplete,
-                          })
-                        }
-                      />
-                    )}
+                    {progress.stage === "impact" && mappedClaim && impactStage(mappedClaim)}
                   </>
                 )}
               </m.div>
