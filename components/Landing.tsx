@@ -1,11 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const STEPS = [
-  { label: "Claim", blurb: "An argument in favor of your side." },
-  { label: "Link", blurb: "The bridge from your claim to why it matters." },
-  { label: "Impact", blurb: "Why your argument matters beyond the debate." },
-];
+import { CLI_DEFINITIONS, CLI_PARTS } from "@/lib/cli";
 
 export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
   return (
@@ -30,29 +25,35 @@ export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
         Read the lesson: Claim → Link → Impact →
       </Button>
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        {STEPS.map((s, i) => (
-          <Card key={s.label}>
-            <CardContent className="p-5">
-              <div className="font-display text-xs font-semibold uppercase tracking-wide text-primary">
-                Step {i + 1}
-              </div>
-              <div className="mt-1 font-display text-xl font-semibold text-foreground">{s.label}</div>
-              <p className="mt-1 text-sm text-muted-foreground">{s.blurb}</p>
-              {s.label === "Link" && (
-                <div className="mt-3 flex gap-3">
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="h-2 w-2 rounded-full bg-evidence" aria-hidden="true" />
-                    evidence
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="h-2 w-2 rounded-full bg-reasoning" aria-hidden="true" />
-                    reasoning
-                  </span>
+        {CLI_PARTS.map((part, i) => {
+          const d = CLI_DEFINITIONS[part];
+          return (
+            <Card key={part}>
+              <CardContent className="p-5">
+                <div className="font-display text-xs font-semibold uppercase tracking-wide text-primary">
+                  Step {i + 1}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                <div className="mt-1 flex items-baseline gap-2">
+                  <div className="font-display text-xl font-semibold text-foreground">{d.label}</div>
+                  <div className="text-sm text-muted-foreground">{d.tag}</div>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{d.definition}</p>
+                {part === "link" && (
+                  <div className="mt-3 flex gap-3">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-evidence" aria-hidden="true" />
+                      evidence
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-reasoning" aria-hidden="true" />
+                      reasoning
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </section>
   );

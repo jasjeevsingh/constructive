@@ -14,6 +14,16 @@ describe("Landing", () => {
     expect(screen.getByText("reasoning")).toBeInTheDocument();
   });
 
+  it("uses the What / How / So What definitions on the strip", () => {
+    render(<Landing onOpenLesson={() => {}} />);
+    expect(screen.getByText('The "What"')).toBeInTheDocument();
+    expect(screen.getByText('The "How"')).toBeInTheDocument();
+    expect(screen.getByText('The "So What?"')).toBeInTheDocument();
+    expect(screen.getByText(/main point you want the audience to believe/i)).toBeInTheDocument();
+    expect(screen.getByText(/step-by-step logic/i)).toBeInTheDocument();
+    expect(screen.getByText(/why your argument actually matters/i)).toBeInTheDocument();
+  });
+
   it("offers a way into the Claim/Link/Impact lesson before practice", async () => {
     const onOpenLesson = vi.fn();
     render(<Landing onOpenLesson={onOpenLesson} />);
