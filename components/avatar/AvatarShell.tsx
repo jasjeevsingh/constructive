@@ -20,7 +20,7 @@ import { TranscriptPane } from "@/components/avatar/TranscriptPane";
 import { AvatarVoiceBar } from "@/components/avatar/AvatarVoiceBar";
 import { cn } from "@/lib/utils";
 import { ScoreCard } from "@/components/avatar/ScoreCard";
-import { speakCoach } from "@/lib/voice/playSpeech";
+import { speakCoachStreaming } from "@/lib/voice/playSpeech";
 
 const MODES: { mode: AvatarMode; title: string; description: string }[] = [
   { mode: "sparring", title: "Sparring", description: "Debate an opponent. Get scored after each round." },
@@ -66,7 +66,7 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
         break;
     }
 
-    // Avatar responds
+    // Avatar responds — stream LLM + sentence-chunked TTS for low latency
     if (result.avatarShouldRespond) {
       const turnReq: AvatarTurnRequest = {
         mode: updated.mode,
@@ -79,13 +79,8 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
         collaborativeArgs: updated.mode === "collaborative" ? getCollaborativeArgs(updated) : undefined,
       };
       try {
-        const res = await fetch("/api/avatar/turn", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(turnReq),
-        });
-        if (res.ok) {
-          const { text: avatarText } = await res.json();
+        const avatarText = await speakCoachStreaming(turnReq);
+        if (avatarText) {
           const avatarTurn: AvatarTurn = {
             speaker: "avatar",
             text: avatarText,
@@ -95,7 +90,6 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
           updated = { ...updated, transcript: [...updated.transcript, avatarTurn] };
           setSession(updated);
           saveAvatarSession(window.localStorage, updated);
-          void speakCoach(avatarText);
 
           // Re-check orchestrator now that both turns are counted — round
           // completion fires at even transcript lengths (e.g. 6) which the
@@ -314,6 +308,11 @@ export function AvatarShell({ onExit }: { onExit: () => void }) {
 
         {/* Center — avatar circles + status */}
         <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+          {/* Motion */}
+          <p className="max-w-lg text-center text-sm font-medium leading-relaxed text-white/50">
+            {session.motionText}
+          </p>
+
           <div className="flex items-center gap-12">
             {/* You */}
             <div className="flex flex-col items-center gap-3">

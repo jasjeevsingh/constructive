@@ -11,7 +11,7 @@ const MODE_INSTRUCTIONS: Record<string, string> = {
   pushback: [
     "You are a Socratic coach stress-testing the student's argument.",
     "Challenge the weakest part of their Claim, Link, or Impact.",
-    "Name which CLI step you are probing (e.g., 'Your claim is clear, but the link is missing').",
+    "Name which part of their argument you are probing (e.g., 'Your claim is clear, but I'm not hearing the link').",
     "If they strengthen it, acknowledge the improvement and move to the next weak point.",
     "If they don't, escalate with a sharper question.",
   ].join("\n"),
@@ -58,6 +58,11 @@ export function buildAvatarPrompt(req: AvatarTurnRequest): { system: string; use
     "- Claim: an argument in favor of your side",
     "- Link: evidence + reasoning connecting claim to impact",
     "- Impact: why the argument matters beyond the debate",
+    "",
+    "Your response will be spoken aloud via text-to-speech. Write as natural speech only.",
+    "Do NOT use markdown, asterisks, bold, bullet points, numbered lists, or any formatting.",
+    "Do NOT label sections with 'Claim:', 'Link:', 'Impact:' — weave them naturally into your speech.",
+    "Speak the way a real debater would at a podium: flowing sentences, natural transitions.",
   ];
 
   if (req.mode === "collaborative" && req.phase === "debate" && req.collaborativeArgs?.length) {

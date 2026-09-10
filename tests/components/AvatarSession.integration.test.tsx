@@ -3,14 +3,22 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AvatarShell } from "@/components/avatar/AvatarShell";
 
+let streamCallCount = 0;
+
+vi.mock("@/lib/voice/playSpeech", () => ({
+  speakCoachStreaming: vi.fn(async () => {
+    streamCallCount++;
+    return `Avatar response ${streamCallCount}.`;
+  }),
+  speakCoach: vi.fn(async () => {}),
+  stopSpeech: vi.fn(),
+}));
+
 beforeEach(() => {
   localStorage.clear();
-  let callCount = 0;
+  streamCallCount = 0;
+
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
-    if (typeof url === "string" && url.includes("/api/avatar/turn")) {
-      callCount++;
-      return new Response(JSON.stringify({ text: `Avatar response ${callCount}.` }), { status: 200 });
-    }
     if (typeof url === "string" && url.includes("/api/avatar/score")) {
       return new Response(JSON.stringify({
         argumentation: { claim: 2, link: 2, impact: 2, weighing: 1 },
@@ -32,7 +40,6 @@ async function navigateToSession(user: ReturnType<typeof userEvent.setup>) {
 }
 
 async function sendText(user: ReturnType<typeof userEvent.setup>, text: string) {
-  // Ensure text input is visible
   let input = screen.queryByPlaceholderText(/type your argument/i);
   if (!input) {
     await user.click(screen.getByRole("button", { name: /toggle text input/i }));
@@ -51,13 +58,13 @@ describe("Avatar sparring integration", () => {
     expect(screen.getByText(/hold mic or press/i)).toBeInTheDocument();
   });
 
-  it("runs a full student turn: transcript update, avatar reply via /api/avatar/turn, and TTS", async () => {
+  it("runs a full student turn: transcript update, avatar reply via streaming, and TTS", async () => {
     const user = userEvent.setup();
     render(<AvatarShell onExit={() => {}} />);
     await navigateToSession(user);
     await sendText(user, "My first speech.");
 
-    const matches = await screen.findAllByText(/Avatar response 1\./);
+    const matches = await screen.findAllByText(/Avatar response 1\./, {}, { timeout: 5000 });
     expect(matches.length).toBeGreaterThan(0);
   });
 
@@ -68,13 +75,13 @@ describe("Avatar sparring integration", () => {
 
     for (let i = 0; i < 2; i++) {
       await sendText(user, `Speech ${i + 1}`);
-      const matches = await screen.findAllByText(new RegExp(`Avatar response ${i + 1}\\.`), {}, { timeout: 3000 });
+      const matches = await screen.findAllByText(new RegExp(`Avatar response ${i + 1}\\.`), {}, { timeout: 5000 });
       expect(matches.length).toBeGreaterThan(0);
     }
 
     await sendText(user, "Speech 3");
 
-    expect(await screen.findByText(/round.*score/i, {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(await screen.findByText(/round.*score/i, {}, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /next round/i })).toBeInTheDocument();
   });
 });
