@@ -113,20 +113,15 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion, sta
   const universes = Object.entries(store);
 
   return (
-    <section className="mt-12">
-      <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 3 · Your own universe (optional)</div>
-      <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Bring your own universe</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Name a book, show, or game you love and we&apos;ll build debates from it.
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
+    <div>
+      <div className="mt-6 flex flex-wrap gap-2">
         <Input
           aria-label="Fictional universe"
           placeholder="Try Harry Potter, Naruto, Lord of the Rings…"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void generate(); }}
-          className="max-w-xs"
+          className="max-w-xs bg-card"
           maxLength={100}
         />
         <Button type="button" onClick={() => void generate()} disabled={status === "loading" || !input.trim()}>
@@ -154,7 +149,7 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion, sta
                 onClick={() => void openCard(key, card)}
                 disabled={openingId === card.id}
                 aria-label={`${card.motion} — ${card.sides ? "resume" : "start"}`}
-                className="group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60"
+                className="group flex flex-col rounded-xl border border-border bg-card p-5 text-left shadow-sm transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60"
               >
                 <Badge variant="secondary" className="self-start">✨ Generated</Badge>
                 <div className="mt-3 font-display text-lg font-semibold leading-snug text-foreground">{normalizeMotionText(card.motion)}</div>
@@ -167,6 +162,6 @@ export function UniverseGenerator({ onOpen }: { onOpen: (motion: FlowMotion, sta
           </div>
         </div>
       ))}
-    </section>
+    </div>
   );
 }

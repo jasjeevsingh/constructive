@@ -124,7 +124,7 @@ describe("FlowDeck", () => {
     const order = [
       screen.getByRole("heading", { name: /pick a motion/i }),
       screen.getByRole("heading", { name: /practice a skill/i }),
-      screen.getByText(/step 3 · your own universe/i),
+      screen.getByText(/^step 3 · your own universe$/i),
       screen.getByText(/step 4 · spar/i),
     ];
     for (let i = 1; i < order.length; i++) {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getFlowMotions } from "@/lib/flowMotions";
 import { FlowShell } from "@/components/FlowShell";
 import { AppShell } from "@/components/ui/app-shell";
+import { SectionBand } from "@/components/ui/section-band";
 import { Landing } from "@/components/Landing";
 import { Lesson } from "@/components/Lesson";
 import { Badge } from "@/components/ui/badge";
@@ -111,12 +112,18 @@ export function FlowDeck() {
   }
 
   return (
-    <AppShell>
-      <Landing onOpenLesson={() => setShowLesson(true)} />
-      <section className="mt-12">
-        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 2 · Build core skills</div>
-        <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Pick a motion</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <AppShell layout="full">
+      <div className="mx-auto max-w-5xl px-4 pb-14 pt-10 sm:px-6 sm:pt-12">
+        <Landing onOpenLesson={() => setShowLesson(true)} />
+      </div>
+
+      <SectionBand
+        tone="sky"
+        eyebrow="Step 2 · Build core skills"
+        title="Pick a motion"
+        blurb="Argue both sides of a motion. Choose the strongest claim, build the link, and pick the impact that shows why it matters."
+      >
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {motions.map((m, i) => {
             const status = motionStatus(progress[m.id]);
             const meta = STATUS_META[status];
@@ -128,7 +135,7 @@ export function FlowDeck() {
                 onClick={() => open(m)}
                 aria-label={`${m.motion} — ${meta.label}`}
                 className={cn(
-                  "group flex flex-col rounded-lg border border-border bg-card p-5 text-left shadow-sm transition-[border-color,box-shadow] hover:border-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "group flex flex-col rounded-xl border border-border bg-card p-5 text-left shadow-sm transition-[border-color,box-shadow] hover:border-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   status === "complete" && "ring-1 ring-success"
                 )}
               >
@@ -143,19 +150,36 @@ export function FlowDeck() {
             );
           })}
         </div>
-      </section>
-      <PracticeDeck onPick={setPracticePart} />
-      <UniverseGenerator onOpen={(m, side) => setActive({ motion: m, side })} />
-      <section className="mt-12">
-        <div className="text-xs font-semibold uppercase tracking-wide text-primary">Step 4 · Spar with an AI</div>
-        <h2 className="mt-1 font-display text-2xl font-semibold text-foreground">Debate Avatar</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Practice debating against an AI opponent. Choose your mode: structured sparring, pushback coaching, or collaborative build + debate.
-        </p>
-        <Button type="button" variant="outline" className="mt-3" onClick={() => setShowAvatar(true)}>
+      </SectionBand>
+
+      <SectionBand
+        tone="sand"
+        eyebrow="Step 2 · Guided reps"
+        title="Practice a skill"
+        blurb="Drill one part of the framework with quick reps."
+      >
+        <PracticeDeck onPick={setPracticePart} />
+      </SectionBand>
+
+      <SectionBand
+        tone="gold"
+        eyebrow="Step 3 · Your own universe"
+        title="Bring your own universe"
+        blurb="This is where you write your own claims, links, and impacts. Name a book, show, or game you love and we'll build debates from it."
+      >
+        <UniverseGenerator onOpen={(m, side) => setActive({ motion: m, side })} />
+      </SectionBand>
+
+      <SectionBand
+        tone="navy"
+        eyebrow="Step 4 · Spar with an AI"
+        title="Debate Avatar"
+        blurb="Practice debating against an AI opponent. Choose your mode: structured sparring, pushback coaching, or collaborative build + debate."
+      >
+        <Button type="button" variant="secondary" className="mt-6" onClick={() => setShowAvatar(true)}>
           Debate Avatar →
         </Button>
-      </section>
+      </SectionBand>
     </AppShell>
   );
 }

@@ -1,6 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CLI_DEFINITIONS, CLI_PARTS } from "@/lib/cli";
+import { CLI_DEFINITIONS, CLI_PARTS, type CliPart } from "@/lib/cli";
+
+/** Same colors the lesson uses for each layer: Claim navy, Link gold, Impact green. */
+const ACCENT: Record<CliPart, string> = {
+  claim: "border-t-foreground",
+  link: "border-t-evidence",
+  impact: "border-t-success",
+};
 
 export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
   return (
@@ -13,23 +20,23 @@ export function Landing({ onOpenLesson }: { onOpenLesson: () => void }) {
         Debate is a search for what&apos;s true, not a fight to win. Make a claim, build the
         bridge to why it matters, and see the impact.
       </p>
-      <div className="mt-4 max-w-2xl rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+      <div className="mt-5 max-w-2xl rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
         <div className="font-medium text-foreground">How to use this tool</div>
         <ol className="mt-2 list-inside list-decimal space-y-1">
           <li><span className="font-medium text-foreground">Read the lesson below</span> — walk through Claim, Link, and Impact with a worked example.</li>
           <li><span className="font-medium text-foreground">Pick a motion</span> and argue both sides to build your core skills.</li>
-          <li><span className="font-medium text-foreground">Bring your own universe</span> (optional) — practice with stories you already know.</li>
+          <li><span className="font-medium text-foreground">Bring your own universe</span> — write your own claims, links, and impacts with stories you already know.</li>
           <li><span className="font-medium text-foreground">Spar with the Debate Avatar</span> — argue against an AI opponent.</li>
         </ol>
       </div>
       <Button type="button" variant="outline" className="mt-4" onClick={onOpenLesson}>
         Read the lesson: Claim → Link → Impact →
       </Button>
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {CLI_PARTS.map((part, i) => {
           const d = CLI_DEFINITIONS[part];
           return (
-            <Card key={part}>
+            <Card key={part} className={`border-t-4 ${ACCENT[part]}`}>
               <CardContent className="p-5">
                 <div className="font-display text-xs font-semibold uppercase tracking-wide text-primary">
                   Step {i + 1}
