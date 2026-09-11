@@ -7,9 +7,9 @@ export type BandTone = "paper" | "sky" | "sand" | "gold" | "navy";
  *  the page reads as a sequence of rooms rather than one wall of text. */
 const TONES: Record<BandTone, { band: string; eyebrow: string; title: string; blurb: string }> = {
   paper: { band: "bg-background", eyebrow: "text-primary", title: "text-foreground", blurb: "text-muted-foreground" },
-  sky: { band: "bg-primary/10", eyebrow: "text-primary", title: "text-foreground", blurb: "text-muted-foreground" },
+  sky: { band: "bg-[#E3EBF7]", eyebrow: "text-primary", title: "text-foreground", blurb: "text-muted-foreground" },
   sand: { band: "bg-muted", eyebrow: "text-primary", title: "text-foreground", blurb: "text-muted-foreground" },
-  gold: { band: "bg-evidence/15", eyebrow: "text-evidence-foreground/70", title: "text-foreground", blurb: "text-muted-foreground" },
+  gold: { band: "bg-[#F3E6C6]", eyebrow: "text-[#7A5A12]", title: "text-foreground", blurb: "text-muted-foreground" },
   navy: { band: "bg-[var(--navy)]", eyebrow: "text-[var(--gold)]", title: "text-[var(--text)]", blurb: "text-[var(--dim)]" },
 };
 
